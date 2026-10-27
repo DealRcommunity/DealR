@@ -73,13 +73,31 @@ create policy "Mettre à jour ses conversations"
   on public.conversations for update to authenticated
   using (auth.uid() in (user_a, user_b)) with check (auth.uid() in (user_a, user_b));
 
+-- Les participants d'une conversation ne peuvent jamais être remplacés
+create or replace function public.conversations_guard() returns trigger
+language plpgsql as $$
+begin
+  if new.id <> old.id or new.user_a <> old.user_a or new.user_b <> old.user_b then
+    raise exception 'Les participants d''une conversation ne peuvent pas changer';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists conversations_guard on public.conversations;
+create trigger conversations_guard before update on public.conversations
+  for each row execute function public.conversations_guard();
+
 create table if not exists public.messages (
   id text primary key,
   conv text not null references public.conversations(id) on delete cascade,
   sender uuid not null references auth.users(id) on delete cascade,
   text text not null check (char_length(text) between 1 and 2000),
+  kind text not null default 'text' check (kind in ('text', 'deal', 'event')),
+  deal text,
   created_at timestamptz not null default now()
 );
+alter table public.messages add column if not exists kind text not null default 'text' check (kind in ('text', 'deal', 'event'));
+alter table public.messages add column if not exists deal text;
 alter table public.messages enable row level security;
 
 drop policy if exists "Lire les messages de ses conversations" on public.messages;
@@ -91,3 +109,87 @@ drop policy if exists "Écrire dans ses conversations" on public.messages;
 create policy "Écrire dans ses conversations"
   on public.messages for insert to authenticated
   with check (sender = auth.uid() and exists (select 1 from public.conversations c where c.id = conv and auth.uid() in (c.user_a, c.user_b)));
+
+-- 4. Deals : proposés par un participant, acceptés par l'autre,
+--    puis paiement bloqué au coffre jusqu'à la validation de la livraison
+create table if not exists public.deals (
+  id text primary key,
+  conv text not null references public.conversations(id) on delete cascade,
+  proposer uuid not null references auth.users(id) on delete cascade,
+  payer uuid not null references auth.users(id) on delete cascade,
+  payee uuid not null references auth.users(id) on delete cascade,
+  title text not null check (char_length(title) between 1 and 140),
+  amount numeric(10, 2) not null check (amount >= 1 and amount <= 100000),
+  deadline date,
+  details text check (char_length(details) <= 1000),
+  status text not null default 'proposed'
+    check (status in ('proposed', 'accepted', 'declined', 'cancelled', 'countered', 'funded', 'delivered', 'released', 'disputed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  accepted_at timestamptz,
+  funded_at timestamptz,
+  delivered_at timestamptz,
+  released_at timestamptz,
+  check (payer <> payee),
+  check (proposer in (payer, payee))
+);
+alter table public.deals enable row level security;
+
+drop policy if exists "Voir les deals de ses conversations" on public.deals;
+create policy "Voir les deals de ses conversations"
+  on public.deals for select to authenticated
+  using (exists (select 1 from public.conversations c where c.id = conv and auth.uid() in (c.user_a, c.user_b)));
+
+drop policy if exists "Proposer un deal" on public.deals;
+create policy "Proposer un deal"
+  on public.deals for insert to authenticated
+  with check (
+    proposer = auth.uid() and status = 'proposed'
+    and exists (select 1 from public.conversations c
+                where c.id = conv and payer in (c.user_a, c.user_b) and payee in (c.user_a, c.user_b))
+  );
+
+drop policy if exists "Faire avancer un deal" on public.deals;
+create policy "Faire avancer un deal"
+  on public.deals for update to authenticated
+  using (auth.uid() in (payer, payee)) with check (auth.uid() in (payer, payee));
+
+-- Seul le statut peut changer, et uniquement dans l'ordre prévu, par la bonne personne.
+-- IMPORTANT pour la version réelle : le passage à 'funded' (argent au coffre) devra être fait
+-- par le serveur une fois le paiement confirmé par le prestataire de paiement (ex. webhook Stripe),
+-- et non par le navigateur du client. Ici, le paiement est simulé.
+create or replace function public.deals_guard() returns trigger
+language plpgsql as $$
+declare me uuid := auth.uid();
+begin
+  if new.id <> old.id or new.conv <> old.conv or new.proposer <> old.proposer
+     or new.payer <> old.payer or new.payee <> old.payee or new.title <> old.title
+     or new.amount <> old.amount or new.deadline is distinct from old.deadline
+     or new.details is distinct from old.details or new.created_at <> old.created_at then
+    raise exception 'Seul le statut d''un deal peut changer';
+  end if;
+  if new.status = old.status then
+    return new;
+  end if;
+  if me is not null and not (
+       (old.status = 'proposed'  and new.status in ('accepted', 'declined', 'countered') and me <> old.proposer)
+    or (old.status = 'proposed'  and new.status = 'cancelled' and me = old.proposer)
+    or (old.status = 'accepted'  and new.status = 'cancelled')
+    or (old.status = 'accepted'  and new.status = 'funded'    and me = old.payer)
+    or (old.status = 'funded'    and new.status = 'delivered' and me = old.payee)
+    or (old.status in ('funded', 'delivered') and new.status = 'disputed' and me = old.payer)
+    or (old.status = 'delivered' and new.status = 'released'  and me = old.payer)
+  ) then
+    raise exception 'Changement de statut non autorisé';
+  end if;
+  new.updated_at := now();
+  if new.status = 'accepted'  then new.accepted_at  := now(); end if;
+  if new.status = 'funded'    then new.funded_at    := now(); end if;
+  if new.status = 'delivered' then new.delivered_at := now(); end if;
+  if new.status = 'released'  then new.released_at  := now(); end if;
+  return new;
+end $$;
+
+drop trigger if exists deals_guard on public.deals;
+create trigger deals_guard before update on public.deals
+  for each row execute function public.deals_guard();

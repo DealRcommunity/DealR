@@ -60,10 +60,19 @@
         maybeSingle: function () { q.single = true; return b; },
         upsert: function (row) { q.op = "upsert"; q.row = row; return b; },
         insert: function (row) { q.op = "upsert"; q.row = row; return b; },
+        update: function (patch) { q.op = "update"; q.patch = patch; return b; },
         then: function (res, rej) { return run().then(res, rej); }
       };
       function run() {
         var s = sess(), rows = get(table, []);
+        if (q.op === "update") {
+          if (!s) return ko("not_logged");
+          var hit = rows.filter(function (r) { return q.f.every(function (f) { return f(r); }); });
+          if (table === "deals" && hit.some(function (r) { return r.payer !== s.user.id && r.payee !== s.user.id; })) return ko("forbidden");
+          hit.forEach(function (r) { Object.assign(r, q.patch); });
+          try { put(table, rows); } catch (e) { return ko("quota"); }
+          return ok(null);
+        }
         if (q.op === "upsert") {
           if (!s) return ko("not_logged");
           var row = q.row;
@@ -282,6 +291,21 @@
       .then(check);
   };
 
+  function newId() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10); }
+  A.eur = function (n) { return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(+n || 0); };
+
+  /* Ajoute un message à la conversation et la marque « non lue » pour l'autre participant */
+  function post(c, conv, u, msg, preview) {
+    var now = new Date().toISOString(), isA = conv.user_a === u.id;
+    var row = Object.assign({ id: newId(), conv: conv.id, sender: u.id, created_at: now, kind: "text", deal: null }, msg);
+    return c.from("messages").insert(row).then(check).then(function () {
+      var patch = Object.assign({}, conv, { last_text: String(preview || row.text).slice(0, 200), last_sender: u.id, updated_at: now });
+      patch[isA ? "read_a" : "read_b"] = true;
+      patch[isA ? "read_b" : "read_a"] = false;
+      return c.from("conversations").upsert(patch).then(check);
+    });
+  }
+
   A.sendMessage = function (convId, text) {
     text = String(text || "").trim().slice(0, 2000);
     if (!text) return Promise.reject(new Error("empty"));
@@ -290,13 +314,89 @@
       return client().then(function (c) {
         return getConv(c, convId).then(function (conv) {
           if (!conv) throw new Error("not_found");
-          var now = new Date().toISOString(), isA = conv.user_a === u.id;
-          var msgId = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
-          return c.from("messages").insert({ id: msgId, conv: convId, sender: u.id, text: text, created_at: now }).then(check).then(function () {
-            var patch = Object.assign({}, conv, { last_text: text.slice(0, 200), last_sender: u.id, updated_at: now });
-            patch[isA ? "read_a" : "read_b"] = true;
-            patch[isA ? "read_b" : "read_a"] = false;
-            return c.from("conversations").upsert(patch).then(check);
+          return post(c, conv, u, { text: text });
+        });
+      });
+    });
+  };
+
+  /* ---------- Deals ----------
+     Un participant propose (prestation, montant, date) ; l'autre accepte, refuse ou contre-propose.
+     Une fois accepté des deux côtés, le client sécurise le paiement : l'argent est bloqué au coffre Dealr.
+     Le prestataire livre, le client valide, et le coffre verse le paiement au prestataire. */
+  var FLOW = {
+    proposed:  { accepted: "other", declined: "other", countered: "other", cancelled: "proposer" },
+    accepted:  { funded: "payer", cancelled: "any" },
+    funded:    { delivered: "payee", disputed: "payer" },
+    delivered: { released: "payer", disputed: "payer" }
+  };
+  A.DEAL_EVENT = { accepted: "Deal accepté", declined: "Deal refusé", cancelled: "Deal annulé", countered: "Contre-proposition",
+    funded: "Paiement sécurisé au coffre", delivered: "Travail livré", released: "Paiement versé", disputed: "Litige ouvert" };
+
+  /* Le membre « me » peut-il faire passer ce deal au statut « to » ? */
+  A.dealCan = function (d, me, to) {
+    var who = (FLOW[d.status] || {})[to];
+    if (!who || (me !== d.payer && me !== d.payee)) return false;
+    if (who === "any") return true;
+    if (who === "other") return me !== d.proposer;
+    if (who === "proposer") return me === d.proposer;
+    return me === d[who];
+  };
+
+  A.listDeals = function (convId) {
+    return client()
+      .then(function (c) { return c.from("deals").select("*").eq("conv", convId).order("created_at", { ascending: true }).limit(100); })
+      .then(check);
+  };
+
+  /* f : { title, amount, deadline, details, role: "payee" (je serai payé) ou "payer" (je paierai) }
+     replaces : le deal remplacé par cette contre-proposition (mêmes rôles) */
+  A.proposeDeal = function (convId, f, replaces) {
+    var title = String(f.title || "").trim().slice(0, 140);
+    var amount = Math.round(parseFloat(String(f.amount).replace(",", ".")) * 100) / 100;
+    if (!title) return Promise.reject(new Error("deal_title"));
+    if (!(amount >= 1) || amount > 100000) return Promise.reject(new Error("deal_amount"));
+    return A.user().then(function (u) {
+      if (!u) throw new Error("not_logged");
+      return client().then(function (c) {
+        return getConv(c, convId).then(function (conv) {
+          if (!conv) throw new Error("not_found");
+          var other = conv.user_a === u.id ? conv.user_b : conv.user_a;
+          var payer = replaces ? replaces.payer : (f.role === "payer" ? u.id : other);
+          var payee = replaces ? replaces.payee : (f.role === "payer" ? other : u.id);
+          var now = new Date().toISOString();
+          var deal = { id: newId(), conv: convId, proposer: u.id, payer: payer, payee: payee, title: title, amount: amount,
+            deadline: f.deadline || null, details: String(f.details || "").trim().slice(0, 1000) || null,
+            status: "proposed", created_at: now, updated_at: now };
+          var first = replaces ? A.updateDeal(replaces, "countered", true) : Promise.resolve();
+          return first
+            .then(function () { return c.from("deals").insert(deal).then(check); })
+            .then(function () {
+              var label = (replaces ? "Contre-proposition : " : "Deal proposé : ") + title + " · " + A.eur(amount);
+              return post(c, conv, u, { kind: "deal", deal: deal.id, text: label });
+            })
+            .then(function () { return deal; });
+        });
+      });
+    });
+  };
+
+  /* Fait avancer un deal (accepter, sécuriser, livrer, libérer…) en vérifiant que l'action est permise */
+  A.updateDeal = function (deal, to, silent) {
+    return A.user().then(function (u) {
+      if (!u) throw new Error("not_logged");
+      return client().then(function (c) {
+        return c.from("deals").select("*").eq("id", deal.id).maybeSingle().then(check).then(function (cur) {
+          if (!cur) throw new Error("not_found");
+          if (!A.dealCan(cur, u.id, to)) throw new Error("deal_state");
+          var now = new Date().toISOString(), patch = { status: to, updated_at: now };
+          if (/^(accepted|funded|delivered|released)$/.test(to)) patch[to + "_at"] = now;
+          return c.from("deals").update(patch).eq("id", cur.id).then(check).then(function () {
+            var d = Object.assign({}, cur, patch);
+            if (silent) return d;
+            return getConv(c, cur.conv).then(function (conv) {
+              return post(c, conv, u, { kind: "event", deal: cur.id, text: A.DEAL_EVENT[to] }, A.DEAL_EVENT[to] + " · " + A.eur(cur.amount));
+            }).then(function () { return d; });
           });
         });
       });
@@ -346,6 +446,9 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/deal_title/.test(m)) return "Indiquez la prestation concernée par le deal.";
+    if (/deal_amount/.test(m)) return "Montant invalide : entre 1 € et 100 000 €.";
+    if (/deal_state|statut non autoris/i.test(m)) return "Ce deal a changé entre-temps. La conversation a été mise à jour.";
     if (/self_chat/.test(m)) return "C’est votre propre profil : vous ne pouvez pas vous écrire à vous-même.";
     if (/empty/.test(m)) return "Le message est vide.";
     if (/demo_reset/.test(m)) return "En mode démonstration, aucun email n’est envoyé. Créez un nouveau compte pour tester.";
