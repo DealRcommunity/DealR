@@ -127,12 +127,6 @@ document.title="Dealr – "+(own?"Mon profil":p.n);
 var layout=h("div","layout"),main=h("div","main"),side=h("aside","side");layout.appendChild(main);layout.appendChild(side);app.appendChild(layout);
 function sec(title){var c=h("section","card");c.appendChild(h("h2","",title));main.appendChild(c);return c}
 
-/* Bandeau « Mon espace » quand on consulte son propre profil */
-if(own){var bar=h("section","card own");
-  var bt=h("div");bt.appendChild(h("b","","Mon espace"));bt.appendChild(h("div","sub","Connecté avec "+(u.email||"votre compte")+". Voici votre profil tel que les clients le voient."));
-  var ba=h("div","acts");ba.appendChild(link("Tableau de bord","dashboard.html","btn"));ba.appendChild(link("Devis et factures","documents.html","btn out"));ba.appendChild(link("Modifier mon profil","profil.html","btn out"));
-  var so=h("button","btn out","Se déconnecter");so.type="button";so.onclick=function(){A.signOut().then(function(){location.href="index.html"})};ba.appendChild(so);
-  bar.appendChild(bt);bar.appendChild(ba);main.appendChild(bar)}
 
 /* En-tête du profil */
 var hero=h("section","card"),hr=h("div","hero"),img=A.safeImg(p.photo);
@@ -143,6 +137,7 @@ var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""
 if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(+p.a>=5)bd.appendChild(h("span","b c","✓ Certifié"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
 tx.appendChild(bd);
 tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
+if(own){var oa=h("div","acts");oa.appendChild(link("Modifier mon profil","profil.html","btn out"));tx.appendChild(oa)}
 if(!own){var ac=h("div","acts member-only"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){contact()};
   ac.appendChild(b1);ac.appendChild(link("Demander un devis","#devis","btn out"));tx.appendChild(ac)}
 hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
