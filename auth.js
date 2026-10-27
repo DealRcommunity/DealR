@@ -438,6 +438,56 @@
     return A.listConversations().then(function (l) { return l.filter(function (c) { return c.unread; }).length; }).catch(function () { return 0; });
   };
 
+  /* ---------- Tableau de bord ---------- */
+  /* Tous mes deals (comme client ou comme prestataire), les plus récents d'abord */
+  A.myDeals = function () {
+    return A.user().then(function (u) {
+      if (!u) return [];
+      return client().then(function (c) {
+        return Promise.all([c.from("deals").select("*").eq("payer", u.id), c.from("deals").select("*").eq("payee", u.id)]);
+      }).then(function (r) {
+        var rows = check(r[0]).concat(check(r[1])), seen = {}, out = [];
+        rows.forEach(function (d) { if (!seen[d.id]) { seen[d.id] = 1; out.push(d); } });
+        out.sort(function (x, y) { return String(y.updated_at || "").localeCompare(String(x.updated_at || "")); });
+        return out;
+      });
+    });
+  };
+  A.LIVE_DEAL = /^(proposed|accepted|funded|delivered|disputed)$/;
+  /* Chiffres clés à partir des deals d'un membre */
+  A.dealStats = function (deals, me) {
+    var now = new Date(), month = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2);
+    var st = { toReceive: 0, earned: 0, earnedMonth: 0, committed: 0, spent: 0, refunded: 0, live: 0, done: 0 };
+    deals.forEach(function (d) {
+      var a = +d.amount || 0, held = /^(funded|delivered|disputed)$/.test(d.status);
+      if (A.LIVE_DEAL.test(d.status)) st.live++;
+      if (d.status === "released" || d.status === "refunded") st.done++;
+      if (d.payee === me) {
+        if (held) st.toReceive += a;
+        if (d.status === "released") { st.earned += a; if (String(d.released_at || "").slice(0, 7) === month) st.earnedMonth += a; }
+      } else if (d.payer === me) {
+        if (held) st.committed += a;
+        if (d.status === "released") st.spent += a;
+        if (d.status === "refunded") st.refunded += a;
+      }
+    });
+    return st;
+  };
+  /* Ce que le membre doit faire maintenant (les étapes où c'est à lui d'agir) */
+  A.dealTodos = function (deals, me) {
+    var out = [];
+    deals.forEach(function (d) {
+      var a = A.eur(d.amount), t = null;
+      if (d.status === "proposed" && d.proposer !== me) t = { kind: "answer", label: "Répondre à la proposition", text: "« " + d.title + " » · " + a, cta: "Répondre", prio: 1 };
+      else if (d.status === "accepted" && d.payer === me) t = { kind: "pay", label: "Sécuriser le paiement", text: "« " + d.title + " » · " + a + " à mettre au coffre", cta: "Payer", prio: 0 };
+      else if (d.status === "funded" && d.payee === me) t = { kind: "deliver", label: "Réaliser et livrer", text: "« " + d.title + " » · " + a + " vous attendent au coffre", cta: "Livrer", prio: 2 };
+      else if (d.status === "delivered" && d.payer === me) t = { kind: "validate", label: "Vérifier la livraison", text: "« " + d.title + " » · libérez " + a + " si tout est conforme", cta: "Vérifier", prio: 0 };
+      if (t) { t.deal = d; t.deadline = d.deadline || null; out.push(t); }
+    });
+    out.sort(function (x, y) { return x.prio - y.prio || String(x.deadline || "9").localeCompare(String(y.deadline || "9")); });
+    return out;
+  };
+
   /* ---------- Administration ----------
      Démo : adresse présente dans ADMIN_EMAILS (config.js).
      Supabase : présence dans la table admins, vérifiée par la base (fonction is_admin). */
@@ -533,7 +583,7 @@
   /* ---------- Menu commun à toutes les pages ----------
      Chaque page contient <nav data-nav="(page)"> ; le menu y est généré ici, identique partout :
      visiteur : Marketplace · Se connecter · Créer un compte
-     membre   : Marketplace · Messages · Mon profil · Se déconnecter
+     membre   : Marketplace · Messages · Tableau de bord · Mon profil · Se déconnecter
      admin    : Marketplace · Messages · Administration · Se déconnecter
      Les éléments propres à une page (data-extra / data-extra="end") sont conservés autour. */
   var NAV_CSS = ".dnav{display:flex;align-items:center;gap:22px}" +
@@ -558,12 +608,13 @@
     if (!b) { b = document.createElement("span"); b.className = "mbadge" + (cls ? " " + cls : ""); el.appendChild(b); }
     b.textContent = n > 9 ? "9+" : String(n); b.hidden = !n; b.setAttribute("aria-label", n + label);
     var t = document.getElementById("dnTgBadge");
-    if (t) { var tot = 0; ["dnMsg", "dnAdmin"].forEach(function (k) { var x = document.querySelector("#" + k + " .mbadge"); if (x && !x.hidden) tot += parseInt(x.textContent, 10) || 0; }); t.textContent = String(tot); t.hidden = !tot; }
+    if (t) { var tot = 0; ["dnMsg", "dnAdmin", "dnDash"].forEach(function (k) { var x = document.querySelector("#" + k + " .mbadge"); if (x && !x.hidden) tot += parseInt(x.textContent, 10) || 0; }); t.textContent = String(tot); t.hidden = !tot; }
   }
   function refreshBadges() {
     A.user().then(function (u) {
       if (!u) return;
       A.unreadCount().then(function (n) { setBadge("dnMsg", n, "", " conversation" + (n > 1 ? "s" : "") + " non lue" + (n > 1 ? "s" : "")); });
+      if (document.getElementById("dnDash")) A.myDeals().then(function (ds) { var n = A.dealTodos(ds, u.id).length; setBadge("dnDash", n, "", " action" + (n > 1 ? "s" : "") + " à faire"); }).catch(function () {});
       adminAlerts();
     });
   }
@@ -599,7 +650,7 @@
       }
       add("Messages", "messages.html", "messages", "dnMsg");
       if (adm) add("Administration", "admin.html", "admin", "dnAdmin");
-      else add("Mon profil", "prestataire.html?id=moi", "profil", "dnProfile");
+      else { add("Tableau de bord", "dashboard.html", "dashboard", "dnDash"); add("Mon profil", "prestataire.html?id=moi", "profil", "dnProfile"); }
       var out = document.createElement("button"); out.type = "button"; out.className = "lk dn-pill"; out.id = "dnLogout"; out.textContent = "Se déconnecter";
       out.onclick = function () { out.disabled = true; A.signOut().then(function () { location.href = "index.html"; }); };
       box.appendChild(out);

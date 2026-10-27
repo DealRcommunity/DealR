@@ -66,6 +66,13 @@ h2{font-size:1.3rem;margin-bottom:14px}
 .bio{white-space:pre-line;overflow-wrap:anywhere;margin:0}
 .own{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#fff6ef;border:1px solid #ffd9bf;box-shadow:none}
 .own .acts{margin-top:0}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini div{background:#f7f7f9;border-radius:14px;padding:10px 12px}
+.mini b{display:block;font:800 1.3rem "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+.dash .sub{font-size:.84rem}
+a.todo1{display:block;text-decoration:none;margin-top:12px;border:1.5px solid #ffd2bd;background:#fff6ef;border-radius:14px;padding:10px 12px}
+a.todo1 b{display:block;color:#b13d0d}
+a.todo1 .sub{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 a.tool{display:block;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
 a.tool:hover{border-color:var(--ink)}
 a.tool b{display:block}
@@ -123,7 +130,7 @@ function sec(title){var c=h("section","card");c.appendChild(h("h2","",title));ma
 /* Bandeau « Mon espace » quand on consulte son propre profil */
 if(own){var bar=h("section","card own");
   var bt=h("div");bt.appendChild(h("b","","Mon espace"));bt.appendChild(h("div","sub","Connecté avec "+(u.email||"votre compte")+". Voici votre profil tel que les clients le voient."));
-  var ba=h("div","acts");ba.appendChild(link("Devis et factures","documents.html","btn"));ba.appendChild(link("Modifier mon profil","profil.html","btn out"));
+  var ba=h("div","acts");ba.appendChild(link("Tableau de bord","dashboard.html","btn"));ba.appendChild(link("Devis et factures","documents.html","btn out"));ba.appendChild(link("Modifier mon profil","profil.html","btn out"));
   var so=h("button","btn out","Se déconnecter");so.type="button";so.onclick=function(){A.signOut().then(function(){location.href="index.html"})};ba.appendChild(so);
   bar.appendChild(bt);bar.appendChild(ba);main.appendChild(bar)}
 
@@ -160,6 +167,19 @@ else c.appendChild(h("p","sub","Aucun avis pour le moment."));
 
 /* Colonne de droite */
 if(own){
+  /* Résumé du tableau de bord */
+  var db=h("section","card dash");db.appendChild(h("h2","","Mon activité"));
+  var kp=h("div","mini");db.appendChild(kp);var td=h("div","");db.appendChild(td);
+  var go2=link("Ouvrir le tableau de bord","dashboard.html","btn");go2.style.cssText="width:100%;margin-top:14px";db.appendChild(go2);
+  side.appendChild(db);
+  A.myDeals().then(function(ds){
+    var s=A.dealStats(ds,u.id),todos=A.dealTodos(ds,u.id),eur0=function(n){return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0)};
+    [["À recevoir",eur0(s.toReceive)],["Gagné",eur0(s.earned)],["Deals en cours",String(s.live)],["Engagé au coffre",eur0(s.committed)]].forEach(function(k){
+      var d=h("div");d.appendChild(h("span","sub",k[0]));d.appendChild(h("b","",k[1]));kp.appendChild(d)});
+    if(todos.length){var t=h("a","todo1");t.href="dashboard.html";t.appendChild(h("b","",todos.length+" action"+(todos.length>1?"s":"")+" à faire"));
+      t.appendChild(h("span","sub",todos[0].label+" · « "+todos[0].deal.title+" »"));td.appendChild(t)}
+    else td.appendChild(h("p","sub","Rien à faire pour l’instant."));
+  }).catch(function(){kp.appendChild(h("p","sub","Activité indisponible pour le moment."))});
   var me=h("section","card");me.appendChild(h("h2","","Mes outils"));
   [["Devis et factures","Créez un devis, transformez-le en facture, téléchargez-le en PDF.","documents.html"],
    ["Modifier mon profil","Photo, compétences, expériences, tarif, disponibilité.","profil.html"]].forEach(function(t){

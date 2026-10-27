@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealr – Tableau de bord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--ink2:#3a3a40;--mute:#6b6b73;--line:#ececf0;--grid:#ececf0;--o:#f55a1f;--ind:#3b4a9e;--g:#22a863;--red:#c0270f;--surface:#fff}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--ink);background:#f7f7f9;font:16px/1.5 Figtree,system-ui,sans-serif;
+ background-image:radial-gradient(50% 30% at 100% 0,#ffe7d6 0,transparent 70%);background-repeat:no-repeat}
+body.wait main{visibility:hidden}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.035em;font-weight:800;line-height:1.05}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.12em;color:var(--o)}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:12px}
+.logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:99px;padding:10px 18px;font:600 .92rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
+.btn:hover{background:#2a2a2e}
+.btn.out{background:#fff;color:var(--ink)}.btn.out:hover{background:#f3f3f6}
+.btn.pay{background:var(--o);border-color:var(--o)}.btn.pay:hover{background:#e04a12}
+.btn.sm{padding:6px 13px;font-size:.84rem}
+.sub{color:var(--mute);font-size:.9rem}
+
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0 20px}
+h1{font-size:clamp(2.1rem,4.4vw,3.1rem)}
+.top .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Chiffres clés */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border-radius:20px;padding:16px 18px;border:1px solid var(--line)}
+.kpi .l{display:flex;align-items:center;gap:7px;color:var(--mute);font-size:.88rem;font-weight:500}
+.kpi .l i{width:9px;height:9px;border-radius:50%;flex:none}
+.kpi b{display:block;font:800 1.9rem "Bricolage Grotesque",sans-serif;letter-spacing:-.045em;margin:6px 0 2px;line-height:1.05}
+.kpi .s{color:var(--mute);font-size:.82rem}
+.kpi.hl{background:#111;color:#fff;border-color:#111}.kpi.hl .l,.kpi.hl .s{color:#c9c9cf}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start;padding-bottom:50px}
+.col{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+.card{background:var(--surface);border-radius:22px;border:1px solid var(--line);padding:20px}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ch h2{font-size:1.3rem}
+.count{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:99px;background:var(--o);color:#fff;font:700 .74rem Figtree;margin-left:8px;padding:0 6px;vertical-align:3px}
+
+/* À faire */
+.todo{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.todo:first-of-type{border-top:0;padding-top:0}
+.ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;font-weight:800}
+.ic.pay,.ic.validate{background:#fff1e8;color:#b13d0d}.ic.answer{background:#fff1cc;color:#6b4a00}.ic.deliver{background:#eef0ff;color:#2d3a8c}.ic.msg{background:#f3f3f6;color:var(--ink)}
+.todo .t{flex:1;min-width:0}
+.todo b{display:block}
+.todo .t span{display:block;color:var(--mute);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.due{font-size:.78rem;font-weight:600;color:#a1230f}
+.empty{color:var(--mute);text-align:center;padding:16px 8px}
+.empty b{display:block;color:var(--ink);font-size:1.05rem;margin-bottom:4px}
+.empty .btn{margin-top:12px}
+
+/* Graphique */
+.seg{display:inline-flex;background:#f3f3f6;border-radius:12px;padding:3px}
+.seg button{border:0;background:none;border-radius:9px;padding:6px 12px;font-weight:600;color:var(--mute);cursor:pointer;font-size:.86rem}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .tick{font:500 11px Figtree,system-ui,sans-serif;fill:var(--mute)}
+.chart .val{font:700 12px Figtree,system-ui,sans-serif;fill:var(--ink)}
+.chart .hit{fill:transparent;cursor:pointer}
+.chart .hit:focus{outline:none}
+.chart .bar{transition:opacity .15s}
+.chart.hov .bar{opacity:.45}.chart.hov .bar.on{opacity:1}
+.tip{position:absolute;pointer-events:none;background:#111;color:#fff;border-radius:10px;padding:7px 10px;font-size:.82rem;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.tip b{display:block;font-size:.95rem}
+.cfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.linkbtn{border:0;background:none;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:.86rem;padding:0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left;color:var(--mute);font-weight:600;font-size:.78rem;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid var(--line)}
+td.n,th.n{text-align:right;white-space:nowrap}
+
+/* Liste des deals */
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{border:0;background:none;border-radius:10px;padding:6px 11px;font-weight:600;color:var(--mute);cursor:pointer;font-size:.86rem}
+.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.deals td b{display:block}
+.deals .who{color:var(--mute);font-size:.82rem}
+.st{font-size:.74rem;font-weight:600;padding:3px 9px;border-radius:99px;background:#f3f3f6;color:var(--mute);white-space:nowrap}
+.s-proposed{background:#fff1cc;color:#6b4a00}.s-accepted,.s-delivered,.s-refunded{background:#eef0ff;color:#2d3a8c}
+.s-funded{background:#fff1e8;color:#b13d0d}.s-released{background:#e3f4ea;color:#17613a}.s-disputed{background:#fde8e6;color:#a1230f}
+.role{font-size:.78rem;color:var(--mute)}
+.dl{display:none}
+
+/* Colonne de droite */
+.me{display:flex;gap:14px;align-items:center}
+.av{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o)) center/cover}
+.av.s{width:36px;height:36px;font-size:.74rem}
+.me b{display:block;font-size:1.1rem;line-height:1.2}
+.meter{height:8px;border-radius:9px;background:#ececf0;overflow:hidden;margin:14px 0 6px}
+.meter span{display:block;height:100%;background:var(--g);border-radius:9px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row .btn{flex:1 1 auto}
+.cv{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);text-decoration:none}
+.cv:first-of-type{border-top:0}
+.cv .t{flex:1;min-width:0}
+.cv b{display:block;font-size:.92rem}
+.cv span{display:block;color:var(--mute);font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv.un b,.cv.un span{color:var(--ink);font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--o);flex:none}
+.docs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.docs div{background:#f7f7f9;border-radius:14px;padding:10px 12px}
+.docs b{display:block;font:800 1.4rem "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+
+@media(max-width:1020px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){
+ .deals thead{display:none}
+ .deals tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 0;border-bottom:1px solid var(--line)}
+ .deals td{border:0;padding:0}
+ .deals td.hm{display:none}
+ .dl{display:inline}
+ .kpi b{font-size:1.5rem}
+}
+</style>
+</head>
+<body class="wait">
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav data-nav="dashboard"></nav></div></header>
+
+<main class="wrap">
+  <div class="top">
+    <div><p class="sub" id="today" style="margin:0 0 6px"></p><h1 id="hello">Tableau de bord</h1></div>
+    <div class="acts"><a class="btn out" href="marketplace.html">Trouver un prestataire</a><a class="btn" href="messages.html">Mes messages</a></div>
+  </div>
+
+  <section class="kpis" id="kpis" aria-label="Chiffres clés"></section>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card" aria-labelledby="todoT">
+        <div class="ch"><h2 id="todoT">À faire<span class="count" id="todoN" hidden></span></h2></div>
+        <div id="todo"></div>
+      </section>
+
+      <section class="card" aria-labelledby="chT">
+        <div class="ch"><div><h2 id="chT">Revenus</h2><p class="sub" id="chS" style="margin:4px 0 0">Paiements reçus sur les 6 derniers mois</p></div>
+          <div class="seg" role="group" aria-label="Mesure affichée"><button type="button" id="mEarn" aria-pressed="true">Revenus</button><button type="button" id="mSpend" aria-pressed="false">Dépenses</button></div></div>
+        <div class="chart" id="chart"><div class="tip" id="tip" role="status"></div></div>
+        <div id="ctable" hidden></div>
+        <div class="cfoot"><span class="sub" id="ctotal"></span><button type="button" class="linkbtn" id="ctoggle">Voir en tableau</button></div>
+      </section>
+
+      <section class="card" aria-labelledby="dT">
+        <div class="ch"><h2 id="dT">Mes deals</h2>
+          <div class="tabs" role="tablist"><button type="button" role="tab" data-tab="live" aria-selected="true">En cours</button><button type="button" role="tab" data-tab="done" aria-selected="false">Terminés</button><button type="button" role="tab" data-tab="all" aria-selected="false">Tous</button></div></div>
+        <div id="deals"></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card" aria-labelledby="pT"><h2 id="pT" style="font-size:1.2rem;margin-bottom:14px">Mon profil</h2><div id="prof"></div></section>
+      <section class="card" aria-labelledby="mT"><div class="ch"><h2 id="mT" style="font-size:1.2rem">Messages</h2><a class="sub" href="messages.html">Tout voir</a></div><div id="msgs"></div></section>
+      <section class="card" aria-labelledby="fT"><div class="ch"><h2 id="fT" style="font-size:1.2rem">Devis et factures</h2><a class="sub" href="documents.html">Ouvrir</a></div><div id="docs"></div></section>
+    </div>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+var A=window.DealrAuth,$=function(i){return document.getElementById(i)};
+var me=null,deals=[],convs={},measure="earn",tab="live";
+var ST={proposed:"En attente de réponse",accepted:"Deal conclu",funded:"Argent au coffre",delivered:"Livré · à valider",released:"Payé",disputed:"Litige en cours",refunded:"Remboursé",declined:"Refusé",cancelled:"Annulé",countered:"Remplacé"};
+var MONTHS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function eur(n){return A.eur(n)}
+function eur0(n){return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0)}
+function initials(n){return String(n||"?").split(" ").map(function(w){return w[0]||""}).slice(0,2).join("").toUpperCase()}
+function avatar(p,cls){var a=h("div","av"+(cls?" "+cls:""),initials(p&&p.n)),img=A.safeImg(p&&p.photo);if(img){a.textContent="";a.style.backgroundImage="url('"+img+"')"}return a}
+function ago(s){var m=Math.round((Date.now()-new Date(s))/60000);if(m<1)return"à l’instant";if(m<60)return"il y a "+m+" min";var hh=Math.round(m/60);if(hh<24)return"il y a "+hh+" h";var d=Math.round(hh/24);return d<30?"il y a "+d+" j":new Date(s).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}
+function other(d){var c=convs[d.conv];return(c&&c.other&&c.other.n)||"Membre"}
+function go(d){return"messages.html?c="+encodeURIComponent(d.conv)}
+
+/* ---------- Chiffres clés ---------- */
+function renderKpis(){
+  var s=A.dealStats(deals,me),box=$("kpis");box.textContent="";
+  [["À recevoir",eur0(s.toReceive),"Au coffre, versé à la validation","var(--o)","hl"],
+   ["Gagné",eur0(s.earned),s.earnedMonth?eur0(s.earnedMonth)+" ce mois-ci":"Aucun paiement ce mois-ci","var(--g)",""],
+   ["Engagé au coffre",eur0(s.committed),"Payé par vous, en attente de livraison","var(--ind)",""],
+   ["Deals en cours",String(s.live),s.done+" terminé"+(s.done>1?"s":""),"#b4b4bc",""]].forEach(function(k){
+    var t=h("div","kpi "+k[4]),l=h("span","l"),i=h("i");i.style.background=k[3];l.appendChild(i);l.appendChild(document.createTextNode(k[0]));
+    t.appendChild(l);t.appendChild(h("b","",k[1]));t.appendChild(h("span","s",k[2]));box.appendChild(t)})}
+
+/* ---------- À faire ---------- */
+function renderTodo(unread){
+  var box=$("todo"),list=A.dealTodos(deals,me);box.textContent="";
+  var unreadConvs=Object.keys(convs).map(function(k){return convs[k]}).filter(function(c){return c.unread});
+  var n=list.length+(unreadConvs.length?1:0);$("todoN").textContent=n;$("todoN").hidden=!n;
+  var ICON={pay:"€",validate:"✓",answer:"?",deliver:"↗"};
+  list.forEach(function(t){
+    var r=h("div","todo"),ic=h("div","ic "+t.kind,ICON[t.kind]);ic.setAttribute("aria-hidden","true");
+    var tx=h("div","t");tx.appendChild(h("b","",t.label+" · "+other(t.deal)));tx.appendChild(h("span","",t.text));
+    if(t.deadline&&t.kind==="deliver"){var t0=new Date();t0.setHours(0,0,0,0);var days=Math.round((new Date(t.deadline+"T00:00:00")-t0)/864e5);
+      tx.appendChild(h("span","due",days<0?"En retard de "+(-days)+" j":days===0?"À livrer aujourd’hui":"À livrer dans "+days+" j"))}
+    var a=h("a","btn sm"+(t.kind==="pay"||t.kind==="validate"?" pay":""),t.cta);a.href=go(t.deal);
+    r.appendChild(ic);r.appendChild(tx);r.appendChild(a);box.appendChild(r)});
+  if(unreadConvs.length){var r=h("div","todo"),ic=h("div","ic msg","✉");ic.setAttribute("aria-hidden","true");var tx=h("div","t");
+    tx.appendChild(h("b","",unreadConvs.length+" conversation"+(unreadConvs.length>1?"s":"")+" non lue"+(unreadConvs.length>1?"s":"")));
+    tx.appendChild(h("span","",unreadConvs.map(function(c){return c.other.n}).join(", ")));
+    var a=h("a","btn sm out","Lire");a.href="messages.html?c="+encodeURIComponent(unreadConvs[0].id);r.appendChild(ic);r.appendChild(tx);r.appendChild(a);box.appendChild(r)}
+  if(!n){var e=h("div","empty");e.appendChild(h("b","","Rien à faire pour l’instant."));
+    e.appendChild(h("span","",deals.length?"Vos deals avancent : vous serez prévenu ici dès que c’est à vous de jouer.":"Trouvez un prestataire ou proposez vos services pour conclure votre premier deal."));
+    if(!deals.length){var b=h("a","btn out","Parcourir la marketplace");b.href="marketplace.html";e.appendChild(h("br"));e.appendChild(b)}box.appendChild(e)}}
+
+/* ---------- Graphique revenus / dépenses (6 derniers mois) ---------- */
+function months(){var out=[],d=new Date();d.setDate(1);for(var i=5;i>=0;i--){var x=new Date(d.getFullYear(),d.getMonth()-i,1);out.push({key:x.getFullYear()+"-"+("0"+(x.getMonth()+1)).slice(-2),label:MONTHS[x.getMonth()],full:x.toLocaleDateString("fr-FR",{month:"long",year:"numeric"}),v:0,n:0})}return out}
+function series(){var ms=months(),idx={};ms.forEach(function(m,i){idx[m.key]=i});
+  deals.forEach(function(d){if(d.status!=="released")return;var mine=measure==="earn"?d.payee===me:d.payer===me;if(!mine)return;
+    var k=String(d.released_at||d.updated_at||"").slice(0,7);if(k in idx){ms[idx[k]].v+=+d.amount||0;ms[idx[k]].n++}});return ms}
+function niceMax(v){if(v<=0)return 100;var p=Math.pow(10,Math.floor(Math.log10(v))),f=v/p;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+function renderChart(){
+  var ms=series(),color=measure==="earn"?"#f55a1f":"#3b4a9e",total=ms.reduce(function(a,m){return a+m.v},0);
+  $("chT").textContent=measure==="earn"?"Revenus":"Dépenses";
+  $("chS").textContent=measure==="earn"?"Paiements reçus sur les 6 derniers mois":"Paiements versés à des prestataires sur les 6 derniers mois";
+  $("ctotal").textContent="Total sur 6 mois : "+eur(total);
+  var W=Math.max(300,Math.min(640,Math.round($("chart").clientWidth||640))),H=230,L=46,R=8,T=22,B=28,iw=W-L-R,ih=H-T-B,max=niceMax(Math.max.apply(null,ms.map(function(m){return m.v}))),bw=Math.min(24,iw/ms.length*.5);
+  var NS="http://www.w3.org/2000/svg",svg=document.createElementNS(NS,"svg");svg.setAttribute("viewBox","0 0 "+W+" "+H);svg.setAttribute("role","img");
+  svg.setAttribute("aria-label",($("chT").textContent)+" par mois. "+ms.map(function(m){return m.full+" : "+eur(m.v)}).join(", "));
+  function el(n,at,par){var e=document.createElementNS(NS,n);for(var k in at)e.setAttribute(k,at[k]);(par||svg).appendChild(e);return e}
+  for(var i=0;i<=4;i++){var y=T+ih-ih*i/4;el("line",{x1:L,x2:W-R,y1:y,y2:y,stroke:"#ececf0","stroke-width":1});
+    var tx=el("text",{x:L-8,y:y+4,"text-anchor":"end","class":"tick"});tx.textContent=max*i/4>=1000?(max*i/4/1000).toLocaleString("fr-FR")+" k€":Math.round(max*i/4)+" €"}
+  var chart=$("chart"),tip=$("tip");
+  var peak=ms.reduce(function(a,m,i){return m.v>ms[a].v?i:a},0);
+  ms.forEach(function(m,i){
+    var cx=L+iw*(i+.5)/ms.length,bh=m.v?Math.max(3,ih*m.v/max):0,x=cx-bw/2,y=T+ih-bh,r=Math.min(4,bh);
+    if(bh){var p="M"+x+","+(T+ih)+"V"+(y+r)+"Q"+x+","+y+" "+(x+r)+","+y+"H"+(x+bw-r)+"Q"+(x+bw)+","+y+" "+(x+bw)+","+(y+r)+"V"+(T+ih)+"Z";
+      el("path",{d:p,fill:color,"class":"bar","data-i":i})}
+    if(m.v&&i===peak){var v=el("text",{x:cx,y:y-7,"text-anchor":"middle","class":"val"});v.textContent=eur0(m.v)}
+    var lb=el("text",{x:cx,y:H-8,"text-anchor":"middle","class":"tick"});lb.textContent=m.label;
+    var hit=el("rect",{x:L+iw*i/ms.length,y:T,width:iw/ms.length,height:ih,"class":"hit",tabindex:0,role:"img","aria-label":m.full+" : "+eur(m.v)+", "+m.n+" deal"+(m.n>1?"s":"")});
+    function show(){chart.classList.add("hov");svg.querySelectorAll(".bar").forEach(function(b){b.classList.toggle("on",+b.getAttribute("data-i")===i)});
+      tip.innerHTML="";tip.appendChild(h("b","",eur(m.v)));tip.appendChild(document.createTextNode(m.full+" · "+m.n+" deal"+(m.n>1?"s":"")));
+      var bx=svg.getBoundingClientRect(),sc=bx.width/W;tip.style.left=(cx*sc)+"px";tip.style.top=((bh?y:T+ih)*sc)+"px";tip.classList.add("on")}
+    function hide(){chart.classList.remove("hov");tip.classList.remove("on")}
+    hit.addEventListener("mouseenter",show);hit.addEventListener("focus",show);hit.addEventListener("mouseleave",hide);hit.addEventListener("blur",hide);
+    hit.addEventListener("touchstart",show,{passive:true})});
+  var old=chart.querySelector("svg");if(old)old.remove();chart.insertBefore(svg,tip);
+  /* Vue tableau (accessibilité) */
+  var tb=h("table"),th=h("thead"),tr=h("tr");tr.appendChild(h("th","","Mois"));tr.appendChild(h("th","n","Deals"));tr.appendChild(h("th","n",$("chT").textContent));th.appendChild(tr);tb.appendChild(th);
+  var bd=h("tbody");ms.forEach(function(m){var r=h("tr");r.appendChild(h("td","",m.full));r.appendChild(h("td","n",String(m.n)));r.appendChild(h("td","n",eur(m.v)));bd.appendChild(r)});tb.appendChild(bd);
+  $("ctable").textContent="";$("ctable").appendChild(tb)}
+$("mEarn").onclick=function(){measure="earn";this.setAttribute("aria-pressed","true");$("mSpend").setAttribute("aria-pressed","false");renderChart()};
+$("mSpend").onclick=function(){measure="spend";this.setAttribute("aria-pressed","true");$("mEarn").setAttribute("aria-pressed","false");renderChart()};
+$("ctoggle").onclick=function(){var t=$("ctable"),c=$("chart"),show=t.hidden;t.hidden=!show;c.hidden=show;this.textContent=show?"Voir le graphique":"Voir en tableau"};
+var rz;window.addEventListener("resize",function(){$("tip").classList.remove("on");clearTimeout(rz);rz=setTimeout(function(){if(deals)renderChart()},150)});
+
+/* ---------- Mes deals ---------- */
+function renderDeals(){
+  var box=$("deals");box.textContent="";
+  var l=deals.filter(function(d){return tab==="all"?true:tab==="live"?A.LIVE_DEAL.test(d.status):(d.status==="released"||d.status==="refunded")});
+  if(!l.length){var e=h("div","empty",tab==="live"?"Aucun deal en cours.":tab==="done"?"Aucun deal terminé pour l’instant.":"Aucun deal pour l’instant.");box.appendChild(e);return}
+  var tb=h("table","deals"),th=h("thead"),tr=h("tr");["Prestation","Votre rôle","Statut","Mis à jour"].forEach(function(t,i){tr.appendChild(h("th",i===3?"hm":"",t))});
+  tr.appendChild(h("th","n","Montant"));th.appendChild(tr);tb.appendChild(th);var bd=h("tbody");
+  l.forEach(function(d){var r=h("tr"),c1=h("td");c1.appendChild(h("b","",d.title));c1.appendChild(h("span","who","avec "+other(d)));
+    var a=h("a","",null);a.href=go(d);a.style.textDecoration="none";a.appendChild(c1.firstChild);c1.insertBefore(a,c1.firstChild);r.appendChild(c1);
+    r.appendChild(h("td","role",d.payee===me?"Prestataire":"Client"));
+    var c3=h("td");c3.appendChild(h("span","st s-"+d.status,ST[d.status]||d.status));r.appendChild(c3);
+    r.appendChild(h("td","hm sub",ago(d.updated_at)));
+    var c5=h("td","n");c5.appendChild(h("b","",eur(d.amount)));r.appendChild(c5);bd.appendChild(r)});
+  tb.appendChild(bd);box.appendChild(tb)}
+document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
+  document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderDeals()}});
+
+/* ---------- Colonne de droite ---------- */
+function completion(p){if(!p)return 0;var s=0,b=String(p.bio||"").length;
+  if(A.safeImg(p.photo))s+=10;if(p.n&&p.city)s+=10;if(String(p.job||"").length>=8)s+=15;s+=Math.min((p.skills||[]).length,5)*3;
+  s+=Math.min((p.exps||[]).length,3)*5;s+=b>=150?15:b>=40?8:0;if((p.links||[]).length||(p.port||[]).length)s+=10;if(p.rate)s+=5;if(p.dispo)s+=5;return Math.min(s,100)}
+function renderProfile(p,email){
+  var box=$("prof");box.textContent="";
+  if(!p){box.appendChild(h("p","sub","Vous n’avez pas encore de profil. Créez-le pour apparaître sur la marketplace."));
+    var a=h("a","btn","Créer mon profil");a.href="profil.html";box.appendChild(a);return}
+  var m=h("div","me");m.appendChild(avatar(p));var t=h("div");t.appendChild(h("b","",p.n));t.appendChild(h("span","sub",p.job||email));m.appendChild(t);box.appendChild(m);
+  var pc=completion(p),mt=h("div","meter"),sp=h("span");sp.style.width=pc+"%";mt.appendChild(sp);mt.setAttribute("role","img");mt.setAttribute("aria-label","Profil complété à "+pc+" %");box.appendChild(mt);
+  box.appendChild(h("span","sub","Profil complété à "+pc+" %"+(pc<100?" · plus il est complet, plus il inspire confiance":"")));
+  var r=h("div","row"),a1=h("a","btn out sm","Voir mon profil");a1.href="prestataire.html?id=moi";var a2=h("a","btn sm","Modifier");a2.href="profil.html";r.appendChild(a1);r.appendChild(a2);box.appendChild(r)}
+function renderMsgs(list){
+  var box=$("msgs");box.textContent="";
+  if(!list.length){box.appendChild(h("p","sub","Aucune conversation pour le moment."));return}
+  list.slice(0,4).forEach(function(c){var a=h("a","cv"+(c.unread?" un":""));a.href="messages.html?c="+encodeURIComponent(c.id);a.appendChild(avatar(c.other,"s"));
+    var t=h("div","t");t.appendChild(h("b","",c.other.n));t.appendChild(h("span","",c.lastText?(c.lastMine?"Vous : ":"")+c.lastText:"Nouvelle conversation"));a.appendChild(t);
+    if(c.unread)a.appendChild(h("span","dot"));box.appendChild(a)})}
+function renderDocs(docs){
+  var box=$("docs");box.textContent="";
+  var dv=docs.filter(function(d){return d.type==="devis"}),fc=docs.filter(function(d){return d.type==="facture"});
+  var g=h("div","docs"),a=h("div"),b=h("div");a.appendChild(h("span","sub","Devis"));a.appendChild(h("b","",String(dv.length)));
+  b.appendChild(h("span","sub","Facturé TTC"));b.appendChild(h("b","",eur0(fc.reduce(function(x,d){return x+(+d.ttc||0)},0))));g.appendChild(a);g.appendChild(b);box.appendChild(g);
+  var r=h("div","row"),n=h("a","btn out sm","Nouveau devis");n.href="documents.html";r.appendChild(n);box.appendChild(r)}
+
+/* ---------- Démarrage ---------- */
+A.requireUser("dashboard.html").then(function(u){
+  return A.isAdmin().then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}return u})}).then(function(u){
+  me=u.id;
+  var d=new Date();$("today").textContent=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  return Promise.all([A.myProfile().catch(function(){return null}),A.myDeals().catch(function(){return[]}),A.listConversations().catch(function(){return[]}),A.listDocs().catch(function(){return[]})]).then(function(r){
+    var p=r[0];deals=r[1]||[];var cl=r[2]||[];cl.forEach(function(c){convs[c.id]=c});
+    var first=p?(p.first||String(p.n||"").split(" ")[0]):"";
+    $("hello").innerHTML="";$("hello").appendChild(document.createTextNode("Bonjour"+(first?", ":".")));
+    if(first){var e=h("em","",first+".");$("hello").appendChild(e)}
+    renderKpis();renderTodo();renderChart();renderDeals();renderProfile(p,u.email);renderMsgs(cl);renderDocs(r[3]||[]);
+    if(!deals.some(function(x){return x.payee===me})&&deals.some(function(x){return x.payer===me}))$("mSpend").click();
+    document.body.classList.remove("wait")})});
+})();
+</script>
+</body>
+</html>
