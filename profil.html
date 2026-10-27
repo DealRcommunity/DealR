@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealr – Créer mon profil de freelance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mute:#6b6b73;--line:#e3e3e8;--o:#f55a1f;--g:#22a863}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:#fff;font:17px/1.55 Figtree,system-ui,sans-serif;
+ background-image:radial-gradient(60% 40% at 100% 0,#ffe3cf 0,transparent 70%),radial-gradient(50% 40% at 0 100%,#e9ebff 0,transparent 70%);background-repeat:no-repeat}
+h1,h2,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.04em;font-weight:800;line-height:1.05}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.12em;color:var(--o)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+[hidden]{display:none!important}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+nav a{text-decoration:none;color:var(--mute);font-weight:500}
+nav a:hover{color:var(--ink)}
+.btn{display:inline-block;border-radius:99px;padding:13px 26px;font:600 1rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer}
+.btn:hover{background:#333}
+.btn.out{background:transparent;color:var(--ink)}
+.btn.out:hover{background:#fff}
+.btn.sm{padding:8px 16px;font-size:.9rem}
+.layout{display:grid;grid-template-columns:1fr 390px;gap:44px;align-items:start;padding:30px 0 80px}
+.card{background:#fff;border-radius:20px;box-shadow:0 24px 60px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06);padding:28px}
+.prog{display:flex;gap:6px;margin:0 0 8px}
+.prog i{flex:1;height:5px;border-radius:9px;background:#ececf0}
+.prog i.on{background:var(--o)}
+.lbl0{color:var(--mute);font-size:.88rem;font-weight:600;margin-bottom:22px}
+h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:8px}
+.help{color:var(--mute);margin:0 0 6px;font-size:.96rem}
+label,.l{display:block;font-weight:600;font-size:.88rem;margin:16px 0 5px}
+input:not([type=radio]):not([type=checkbox]):not([type=file]),select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#fafafb;font:inherit;color:inherit}
+input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--ink);outline:0}
+textarea{min-height:120px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rate{display:grid;grid-template-columns:1fr 130px;gap:10px}
+.cnt{text-align:right;font-size:.8rem;color:var(--mute);margin-top:4px}
+.opts{display:grid;gap:10px}
+.opts.h{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.opt{position:relative;display:block;margin:0;font-weight:500}
+.opt input{position:absolute;opacity:0}
+.opt span{display:block;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;background:#fff}
+.opt input:checked+span{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:#fafafb}
+.opt input:focus-visible+span{outline:3px solid var(--o);outline-offset:2px}
+.photo{display:flex;align-items:center;gap:18px}
+.av{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:linear-gradient(135deg,#ff8a3d,var(--o));background-size:cover;background-position:center;flex:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:var(--ink);color:#fff;padding:5px 8px 5px 14px;font-size:.9rem}
+.chip button{border:0;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;line-height:1}
+.sug button{border:1px dashed #c9c9d1;background:#fff;border-radius:99px;padding:4px 12px;font-size:.88rem;cursor:pointer;color:var(--mute)}
+.sug button:hover{border-color:var(--ink);color:var(--ink)}
+.sug{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.add{display:flex;gap:8px}
+.err{color:#c0270f;font-size:.88rem;min-height:1.3em;margin:8px 0 0}
+.exp{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+.exp b{display:block}.exp small{color:var(--mute)}
+.exp button{border:0;background:none;color:var(--mute);cursor:pointer;text-decoration:underline;font:inherit;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin-top:30px}
+.side{position:sticky;top:20px}
+.side>p{margin:0 0 10px;font-weight:600;font-size:.9rem;color:var(--mute)}
+.meter{height:8px;border-radius:9px;background:#ececf0;overflow:hidden;margin:6px 0 16px}
+.meter span{display:block;height:100%;background:var(--g);width:0;transition:width .3s}
+.pc{padding:22px}
+.who{display:flex;gap:14px;align-items:center}
+.who .av{width:56px;height:56px}
+.who b{display:block;font-size:1.15rem;line-height:1.2;overflow-wrap:anywhere}
+.who small{color:var(--mute)}
+.badge{display:inline-block;font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;background:#e6edff;color:#173ba3;margin:14px 6px 0 0}
+.badge.d{background:#e3f4ea;color:#17613a}
+.badge.n{background:#f1f1f4;color:var(--mute)}
+.bio{margin:12px 0 0;font-size:.93rem;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tags span{font-size:.82rem;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--mute)}
+.port{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.port div{aspect-ratio:1;border-radius:14px;background:#f1f1f4;border:1px dashed #d4d4da}
+.port div.on{border:0}
+.port div:nth-child(1).on{background:linear-gradient(135deg,#ff9a4d,var(--o))}
+.port div:nth-child(2).on{background:linear-gradient(135deg,#6f86ff,#2f45d6)}
+.port div:nth-child(3).on{background:linear-gradient(135deg,#3a3a40,#0f0f12)}
+.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px;gap:8px}
+.price{font-weight:700}
+.sub{color:var(--mute);font-size:.88rem}
+.done{text-align:center;padding:50px 28px}
+.done .ck{width:60px;height:60px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;margin:0 auto 20px;font-size:1.8rem}
+.done p{color:var(--mute);margin:0 auto 26px;max-width:26em}
+.done .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.fileup{position:relative;display:inline-block;margin:0}
+.fileup input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.fileup input:focus-visible+span{outline:3px solid var(--o);outline-offset:2px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 4px}
+.th{position:relative;aspect-ratio:1;border-radius:12px;background:#f1f1f4 center/cover}
+.th button{position:absolute;top:6px;right:6px;border:0;background:rgba(0,0,0,.65);color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer}
+.cv{display:flex;gap:16px;align-items:center;justify-content:space-between;background:#fff6ef;border:1px solid #ffd9bf;border-radius:14px;padding:14px 16px;margin:16px 0 6px}
+.cv .sub{margin-top:2px}
+.err.ok{color:#17613a}
+.acts{display:flex;gap:12px}
+.lp{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fafafb}
+.lp .add{margin-top:8px}
+@media(max-width:520px){.cv{flex-direction:column;align-items:flex-start}}
+body.wait main{visibility:hidden}
+#pubErr{text-align:right}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static}}
+@media(max-width:520px){.two{grid-template-columns:1fr}.card{padding:20px}}
+</style>
+</head>
+<body class="wait">
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="prestataire.html?id=moi">Mon profil</a></nav></div></header>
+
+<main class="wrap"><div class="layout">
+<div>
+  <form class="card" id="wiz" novalidate>
+    <div class="prog" id="prog"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="lbl0" id="stepLbl">Étape 1 sur 6</div>
+
+    <section class="step">
+      <h2>Faisons <em>connaissance.</em></h2>
+      <p class="help">Un profil avec photo inspire davantage confiance aux clients.</p>
+      <div class="photo" style="margin-top:18px"><span class="av" id="stAv">?</span>
+        <div><label class="fileup"><input id="photo" type="file" accept="image/*"><span class="btn out sm">Ajouter une photo</span></label><div class="sub" style="margin-top:6px">JPG ou PNG, visage bien visible.</div></div></div>
+      <div class="two"><div><label for="first">Prénom</label><input id="first" autocomplete="given-name" required></div>
+      <div><label for="last">Nom</label><input id="last" autocomplete="family-name" required></div></div>
+      <label for="city">Ville</label><input id="city" placeholder="Paris" required>
+      <div class="l">Où travaillez-vous ?</div>
+      <div class="opts h">
+        <label class="opt"><input type="radio" name="mob" value="À distance" checked><span>À distance</span></label>
+        <label class="opt"><input type="radio" name="mob" value="Sur site"><span>Sur site</span></label>
+        <label class="opt"><input type="radio" name="mob" value="À distance ou sur site"><span>Les deux</span></label>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>Quel est votre <em>métier ?</em></h2>
+      <p class="help">Le titre est la première chose que lit un client. Indiquez votre métier et votre spécialité.</p>
+      <label for="job">Titre de votre profil</label>
+      <input id="job" maxlength="70" placeholder="Ex. Monteuse vidéo spécialisée en Reels" required>
+      <label for="cat">Catégorie</label>
+      <select id="cat"><option>Développement</option><option>Design</option><option>Marketing</option><option>Rédaction</option><option selected>Vidéo</option><option>Conseil</option></select>
+      <div class="l">Votre niveau d’expérience</div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="lvl" value="Débutant"><span>Débutant · moins de 2 ans</span></label>
+        <label class="opt"><input type="radio" name="lvl" value="Confirmé" checked><span>Confirmé · 2 à 5 ans</span></label>
+        <label class="opt"><input type="radio" name="lvl" value="Senior"><span>Senior · plus de 5 ans</span></label>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>Vos <em>compétences.</em></h2>
+      <p class="help">Ajoutez au moins 3 compétences, jusqu’à 15. Les 5 premières sont mises en avant.</p>
+      <div class="add" style="margin-top:16px"><input id="skIn" placeholder="Tapez une compétence puis Entrée" aria-label="Nouvelle compétence"><button type="button" class="btn sm" id="skAdd">Ajouter</button></div>
+      <div class="chips" id="skills"></div>
+      <div class="sub">Suggestions :</div><div class="sug" id="sug"></div>
+      <div class="err" id="skErr" role="alert"></div>
+    </section>
+
+    <section class="step">
+      <h2>Vos <em>expériences.</em></h2>
+      <p class="help">Avec 3 expériences, un profil inspire nettement plus confiance. Vous pouvez aussi passer cette étape.</p>
+      <div class="cv"><div><b>Gagnez du temps</b><div class="sub">Importez votre CV (PDF, Word .docx ou texte) pour détecter vos expériences. Le fichier est lu dans votre navigateur et n’est pas envoyé.</div></div>
+        <label class="fileup"><input id="cv" type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"><span class="btn sm">Importer mon CV</span></label></div>
+      <div class="err" id="cvMsg" role="status"></div>
+      <div id="expList"></div>
+      <div class="two"><div><label for="xr">Poste</label><input id="xr" placeholder="Monteuse vidéo"></div><div><label for="xc">Entreprise ou client</label><input id="xc" placeholder="Café Lumen"></div></div>
+      <label for="xp">Période</label><input id="xp" placeholder="2023 – 2025">
+      <label for="xd">Ce que vous avez réalisé</label><input id="xd" maxlength="140" placeholder="Montage de 40 Reels pour les réseaux sociaux">
+      <button type="button" class="btn out sm" id="xAdd" style="margin-top:14px">Ajouter cette expérience</button>
+      <div class="err" id="xErr" role="alert"></div>
+    </section>
+
+    <section class="step">
+      <h2>Vous en <em>quelques mots.</em></h2>
+      <p class="help">Décrivez les services que vous proposez et ce que le client obtient avec vous.</p>
+      <label for="bio">Votre présentation</label>
+      <textarea id="bio" maxlength="600" placeholder="Je monte des vidéos courtes pour les commerces et les marques…" required></textarea>
+      <div class="cnt"><span id="bn">0</span>/600 · 40 caractères minimum</div>
+      <div class="l">Portfolio : vos photos</div>
+      <label class="fileup"><input id="pf" type="file" accept="image/*" multiple><span class="btn out sm">Ajouter des photos</span></label>
+      <span class="sub" id="pfMsg" style="margin-left:10px">0/6 photos</span>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="l">Liens vers vos réalisations <span class="sub" style="font-weight:400">(facultatif, 3 maximum)</span></div>
+      <input id="l1" type="url" placeholder="https://" aria-label="Lien portfolio 1" style="margin-bottom:8px">
+      <input id="l2" type="url" placeholder="https://" aria-label="Lien portfolio 2" style="margin-bottom:8px">
+      <input id="l3" type="url" placeholder="https://" aria-label="Lien portfolio 3">
+    </section>
+
+    <section class="step">
+      <h2>Tarif et <em>disponibilité.</em></h2>
+      <p class="help">Les clients filtrent leur recherche avec ces informations.</p>
+      <label for="rate">Votre tarif</label>
+      <div class="rate"><input id="rate" type="number" min="1" inputmode="numeric" placeholder="350" required><select id="unit" aria-label="Unité"><option>€/jour</option><option>€/h</option><option>€/mission</option></select></div>
+      <div class="l">Disponibilité</div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="dispo" value="Disponible maintenant" checked><span>Disponible maintenant</span></label>
+        <label class="opt"><input type="radio" name="dispo" value="Disponible sous 2 semaines"><span>Sous 2 semaines</span></label>
+        <label class="opt"><input type="radio" name="dispo" value="Disponible sous 1 mois"><span>Sous 1 mois</span></label>
+        <label class="opt"><input type="radio" name="dispo" value="Pas disponible"><span>Pas disponible pour le moment</span></label>
+      </div>
+      <div class="l">Langues parlées</div>
+      <div class="opts h">
+        <label class="opt"><input type="checkbox" name="lang" value="Français" checked><span>Français</span></label>
+        <label class="opt"><input type="checkbox" name="lang" value="Anglais"><span>Anglais</span></label>
+        <label class="opt"><input type="checkbox" name="lang" value="Espagnol"><span>Espagnol</span></label>
+        <label class="opt"><input type="checkbox" name="lang" value="Allemand"><span>Allemand</span></label>
+        <label class="opt"><input type="checkbox" id="otherLang"><span>Autre langue…</span></label>
+      </div>
+      <div class="lp" id="langPanel" hidden>
+        <label for="lsel" style="margin-top:0">Choisissez une langue dans la liste</label>
+        <select id="lsel"><option value="" selected disabled>Choisir dans la liste…</option></select>
+        <div class="add"><input id="ltxt" placeholder="Absente de la liste ? Saisissez-la" aria-label="Autre langue"><button type="button" class="btn sm" id="ladd">Ajouter</button></div>
+        <div class="chips" id="xl"></div>
+      </div>
+    </section>
+
+    <div class="nav"><button type="button" class="btn out" id="back">Retour</button><button type="submit" class="btn" id="next">Continuer</button></div>
+    <p class="err" id="pubErr" role="alert"></p>
+  </form>
+
+  <div class="card done" id="done" hidden role="status">
+    <div class="ck">✓</div>
+    <h2>Votre profil est <em>en ligne.</em></h2>
+    <p>Il apparaît maintenant dans la liste des prestataires. Après 5 missions réussies, vous obtiendrez le badge certifié.</p>
+    <div class="row"><a class="btn" href="prestataire.html?id=moi">Voir mon profil</a><a class="btn out" href="marketplace.html">Voir les missions</a><a class="btn out" href="index.html">Retour à l’accueil</a></div>
+  </div>
+</div>
+
+<aside class="side" aria-label="Aperçu de votre profil">
+  <p>Aperçu en direct · profil complété à <span id="pct">0</span> %</p>
+  <div class="meter"><span id="meter"></span></div>
+  <div class="card pc">
+    <div class="who"><span class="av" id="pAv">?</span><div><b id="pName">Votre nom</b><small id="pJob">Votre titre</small></div></div>
+    <div><span class="badge" id="pCat">Vidéo</span><span class="badge d" id="pDispo">Disponible maintenant</span><span class="badge n" id="pCity">Ville</span></div>
+    <p class="bio" id="pBio">Votre présentation apparaîtra ici.</p>
+    <div class="tags" id="pTags"></div>
+    <div class="sub" id="pLang" style="margin-top:12px"></div>
+    <div class="port" id="pPort"><div></div><div></div><div></div></div>
+    <div class="foot"><span class="price" id="pPrice">Tarif à renseigner</span><span class="sub" id="pExp">Aucune expérience</span></div>
+  </div>
+</aside>
+</div></main>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},A=window.DealrAuth,editing=false,prev={};
+var SUG={"Développement":["JavaScript","React","Node.js","HTML/CSS","WordPress","Shopify","Python"],"Design":["Figma","UI/UX","Logo","Identité visuelle","Illustrator","Photoshop"],"Marketing":["SEO","Google Ads","Réseaux sociaux","Emailing","Analytics","Stratégie de contenu"],"Rédaction":["Articles de blog","Copywriting","SEO","Newsletters","Relecture","Fiches produit"],"Vidéo":["Premiere Pro","After Effects","Reels","Motion design","DaVinci Resolve","Sous-titrage"],"Conseil":["Gestion de projet","Stratégie","Audit","Formation","E-commerce","Organisation"]};
+var N=6,st={step:0,skills:[],exps:[],photo:"",port:[],extra:[]};
+function v(id){return $(id).value.trim()}
+function radio(n){var r=document.querySelector('input[name="'+n+'"]:checked');return r?r.value:""}
+function langs(){return Array.prototype.map.call(document.querySelectorAll('input[name="lang"]:checked'),function(i){return i.value}).concat($("otherLang").checked?st.extra:[])}
+function links(){return ["l1","l2","l3"].map(v).filter(Boolean)}
+function fullName(){var f=v("first"),l=v("last");return (f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim()}
+function mk(tag,txt,cls){var e=document.createElement(tag);if(txt)e.textContent=txt;if(cls)e.className=cls;return e}
+function setAv(el){var t=(v("first").charAt(0)+v("last").charAt(0)).toUpperCase()||"?";
+  if(st.photo){el.style.backgroundImage="url("+st.photo+")";el.textContent=""}else{el.style.backgroundImage="";el.textContent=t}}
+function score(){var s=0,b=v("bio").length;
+  if(st.photo)s+=10;if(v("first")&&v("last")&&v("city"))s+=10;if(v("job").length>=8)s+=15;
+  s+=Math.min(st.skills.length,5)*3;s+=Math.min(st.exps.length,3)*5;
+  if(b>=150)s+=15;else if(b>=40)s+=8;if(links().length||st.port.length)s+=10;if(v("rate"))s+=5;if(radio("dispo"))s+=5;
+  return Math.min(s,100)}
+function draw(){
+  setAv($("pAv"));setAv($("stAv"));
+  $("pName").textContent=fullName()||"Votre nom";
+  $("pJob").textContent=v("job")||"Votre titre";
+  $("pCat").textContent=$("cat").value;
+  $("pDispo").textContent=radio("dispo");
+  $("pCity").textContent=v("city")||"Ville";
+  $("pBio").textContent=v("bio")||"Votre présentation apparaîtra ici.";
+  $("bn").textContent=$("bio").value.length;
+  $("pPrice").textContent=v("rate")?v("rate")+" "+$("unit").value:"Tarif à renseigner";
+  var n=st.exps.length;$("pExp").textContent=n?n+" expérience"+(n>1?"s":""):"Aucune expérience";
+  var box=$("pTags");box.textContent="";st.skills.slice(0,5).forEach(function(t){box.appendChild(mk("span",t))});
+  var nl=links().length;
+  Array.prototype.forEach.call($("pPort").children,function(t,i){t.style.backgroundImage="";t.style.backgroundSize="";t.className="";
+    if(i<st.port.length){t.className="on";t.style.backgroundImage="url("+st.port[i]+")";t.style.backgroundSize="cover";t.style.backgroundPosition="center"}
+    else if(i-st.port.length<nl)t.className="on"});
+  $("pLang").textContent=langs().length?"Langues : "+langs().join(", "):"";
+  var p=score();$("pct").textContent=p;$("meter").style.width=p+"%";
+}
+function renderSkills(){
+  var box=$("skills");box.textContent="";
+  st.skills.forEach(function(t,i){var c=mk("span",t,"chip"),b=mk("button","×");b.type="button";b.setAttribute("aria-label","Retirer "+t);
+    b.onclick=function(){st.skills.splice(i,1);renderSkills()};c.appendChild(b);box.appendChild(c)});
+  var s=$("sug");s.textContent="";
+  (SUG[$("cat").value]||[]).filter(function(t){return st.skills.map(function(x){return x.toLowerCase()}).indexOf(t.toLowerCase())<0}).forEach(function(t){
+    var b=mk("button","+ "+t);b.type="button";b.onclick=function(){addSkill(t)};s.appendChild(b)});
+  draw();
+}
+function addSkill(t){t=t.trim();$("skErr").textContent="";
+  if(!t)return;
+  if(st.skills.length>=15){$("skErr").textContent="Vous pouvez ajouter 15 compétences au maximum.";return}
+  if(st.skills.some(function(x){return x.toLowerCase()===t.toLowerCase()}))return;
+  st.skills.push(t);$("skIn").value="";renderSkills()}
+function renderExps(){
+  var box=$("expList");box.textContent="";
+  st.exps.forEach(function(x,i){var d=mk("div","","exp"),w=document.createElement("div");
+    w.appendChild(mk("b",x.role));w.appendChild(mk("small",x.co+(x.period?" · "+x.period:"")));
+    if(x.desc)w.appendChild(mk("small",x.desc)).style.display="block";
+    var b=mk("button","Retirer");b.type="button";b.onclick=function(){st.exps.splice(i,1);renderExps()};
+    var m=mk("button","Modifier");m.type="button";m.onclick=function(){$("xr").value=x.role;$("xc").value=x.co;$("xp").value=x.period;$("xd").value=x.desc;st.exps.splice(i,1);renderExps();$("xr").focus()};
+    var ac=mk("div","","acts");ac.appendChild(m);ac.appendChild(b);d.appendChild(w);d.appendChild(ac);box.appendChild(d)});
+  draw();
+}
+function addExp(){var role=v("xr"),co=v("xc");
+  if(!role||!co){$("xErr").textContent="Renseignez au moins le poste et l’entreprise.";return false}
+  if(st.exps.length>=8){$("xErr").textContent="Vous pouvez ajouter 8 expériences au maximum.";return false}
+  st.exps.push({role:role,co:co,period:v("xp"),desc:v("xd")});
+  ["xr","xc","xp","xd"].forEach(function(i){$(i).value=""});$("xErr").textContent="";renderExps();return true}
+function valid(){
+  var sec=document.querySelectorAll(".step")[st.step],els=sec.querySelectorAll("input,select,textarea");
+  for(var i=0;i<els.length;i++){if(!els[i].checkValidity()){els[i].reportValidity();return false}}
+  if(st.step===2&&st.skills.length<3){$("skErr").textContent="Ajoutez au moins 3 compétences.";return false}
+  if(st.step===3&&(v("xr")||v("xc"))){if(!addExp())return false}
+  if(st.step===4&&v("bio").length<40){$("bio").focus();$("bio").setCustomValidity("Écrivez au moins 40 caractères.");$("bio").reportValidity();$("bio").setCustomValidity("");return false}
+  return true}
+function show(){
+  Array.prototype.forEach.call(document.querySelectorAll(".step"),function(s,i){s.hidden=i!==st.step});
+  Array.prototype.forEach.call(document.querySelectorAll("#prog i"),function(b,i){b.className=i<=st.step?"on":""});
+  $("stepLbl").textContent="Étape "+(st.step+1)+" sur "+N;
+  $("back").style.visibility=st.step?"visible":"hidden";
+  $("next").textContent=st.step===N-1?(editing?"Enregistrer mes modifications":"Publier mon profil"):"Continuer";
+  window.scrollTo({top:0,behavior:"smooth"})}
+function publish(){
+  var unitSel=$("unit").value;
+  var p={first:v("first"),last:v("last"),n:fullName(),t:"Freelance",job:v("job"),c:$("cat").value,city:v("city"),
+    p:v("rate")+" "+unitSel,rate:parseFloat(v("rate"))||0,unit:unitSel.replace("€/",""),unitSel:unitSel,
+    r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
+    tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
+    lvl:radio("lvl"),langs:langs(),links:links(),port:st.port};
+  var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
+  A.saveProfile(p).then(function(){location.href="prestataire.html?id=moi"})
+   .catch(function(e){b.disabled=false;b.textContent=label;$("pubErr").textContent=A.message(e)})}
+
+/* Modification : on reprend le profil existant */
+function setRadio(n,val){if(!val)return;var r=Array.prototype.filter.call(document.querySelectorAll('input[name="'+n+'"]'),function(i){return i.value===val})[0];if(r)r.checked=true}
+function fillFrom(p){
+  prev=p;var parts=(p.n||"").split(" ");
+  $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";$("city").value=p.city||"";
+  setRadio("mob",p.mob);$("job").value=p.job||"";if(p.c)$("cat").value=p.c;setRadio("lvl",p.lvl);
+  st.skills=(p.skills||p.tags||[]).slice(0,15);st.exps=(p.exps||[]).slice(0,8);
+  $("bio").value=p.bio||"";(p.links||[]).slice(0,3).forEach(function(u,i){$("l"+(i+1)).value=u});
+  st.photo=A.safeImg(p.photo);st.port=(p.port||[]).map(A.safeImg).filter(Boolean).slice(0,6);
+  $("rate").value=p.rate||"";if(p.unitSel)$("unit").value=p.unitSel;setRadio("dispo",p.dispo);
+  var base=["Français","Anglais","Espagnol","Allemand"],L=p.langs||["Français"];
+  document.querySelectorAll('input[name="lang"]').forEach(function(c){c.checked=L.indexOf(c.value)>=0});
+  st.extra=L.filter(function(l){return base.indexOf(l)<0});
+  if(st.extra.length){$("otherLang").checked=true;$("langPanel").hidden=false}
+  renderThumbs();renderLangs()}
+
+$("wiz").addEventListener("submit",function(e){e.preventDefault();
+  if(document.activeElement===$("skIn")){addSkill($("skIn").value);return}
+  if(document.activeElement===$("ltxt")){addLang($("ltxt").value);$("ltxt").value="";return}
+  if(!valid())return;
+  if(st.step<N-1){st.step++;show()}else publish()});
+$("back").onclick=function(){if(st.step>0){st.step--;show()}};
+$("skAdd").onclick=function(){addSkill($("skIn").value)};
+$("skIn").addEventListener("keydown",function(e){if(e.key===","){e.preventDefault();addSkill($("skIn").value)}});
+$("xAdd").onclick=addExp;
+$("cat").addEventListener("change",renderSkills);
+$("wiz").addEventListener("input",draw);
+$("wiz").addEventListener("change",draw);
+function loadImg(f,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){cb(im)};im.src=r.result};r.readAsDataURL(f)}
+$("photo").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;
+  loadImg(f,function(im){var c=document.createElement("canvas");c.width=c.height=160;var s=Math.min(im.width,im.height);
+    c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);st.photo=c.toDataURL("image/jpeg",.8);draw()})});
+
+/* Portfolio : photos */
+function renderThumbs(){var box=$("thumbs");box.textContent="";
+  st.port.forEach(function(src,i){var d=mk("div","","th");d.style.backgroundImage="url("+src+")";
+    var b=mk("button","×");b.type="button";b.setAttribute("aria-label","Retirer la photo "+(i+1));
+    b.onclick=function(){st.port.splice(i,1);renderThumbs()};d.appendChild(b);box.appendChild(d)});
+  $("pfMsg").textContent=st.port.length+"/6 photos";draw()}
+$("pf").addEventListener("change",function(e){
+  var files=Array.prototype.slice.call(e.target.files).filter(function(f){return /^image\//.test(f.type)});e.target.value="";
+  files.slice(0,6-st.port.length).forEach(function(f){loadImg(f,function(im){
+    var k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    if(st.port.length<6){st.port.push(c.toDataURL("image/jpeg",.72));renderThumbs()}})})});
+
+/* Langues : autre */
+var LANGS="Afrikaans|Albanais|Amharique|Arabe|Arménien|Azéri|Bambara|Basque|Bengali|Berbère (amazigh)|Biélorusse|Birman|Bosniaque|Breton|Bulgare|Cantonais|Catalan|Chinois (mandarin)|Cingalais|Coréen|Corse|Créole haïtien|Croate|Danois|Estonien|Finnois|Galicien|Gallois|Géorgien|Grec|Gujarati|Haoussa|Hébreu|Hindi|Hongrois|Igbo|Indonésien|Irlandais|Islandais|Italien|Japonais|Javanais|Kannada|Kazakh|Khmer|Kinyarwanda|Kirghiz|Kurde|Langue des signes (LSF)|Langue des signes américaine (ASL)|Lao|Letton|Lingala|Lituanien|Luxembourgeois|Macédonien|Malais|Malayalam|Malgache|Maltais|Marathi|Mongol|Néerlandais|Népalais|Norvégien|Occitan|Oromo|Ouïghour|Ourdou|Ouzbek|Pachto|Pendjabi|Persan (farsi)|Polonais|Portugais|Roumain|Russe|Serbe|Shona|Sindhi|Slovaque|Slovène|Somali|Suédois|Swahili|Tadjik|Tagalog (philippin)|Tamoul|Tchèque|Télougou|Thaï|Tibétain|Tigrinya|Turc|Turkmène|Ukrainien|Vietnamien|Wolof|Xhosa|Yiddish|Yoruba|Zoulou".split("|");
+function renderLangs(){var box=$("xl");box.textContent="";
+  st.extra.forEach(function(t,i){var c=mk("span",t,"chip"),b=mk("button","×");b.type="button";b.setAttribute("aria-label","Retirer "+t);
+    b.onclick=function(){st.extra.splice(i,1);renderLangs()};c.appendChild(b);box.appendChild(c)});draw()}
+function addLang(t){t=t.trim();if(!t)return;var l=t.toLowerCase();
+  if(st.extra.some(function(x){return x.toLowerCase()===l}))return;
+  if(st.extra.length>=12)return;
+  st.extra.push(t.charAt(0).toUpperCase()+t.slice(1));renderLangs()}
+(function(){var sel=$("lsel");LANGS.forEach(function(l){var o=document.createElement("option");o.textContent=l;sel.appendChild(o)})})();
+$("lsel").addEventListener("change",function(){addLang(this.value);this.selectedIndex=0});
+$("ladd").onclick=function(){addLang($("ltxt").value);$("ltxt").value=""};
+$("otherLang").addEventListener("change",function(){$("langPanel").hidden=!this.checked;draw()});
+
+/* Import de CV */
+function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+var PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",WORKER="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",MAMMOTH="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js";
+function readPdf(buf){
+  return (window.pdfjsLib?Promise.resolve():loadScript(PDFJS)).then(function(){
+    pdfjsLib.GlobalWorkerOptions.workerSrc=WORKER;return pdfjsLib.getDocument({data:buf}).promise}).then(function(pdf){
+    var jobs=[];for(var i=1;i<=pdf.numPages&&i<=6;i++){jobs.push(pdf.getPage(i).then(function(p){return p.getTextContent()}).then(function(tc){
+      var out="",y=null;tc.items.forEach(function(it){var yy=it.transform[5];
+        if(y!==null&&Math.abs(yy-y)>2)out+="\n";else if(y!==null&&out&&!/\s$/.test(out))out+=" ";out+=it.str;y=yy});return out}))}
+    return Promise.all(jobs)}).then(function(a){return a.join("\n")})}
+function readDocx(buf){return (window.mammoth?Promise.resolve():loadScript(MAMMOTH)).then(function(){return mammoth.extractRawText({arrayBuffer:buf})}).then(function(r){return r.value})}
+/*CVSTART*/
+var MON="(?:janv|f[ée]vr|mars|avr|mai|juin|juil|ao[uû]t|sept|oct|nov|d[ée]c)[a-zéû]*\\.?",YR="(?:19|20)\\d{2}";
+var DRE=new RegExp("((?:"+MON+"\\s+|\\d{1,2}/)?"+YR+")\\s*(?:-|–|—|à|au|/|jusqu.à)\\s*((?:"+MON+"\\s+|\\d{1,2}/)?"+YR+"|pr[ée]sent|aujourd.hui|actuel(?:lement)?|en cours|ce jour|present|now)","i");
+var SPL=/\s+(?:[-–—|@]|chez|at)\s+|\s*,\s+/i;
+function parseCV(text){
+  var lines=text.split(/\r?\n/).map(function(l){return l.replace(/\s+/g," ").trim()}).filter(Boolean);
+  var sRe=/^(exp[ée]riences?( professionnelles?)?|parcours professionnel|work experience|professional experience)\b/i;
+  var eRe=/^(formations?|[ée]ducation|dipl[ôo]mes?|comp[ée]tences?|skills|langues?|languages?|centres? d.int[ée]r[êe]ts?|loisirs|certifications?|r[ée]f[ée]rences?|[àa] propos|contact|informations? personnelles?)\b/i;
+  var s=-1,e=lines.length,i;
+  for(i=0;i<lines.length;i++){if(sRe.test(lines[i])&&lines[i].length<45){s=i;break}}
+  if(s>=0){for(i=s+1;i<lines.length;i++){if(eRe.test(lines[i])&&lines[i].length<45){e=i;break}}}
+  var b=lines.slice(s+1,e),BUL=/^[•\-–—*▪●◦·]\s*/,idx=[],out=[];
+  b.forEach(function(l,k){if(DRE.test(l))idx.push(k)});
+  if(!idx.length)return out;
+  var above=idx[0]>0&&!BUL.test(b[idx[0]-1])&&b[idx[0]-1].length<80;
+  idx.forEach(function(d,k){
+    var line=b[d],m=line.match(DRE),period=m[0].replace(/\s+/g," ").trim();
+    var rest=line.replace(DRE,"").replace(/[()\[\]|·•]/g," ").replace(/\s+/g," ").replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g,"").trim();
+    var next=k+1<idx.length?idx[k+1]:b.length,from=d+1,to=next,heads=[];
+    if(above){var t=b[d-1];if(t&&!BUL.test(t)&&t.length<80&&d-1>(k?idx[k-1]:-1))heads.push(t);
+      if(next<b.length){var nt=b[next-1];if(nt&&next-1>d&&!BUL.test(nt)&&nt.length<80)to=next-1}}
+    if(rest)heads.push(rest);
+    var j=from;
+    while(heads.length<2&&!(heads[0]&&SPL.test(heads[0]))&&j<to&&!BUL.test(b[j])&&b[j].length<80&&!/[.!?]$/.test(b[j])){heads.push(b[j]);j++}
+    var desc=b.slice(j,to).map(function(l){return l.replace(BUL,"")}).join(" ").slice(0,140).trim();
+    var role=heads[0]||"",co=heads[1]||"";
+    if(!co){var p=role.split(SPL);if(p.length>1){role=p[0];co=p.slice(1).join(", ")}}
+    role=role.trim();if(role)out.push({role:role.slice(0,80),co:co.trim().slice(0,80),period:period,desc:desc});
+  });
+  return out}
+/*CVEND*/
+$("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.value="";if(!f)return;
+  var msg=$("cvMsg"),n=f.name.toLowerCase(),p;msg.className="err";
+  if(f.size>8*1024*1024){msg.textContent="Fichier trop lourd (8 Mo maximum).";return}
+  if(/\.pdf$/.test(n))p=f.arrayBuffer().then(readPdf);
+  else if(/\.docx$/.test(n))p=f.arrayBuffer().then(readDocx);
+  else if(/\.txt$/.test(n))p=f.text();
+  else{msg.textContent="Format non pris en charge. Utilisez un PDF, un fichier Word (.docx) ou un fichier texte.";return}
+  msg.textContent="Lecture du CV…";
+  p.then(function(t){
+    var added=0;parseCV(t).forEach(function(x){
+      if(st.exps.length<8&&!st.exps.some(function(y){return y.role.toLowerCase()===x.role.toLowerCase()&&y.co.toLowerCase()===x.co.toLowerCase()})){st.exps.push(x);added++}});
+    renderExps();
+    if(added){msg.className="err ok";msg.textContent=added+" expérience"+(added>1?"s":"")+" détectée"+(added>1?"s":"")+". Vérifiez-les et corrigez-les avec « Modifier »."}
+    else if(!t.trim())msg.textContent="Aucun texte lisible dans ce fichier (PDF scanné ?). Ajoutez vos expériences à la main.";
+    else msg.textContent="Aucune expérience détectée automatiquement. Ajoutez-les à la main."
+  }).catch(function(){msg.textContent="Impossible de lire ce fichier. Ajoutez vos expériences à la main."})});
+/* Accès réservé aux membres connectés */
+A.requireUser("profil.html").then(function(){return A.myProfile().catch(function(){return null})}).then(function(p){
+  if(p){editing=true;fillFrom(p);document.title="Dealr – Modifier mon profil"}
+  renderSkills();renderExps();show();document.body.classList.remove("wait")});
+})();
+</script>
+</body>
+</html>

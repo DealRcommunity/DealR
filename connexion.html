@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealr – Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mute:#6b6b73;--line:#e3e3e8;--o:#f55a1f;--g:#22a863;--red:#c0270f}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;color:var(--ink);background:#fff;font:17px/1.55 Figtree,system-ui,sans-serif;
+ background-image:radial-gradient(60% 40% at 100% 0,#ffe3cf 0,transparent 70%),radial-gradient(50% 40% at 0 100%,#e9ebff 0,transparent 70%);background-repeat:no-repeat}
+h1,h2,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.04em;font-weight:800;line-height:1.05}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.12em;color:var(--o)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+header nav a{text-decoration:none;color:var(--mute);font-weight:500}
+.btn{display:inline-block;border-radius:99px;padding:13px 26px;font:600 1rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;text-align:center}
+.btn:hover{background:#333}.btn.out{background:#fff;color:var(--ink)}.btn.out:hover{background:#f4f4f6}
+.btn[disabled]{opacity:.6;cursor:wait}
+main{max-width:480px;margin:30px auto 80px;padding:0 22px}
+h1{font-size:clamp(2.1rem,6vw,3rem);margin-bottom:10px}
+.lead{color:var(--mute);margin:0 0 24px}
+.card{background:#fff;border-radius:20px;padding:26px;box-shadow:0 24px 60px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:#ececf0;border-radius:12px;padding:4px;margin-bottom:22px}
+.tabs button{border:0;background:none;padding:10px;border-radius:9px;font:600 .98rem Figtree;cursor:pointer;color:var(--mute)}
+.tabs button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+label{display:block;font-weight:600;font-size:.88rem;margin:14px 0 5px}
+input{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 13px;background:#fafafb;font:inherit;color:inherit}
+input:focus{background:#fff;border-color:var(--ink);outline:0}
+.pw{position:relative}
+.pw input{padding-right:84px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font:600 .82rem Figtree;color:var(--mute);cursor:pointer;padding:6px 8px}
+.hint{font-size:.8rem;color:var(--mute);margin-top:5px}
+.rules{list-style:none;padding:0;margin:8px 0 0;font-size:.82rem;display:grid;gap:3px}
+.rules li{color:var(--mute)}.rules li.ok{color:var(--g)}
+.rules li:before{content:"○ "}.rules li.ok:before{content:"✓ "}
+.full{width:100%;margin-top:20px}
+.link{border:0;background:none;color:var(--mute);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;padding:0;margin-top:14px}
+.msg{min-height:1.4em;margin:12px 0 0;font-size:.92rem;color:var(--red)}
+.msg.ok{color:var(--g)}
+.note{margin-top:18px;font-size:.83rem;color:var(--mute)}
+.box{text-align:center;padding:10px 0}
+.box p{color:var(--mute)}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="marketplace.html">Voir la marketplace</a></nav></div></header>
+<main>
+  <h1 id="title">Bienvenue sur <em>Dealr.</em></h1>
+  <p class="lead" id="lead">Connectez-vous ou créez votre compte pour publier votre profil.</p>
+
+  <div class="card" id="setup" hidden>
+    <h2 style="font-size:1.3rem;margin-bottom:8px">Connexion non configurée</h2>
+    <p class="lead" style="margin:0">Le site doit être relié à Supabase pour gérer les comptes. Renseignez l’adresse du projet et la clé publique dans le fichier <b>config.js</b>.</p>
+  </div>
+
+  <div class="card" id="auth" hidden>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabIn" aria-selected="true">Se connecter</button>
+      <button type="button" role="tab" id="tabUp" aria-selected="false">Créer un compte</button>
+    </div>
+
+    <form id="fIn" novalidate>
+      <label for="inEmail">Identifiant (adresse email)</label>
+      <input id="inEmail" type="email" autocomplete="username" required>
+      <label for="inPw">Mot de passe</label>
+      <div class="pw"><input id="inPw" type="password" autocomplete="current-password" required><button type="button" data-eye="inPw">Afficher</button></div>
+      <button class="btn full" type="submit">Se connecter</button>
+      <button class="link" type="button" id="forgot">Mot de passe oublié ?</button>
+      <p class="msg" id="mIn" role="alert"></p>
+    </form>
+
+    <form id="fUp" novalidate hidden>
+      <label for="upEmail">Identifiant (adresse email)</label>
+      <input id="upEmail" type="email" autocomplete="username" required>
+      <label for="upPw">Mot de passe</label>
+      <div class="pw"><input id="upPw" type="password" autocomplete="new-password" required><button type="button" data-eye="upPw">Afficher</button></div>
+      <ul class="rules" id="rules"><li data-r="len">8 caractères minimum</li><li data-r="let">Au moins une lettre</li><li data-r="num">Au moins un chiffre</li></ul>
+      <label for="upPw2">Confirmer le mot de passe</label>
+      <div class="pw"><input id="upPw2" type="password" autocomplete="new-password" required><button type="button" data-eye="upPw2">Afficher</button></div>
+      <button class="btn full" type="submit">Créer mon compte</button>
+      <p class="msg" id="mUp" role="alert"></p>
+    </form>
+
+    <form id="fForgot" novalidate hidden>
+      <p class="lead" style="margin:0">Indiquez votre email : vous recevrez un lien pour choisir un nouveau mot de passe.</p>
+      <label for="fgEmail">Identifiant (adresse email)</label>
+      <input id="fgEmail" type="email" autocomplete="username" required>
+      <button class="btn full" type="submit">Envoyer le lien</button>
+      <button class="link" type="button" id="backIn">Retour à la connexion</button>
+      <p class="msg" id="mFg" role="alert"></p>
+    </form>
+
+    <form id="fReset" novalidate hidden>
+      <label for="rsPw">Nouveau mot de passe</label>
+      <div class="pw"><input id="rsPw" type="password" autocomplete="new-password" required><button type="button" data-eye="rsPw">Afficher</button></div>
+      <p class="hint">8 caractères minimum, avec au moins une lettre et un chiffre.</p>
+      <button class="btn full" type="submit">Enregistrer le mot de passe</button>
+      <p class="msg" id="mRs" role="alert"></p>
+    </form>
+
+    <div class="box" id="sent" hidden>
+      <h2 style="font-size:1.4rem">Vérifiez votre boîte mail</h2>
+      <p id="sentTxt"></p>
+      <button class="link" type="button" id="sentBack">Retour à la connexion</button>
+    </div>
+
+    <p class="note">Les mots de passe sont chiffrés et jamais stockés en clair. La connexion passe par HTTPS.</p>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+var A=window.DealrAuth,$=function(i){return document.getElementById(i)};
+var params=new URLSearchParams(location.search);
+var next=params.get("next")||"";
+if(!/^[a-z]+\.html(\?[\w=&%.-]*)?$/.test(next))next="";   // uniquement une page de ce site
+var panes=["fIn","fUp","fForgot","fReset","sent"];
+
+function show(id){panes.forEach(function(f){$(f).hidden=f!==id});
+  document.querySelector(".tabs").hidden=!(id==="fIn"||id==="fUp");
+  $("tabIn").setAttribute("aria-selected",id==="fIn");$("tabUp").setAttribute("aria-selected",id==="fUp");
+  var f=$(id).querySelector("input");if(f)setTimeout(function(){f.focus()},30)}
+function msg(id,t,ok){$(id).textContent=t||"";$(id).className="msg"+(ok?" ok":"")}
+function busy(form,on){form.querySelector("button[type=submit]").disabled=on}
+function strong(p){return{len:p.length>=8,let:/[A-Za-zÀ-ÿ]/.test(p),num:/\d/.test(p)}}
+function isStrong(p){var s=strong(p);return s.len&&s.let&&s.num}
+function emailOk(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)}
+
+/* Après connexion : vers la page demandée, sinon vers son profil (ou sa création) */
+function go(){
+  if(next){location.replace(next);return}
+  A.myProfile().then(function(p){location.replace(p?"prestataire.html?id=moi":"profil.html")})
+   .catch(function(){location.replace("profil.html")})}
+
+document.querySelectorAll("[data-eye]").forEach(function(b){b.onclick=function(){
+  var i=$(b.dataset.eye),s=i.type==="password";i.type=s?"text":"password";b.textContent=s?"Masquer":"Afficher"}});
+$("tabIn").onclick=function(){show("fIn")};
+$("tabUp").onclick=function(){show("fUp")};
+$("forgot").onclick=function(){$("fgEmail").value=$("inEmail").value;show("fForgot")};
+$("backIn").onclick=$("sentBack").onclick=function(){show("fIn")};
+$("upPw").addEventListener("input",function(){var s=strong(this.value);
+  document.querySelectorAll("#rules li").forEach(function(li){li.className=s[li.dataset.r]?"ok":""})});
+
+$("fIn").onsubmit=function(e){e.preventDefault();var em=$("inEmail").value.trim(),pw=$("inPw").value,f=this;
+  if(!emailOk(em)){msg("mIn","Saisissez une adresse email valide.");return}
+  if(!pw){msg("mIn","Saisissez votre mot de passe.");return}
+  busy(f,true);msg("mIn","");
+  A.signIn(em,pw).then(go).catch(function(err){busy(f,false);msg("mIn",A.message(err))})};
+
+$("fUp").onsubmit=function(e){e.preventDefault();var em=$("upEmail").value.trim(),pw=$("upPw").value,f=this;
+  if(!emailOk(em)){msg("mUp","Saisissez une adresse email valide.");return}
+  if(!isStrong(pw)){msg("mUp","Le mot de passe ne respecte pas les règles indiquées.");return}
+  if(pw!==$("upPw2").value){msg("mUp","Les deux mots de passe ne sont pas identiques.");return}
+  busy(f,true);msg("mUp","");
+  A.signUp(em,pw).then(function(d){busy(f,false);
+    if(d&&d.session){next=next||"profil.html";go();return}
+    $("sentTxt").textContent="Un lien de confirmation a été envoyé à "+em+". Cliquez dessus pour activer votre compte, puis connectez-vous.";show("sent")})
+  .catch(function(err){busy(f,false);msg("mUp",A.message(err))})};
+
+$("fForgot").onsubmit=function(e){e.preventDefault();var em=$("fgEmail").value.trim(),f=this;
+  if(!emailOk(em)){msg("mFg","Saisissez une adresse email valide.");return}
+  busy(f,true);
+  A.resetPassword(em).then(function(){busy(f,false);
+    $("sentTxt").textContent="Si un compte existe pour "+em+", un lien pour choisir un nouveau mot de passe vient d’être envoyé.";show("sent")})
+  .catch(function(err){busy(f,false);msg("mFg",A.message(err))})};
+
+$("fReset").onsubmit=function(e){e.preventDefault();var pw=$("rsPw").value,f=this;
+  if(!isStrong(pw)){msg("mRs","8 caractères minimum, avec au moins une lettre et un chiffre.");return}
+  busy(f,true);
+  A.updatePassword(pw).then(function(){msg("mRs","Mot de passe enregistré. Redirection…",true);history.replaceState(null,"","connexion.html");setTimeout(go,900)})
+  .catch(function(err){busy(f,false);msg("mRs",A.message(err))})};
+
+/* Démarrage */
+if(!A.configured){$("setup").hidden=false;$("lead").textContent="";return}
+if(A.demo){document.querySelector(".note").textContent="Mode démonstration : le compte est enregistré dans ce navigateur uniquement. Utilisez un email fictif et un mot de passe de test.";$("forgot").hidden=true}
+$("auth").hidden=false;
+var recovery=params.get("reset")==="1"||/type=recovery/.test(location.hash);
+if(recovery){$("title").innerHTML="Nouveau <em>mot de passe.</em>";$("lead").textContent="Choisissez votre nouveau mot de passe.";show("fReset")}
+else if(location.hash==="#inscription"){$("title").innerHTML="Créez votre <em>compte.</em>";$("lead").textContent="Un compte suffit pour publier votre profil, puis gérer vos devis et factures.";show("fUp")}
+else show("fIn");
+A.onAuth(function(ev){if(ev==="PASSWORD_RECOVERY")show("fReset")});
+if(!recovery)A.user().then(function(u){if(u)go()});
+})();
+</script>
+</body>
+</html>

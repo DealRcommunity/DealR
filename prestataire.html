@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealr – Profil prestataire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mute:#6b6b73;--line:#e8e8ed;--o:#f55a1f;--g:#22a863}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 Figtree,system-ui,sans-serif;
+ background-image:radial-gradient(60% 40% at 100% 0,#ffe3cf 0,transparent 70%),radial-gradient(50% 40% at 0 100%,#e9ebff 0,transparent 70%);background-repeat:no-repeat}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.03em;font-weight:800;line-height:1.1}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.12em;color:var(--o)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-size:1.45rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+nav{display:flex;gap:20px;font-weight:500;font-size:.95rem}
+nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
+.btn{display:inline-block;border-radius:99px;padding:11px 22px;font:600 .95rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer}
+.btn:hover{background:#333}.btn.out{background:#fff;color:var(--ink)}.btn.out:hover{background:#f4f4f6}
+.layout{display:grid;grid-template-columns:1fr 350px;gap:28px;align-items:start;padding:14px 0 70px}
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 20px 50px rgba(60,30,10,.1),0 2px 6px rgba(60,30,10,.05);margin-bottom:20px}
+.hero{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.av{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 1.5rem Figtree;background:linear-gradient(135deg,#ff8a3d,var(--o));background-size:cover;background-position:center;flex:none}
+h1{font-size:clamp(1.7rem,4vw,2.4rem)}
+.sub{color:var(--mute);font-size:.92rem}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.b{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;background:#e6edff;color:#173ba3}
+.b.e{background:#fff1cc;color:#6b4a00}.b.d{background:#e3f4ea;color:#17613a}.b.c{background:var(--ink);color:#fff}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+h2{font-size:1.3rem;margin-bottom:14px}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.info div{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.info small{display:block;color:var(--mute);font-size:.8rem;font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips span{border:1px solid #d6d6dd;border-radius:99px;padding:4px 14px;font-size:.92rem}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0;padding-top:0}
+.row b{display:block}
+.pr{font-weight:700;white-space:nowrap}
+.tl{border-left:2px solid var(--line);margin-left:6px;padding-left:18px}
+.tl>div{position:relative;margin-bottom:18px}
+.tl>div:before{content:"";position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--o)}
+.port{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.port div{aspect-ratio:1;border-radius:12px;background:#f1f1f4 center/cover}
+.stars{color:#f5a623;letter-spacing:1px}
+.rv{border-top:1px solid var(--line);padding:14px 0}.rv:first-of-type{border-top:0;padding-top:0}
+.side{position:sticky;top:16px}
+.q label.it{display:grid;grid-template-columns:22px 1fr 58px;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.q label.it:first-of-type{border-top:0}
+.q input[type=number],.q select{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
+.q input[type=checkbox]{width:18px;height:18px;accent-color:var(--o);margin-top:3px}
+.tot{border-top:2px solid var(--ink);margin-top:10px;padding-top:12px;display:grid;gap:6px}
+.tot div{display:flex;justify-content:space-between}
+.tot .big{font:800 1.4rem "Bricolage Grotesque",sans-serif}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+[hidden]{display:none!important}
+.b.x{background:#f1f1f4;color:var(--mute)}
+.bio{white-space:pre-line;overflow-wrap:anywhere;margin:0}
+.own{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#fff6ef;border:1px solid #ffd9bf;box-shadow:none}
+.own .acts{margin-top:0}
+a.tool{display:block;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+a.tool:hover{border-color:var(--ink)}
+a.tool b{display:block}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a>
+<nav><a href="marketplace.html">← Prestataires</a><a id="navAcc" href="connexion.html">Se connecter</a></nav></div></header>
+<main class="wrap" id="app"></main>
+<div id="toast" role="status"></div>
+<script src="profils.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+var A=window.DealrAuth,app=document.getElementById("app");
+function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function eur(n){return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n||0)}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.className="on";setTimeout(function(){t.className=""},2600)}
+function link(txt,href,cls){var a=h("a",cls,txt);a.href=href;return a}
+
+var id=new URLSearchParams(location.search).get("id")||"";
+
+/* Chargement du profil : le sien (connecté), un membre (base de données) ou un exemple */
+function load(){
+  if(id==="moi")return A.requireUser("prestataire.html?id=moi").then(function(u){
+    return A.myProfile().then(function(p){if(!p){location.replace("profil.html");return new Promise(function(){})}return{p:p,own:true,u:u}})});
+  var demo=(window.DEALR_PROS||[]).filter(function(x){return x.id===id})[0];
+  if(demo)return A.user().then(function(u){return{p:Object.assign({demo:true},demo),own:false,u:u}});
+  if(!A.configured||!/^[0-9a-f-]{36}$/i.test(id))return A.user().then(function(u){return{p:null,u:u}});
+  return Promise.all([A.getProfile(id).catch(function(){return null}),A.user()]).then(function(r){
+    return{p:r[0],u:r[1],own:!!(r[1]&&r[0]&&r[1].id===r[0].id)}});
+}
+
+load().then(function(res){
+var p=res.p,own=res.own,u=res.u;
+var acc=document.getElementById("navAcc");
+if(u){acc.textContent="Mon profil";acc.href="prestataire.html?id=moi"}
+if(own)acc.hidden=true;
+if(!p){var nf=h("div","card","Ce profil est introuvable. ");nf.style.marginTop="30px";nf.appendChild(link("Retour aux prestataires","marketplace.html"));app.appendChild(nf);return}
+
+var m=(p.p||"").match(/(\d[\d\s]*)\s*€\s*\/\s*(\S+)/);
+var rate=+p.rate||(m?parseInt(m[1].replace(/\s/g,""),10):0),unit=p.unit||(m?m[2]:"forfait");
+var UNIT={jour:"Prestation à la journée",h:"Prestation à l’heure",mission:"Prestation à la mission"};
+var skills=p.skills||p.tags||[],exps=p.exps||[],langs=p.langs&&p.langs.length?p.langs:["Français"];
+var services=p.services&&p.services.length?p.services:(rate?[{t:UNIT[unit]||"Prestation",d:"Selon votre besoin",price:rate,unit:unit}]:[]);
+document.title="Dealr – "+(own?"Mon profil":p.n);
+
+var layout=h("div","layout"),main=h("div","main"),side=h("aside","side");layout.appendChild(main);layout.appendChild(side);app.appendChild(layout);
+function sec(title){var c=h("section","card");c.appendChild(h("h2","",title));main.appendChild(c);return c}
+
+/* Bandeau « Mon espace » quand on consulte son propre profil */
+if(own){var bar=h("section","card own");
+  var bt=h("div");bt.appendChild(h("b","","Mon espace"));bt.appendChild(h("div","sub","Connecté avec "+(u.email||"votre compte")+". Voici votre profil tel que les clients le voient."));
+  var ba=h("div","acts");ba.appendChild(link("Devis et factures","documents.html","btn"));ba.appendChild(link("Modifier mon profil","profil.html","btn out"));
+  var so=h("button","btn out","Se déconnecter");so.type="button";so.onclick=function(){A.signOut().then(function(){location.href="index.html"})};ba.appendChild(so);
+  bar.appendChild(bt);bar.appendChild(ba);main.appendChild(bar)}
+
+/* En-tête du profil */
+var hero=h("section","card"),hr=h("div","hero"),img=A.safeImg(p.photo);
+var av=h("div","av",((p.n||"?").split(" ").map(function(w){return w[0]}).slice(0,2).join("")).toUpperCase());
+if(img){av.textContent="";av.style.backgroundImage="url('"+img+"')"}
+var tx=h("div");tx.style.flex="1";tx.appendChild(h("h1","",p.n||""));tx.appendChild(h("div","sub",p.job||""));
+var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""),p.t||"Freelance"));bd.appendChild(h("span","b",p.c||""));
+if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(+p.a>=5)bd.appendChild(h("span","b c","✓ Certifié"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
+tx.appendChild(bd);
+tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
+if(!own){var ac=h("div","acts"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){toast("La messagerie arrive bientôt.")};
+  ac.appendChild(b1);ac.appendChild(link("Demander un devis","#devis","btn out"));tx.appendChild(ac)}
+hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
+
+/* Sections */
+var c=sec("À propos");c.appendChild(h("p","bio",p.bio||"Pas encore de présentation."));
+c=sec("Informations clés");var inf=h("div","info");
+[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],["Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
+  var d=h("div");d.appendChild(h("small","",r[0]));d.appendChild(h("span","",r[1]));inf.appendChild(d)});c.appendChild(inf);
+c=sec("Compétences");var ch=h("div","chips");skills.forEach(function(s){ch.appendChild(h("span","",s))});c.appendChild(ch);
+if(services.length){c=sec("Services et tarifs");services.forEach(function(s){var r=h("div","row"),l=h("div");l.appendChild(h("b","",s.t));l.appendChild(h("span","sub",s.d||""));
+  r.appendChild(l);r.appendChild(h("span","pr",eur(s.price)+" / "+s.unit));c.appendChild(r)})}
+if(exps.length){c=sec("Expériences");var tl=h("div","tl");exps.forEach(function(x){var d=h("div");d.appendChild(h("b","",x.role));
+  d.appendChild(h("div","sub",(x.co||"")+(x.period?" · "+x.period:"")));if(x.desc)d.appendChild(h("div","",x.desc));tl.appendChild(d)});c.appendChild(tl)}
+c=sec("Portfolio");var port=(p.port||[]).map(A.safeImg).filter(Boolean),links=(p.links||[]).filter(function(x){return /^https?:\/\//.test(x)});
+if(port.length){var g=h("div","port");port.forEach(function(s){var d=h("div");d.style.backgroundImage="url('"+s+"')";g.appendChild(d)});c.appendChild(g)}
+links.forEach(function(x){var a=link(x,x);a.target="_blank";a.rel="noopener noreferrer";a.style.cssText="display:block;margin-top:8px;overflow-wrap:anywhere";c.appendChild(a)});
+if(!port.length&&!links.length)c.appendChild(h("p","sub","Portfolio à venir."));
+c=sec("Avis clients");var rv=p.reviews||[];
+if(rv.length)rv.forEach(function(r){var d=h("div","rv");d.appendChild(h("div","stars",new Array((+r.note||0)+1).join("★")));d.appendChild(h("div","",r.txt));d.appendChild(h("div","sub","— "+r.by));c.appendChild(d)});
+else c.appendChild(h("p","sub","Aucun avis pour le moment."));
+
+/* Colonne de droite */
+if(own){
+  var me=h("section","card");me.appendChild(h("h2","","Mes outils"));
+  [["Devis et factures","Créez un devis, transformez-le en facture, téléchargez-le en PDF.","documents.html"],
+   ["Modifier mon profil","Photo, compétences, expériences, tarif, disponibilité.","profil.html"]].forEach(function(t){
+    var r=h("a","tool");r.href=t[2];r.appendChild(h("b","",t[0]));r.appendChild(h("span","sub",t[1]));me.appendChild(r)});
+  side.appendChild(me);return}
+
+var q=h("section","card q");q.id="devis";q.appendChild(h("h2","","Estimer un devis"));q.appendChild(h("p","sub","Choisissez les services pour obtenir une estimation, puis envoyez votre demande."));
+var boxes=[];
+if(!services.length)q.appendChild(h("p","sub","Ce prestataire travaille sur devis personnalisé."));
+services.forEach(function(s,i){var lb=h("label","it"),cb=document.createElement("input");cb.type="checkbox";cb.checked=i===0;
+  var t=h("div");t.appendChild(h("b","",s.t));t.appendChild(h("span","sub",eur(s.price)+" / "+s.unit));
+  var n=document.createElement("input");n.type="number";n.min="1";n.value="1";n.setAttribute("aria-label","Quantité : "+s.t);
+  lb.appendChild(cb);lb.appendChild(t);lb.appendChild(n);q.appendChild(lb);boxes.push({s:s,cb:cb,n:n});cb.onchange=n.oninput=calc});
+var tv=document.createElement("select");tv.setAttribute("aria-label","TVA");tv.style.marginTop="10px";
+[["20","TVA 20 %"],["10","TVA 10 %"],["5.5","TVA 5,5 %"],["0","TVA non applicable"]].forEach(function(o){var op=h("option","",o[1]);op.value=o[0];tv.appendChild(op)});
+tv.onchange=calc;q.appendChild(tv);
+var tot=h("div","tot");q.appendChild(tot);
+var go=h("button","btn","Envoyer ma demande de devis");go.type="button";go.style.cssText="width:100%;margin-top:14px";q.appendChild(go);
+q.appendChild(h("p","sub","Estimation indicative. Le prestataire vous enverra son devis définitif."));
+side.appendChild(q);
+function calc(){var ht=boxes.filter(function(x){return x.cb.checked}).reduce(function(a,x){return a+Math.max(1,parseFloat(x.n.value)||1)*x.s.price},0),t=ht*parseFloat(tv.value)/100;tot.textContent="";
+  [["Total HT",eur(ht)],["TVA",eur(t)]].forEach(function(r){var d=h("div");d.appendChild(h("span","",r[0]));d.appendChild(h("span","",r[1]));tot.appendChild(d)});
+  var d=h("div","big");d.appendChild(h("span","","Total TTC"));d.appendChild(h("span","",eur(ht+t)));tot.appendChild(d)}
+go.onclick=function(){if(!boxes.some(function(x){return x.cb.checked})){toast("Sélectionnez au moins un service.");return}toast("Demande prête : la messagerie arrive bientôt.")};
+calc();
+});
+})();
+</script>
+</body>
+
+</html>
