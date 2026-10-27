@@ -741,5 +741,43 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", adminMode); else adminMode();
 
+  /* Profil obligatoire : un membre connecté doit terminer son profil avant d'utiliser le site.
+     Champs requis (les mêmes que l'assistant de création) : nom, ville, métier, 3 compétences,
+     présentation d'au moins 40 caractères et tarif. */
+  A.profileMissing = function (p) {
+    if (!p) return ["profil"];
+    var m = [];
+    if (!p.n) m.push("nom");
+    if (!p.city) m.push("ville");
+    if (!p.job) m.push("métier");
+    if (!p.skills || p.skills.length < 3) m.push("compétences");
+    if (!p.bio || String(p.bio).length < 40) m.push("présentation");
+    if (!(p.rate > 0)) m.push("tarif");
+    return m;
+  };
+  A.profileComplete = function (p) { return !A.profileMissing(p).length; };
+  function profileGate() {
+    var page = location.pathname.split("/").pop() || "index.html";
+    if (/^(profil|connexion)\.html$/.test(page)) return;
+    /* Sans session enregistrée dans le navigateur, c'est un visiteur : rien à vérifier */
+    var likely = false;
+    try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k === "dealr_demo_session" || /^sb-.*-auth-token$/.test(k)) { likely = true; break; } } } catch (e) {}
+    if (!likely) return;
+    var st = document.createElement("style"); st.id = "dlrGate"; st.textContent = "body{visibility:hidden}"; document.head.appendChild(st);
+    function done() { var x = document.getElementById("dlrGate"); if (x) x.remove(); }
+    setTimeout(done, 4000);
+    A.user().then(function (u) {
+      if (!u) return done();
+      return A.isAdmin().then(function (adm) {
+        if (adm) return done();
+        return A.myProfile().then(function (p) {
+          if (A.profileComplete(p)) return done();
+          location.replace("profil.html?obligatoire=1");
+        }, done);
+      });
+    }).catch(done);
+  }
+  profileGate();
+
   window.DealrAuth = A;
 })();
