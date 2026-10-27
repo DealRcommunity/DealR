@@ -9,6 +9,10 @@
   var demo = !configured;   // config.js vide : mode démonstration (données dans ce navigateur)
 
   /* ---------- Mode démonstration : même fonctionnement que Supabase, stocké dans le navigateur ---------- */
+  function isAdminEmail(email) {
+    var list = (C.ADMIN_EMAILS || []).map(function (e) { return String(e).trim().toLowerCase(); });
+    return !!email && list.indexOf(String(email).trim().toLowerCase()) >= 0;
+  }
   function demoClient() {
     var K = "dealr_demo_";
     function get(k, d) { try { var v = JSON.parse(localStorage.getItem(K + k)); return v == null ? d : v; } catch (e) { return d; } }
@@ -64,11 +68,11 @@
         then: function (res, rej) { return run().then(res, rej); }
       };
       function run() {
-        var s = sess(), rows = get(table, []);
+        var s = sess(), rows = get(table, []), adm = !!(s && isAdminEmail(s.user.email));
         if (q.op === "update") {
           if (!s) return ko("not_logged");
           var hit = rows.filter(function (r) { return q.f.every(function (f) { return f(r); }); });
-          if (table === "deals" && hit.some(function (r) { return r.payer !== s.user.id && r.payee !== s.user.id; })) return ko("forbidden");
+          if (table === "deals" && !adm && hit.some(function (r) { return r.payer !== s.user.id && r.payee !== s.user.id; })) return ko("forbidden");
           hit.forEach(function (r) { Object.assign(r, q.patch); });
           try { put(table, rows); } catch (e) { return ko("quota"); }
           return ok(null);
@@ -78,7 +82,8 @@
           var row = q.row;
           if (table === "profiles" && row.id !== s.user.id) return ko("forbidden");
           if (table === "documents") row.owner = s.user.id;
-          if (table === "conversations" && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
+          if (table === "conversations" && !adm && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
+          if (table === "messages" && row.kind === "admin" && !adm) return ko("forbidden");
           if (table === "messages" && row.sender !== s.user.id) return ko("forbidden");
           var same = table === "documents" ? function (r) { return r.owner === row.owner && r.num === row.num; } : function (r) { return r.id === row.id; };
           var i = rows.findIndex(same);
@@ -87,7 +92,7 @@
           return ok(null);
         }
         var out = table === "documents" ? rows.filter(function (r) { return s && r.owner === s.user.id; })
-          : table === "conversations" ? rows.filter(function (r) { return s && (r.user_a === s.user.id || r.user_b === s.user.id); })
+          : table === "conversations" && !adm ? rows.filter(function (r) { return s && (r.user_a === s.user.id || r.user_b === s.user.id); })
           : rows.slice();
         q.f.forEach(function (f) { out = out.filter(f); });
         if (q.sort) out.sort(function (a, c) { var x = String(a[q.sort.k] || ""), y = String(c[q.sort.k] || ""); return q.sort.asc ? (x < y ? -1 : x > y ? 1 : 0) : (x < y ? 1 : x > y ? -1 : 0); });
@@ -244,8 +249,10 @@
       return client().then(function (c) {
         return getConv(c, id).then(function (row) {
           if (row) return id;
-          return A.myProfile().catch(function () { return null; }).then(function (me) {
-            var mine = snap(Object.assign({ id: u.id }, me || {}), (me && me.n) || (u.email || "").split("@")[0]);
+          return Promise.all([A.myProfile().catch(function () { return null; }), A.isAdmin()]).then(function (r) {
+            var me = r[0];
+            var mine = r[1] ? { id: u.id, n: "Équipe Dealr", job: "Support Dealr", photo: "" }
+              : snap(Object.assign({ id: u.id }, me || {}), (me && me.n) || (u.email || "").split("@")[0]);
             var theirs = snap(other);
             var first = u.id < other.id;
             var now = new Date().toISOString();
@@ -331,7 +338,7 @@
     delivered: { released: "payer", disputed: "payer" }
   };
   A.DEAL_EVENT = { accepted: "Deal accepté", declined: "Deal refusé", cancelled: "Deal annulé", countered: "Contre-proposition",
-    funded: "Paiement sécurisé au coffre", delivered: "Travail livré", released: "Paiement versé", disputed: "Litige ouvert" };
+    funded: "Paiement sécurisé au coffre", delivered: "Travail livré", released: "Paiement versé", disputed: "Litige ouvert", refunded: "Client remboursé" };
 
   /* Le membre « me » peut-il faire passer ce deal au statut « to » ? */
   A.dealCan = function (d, me, to) {
@@ -390,7 +397,7 @@
           if (!cur) throw new Error("not_found");
           if (!A.dealCan(cur, u.id, to)) throw new Error("deal_state");
           var now = new Date().toISOString(), patch = { status: to, updated_at: now };
-          if (/^(accepted|funded|delivered|released)$/.test(to)) patch[to + "_at"] = now;
+          if (/^(accepted|funded|delivered|released|disputed|refunded)$/.test(to)) patch[to + "_at"] = now;
           return c.from("deals").update(patch).eq("id", cur.id).then(check).then(function () {
             var d = Object.assign({}, cur, patch);
             if (silent) return d;
@@ -422,17 +429,112 @@
     return A.listConversations().then(function (l) { return l.filter(function (c) { return c.unread; }).length; }).catch(function () { return 0; });
   };
 
+  /* ---------- Administration ----------
+     Démo : adresse présente dans ADMIN_EMAILS (config.js).
+     Supabase : présence dans la table admins, vérifiée par la base (fonction is_admin). */
+  var adminP = null;
+  A.isAdmin = function () {
+    if (!adminP) adminP = A.user().then(function (u) {
+      if (!u) return false;
+      if (demo) return isAdminEmail(u.email);
+      return client().then(function (c) { return c.rpc("is_admin"); }).then(function (r) { return !r.error && r.data === true; });
+    }).catch(function () { return false; });
+    return adminP;
+  };
+  function needAdmin() { return A.isAdmin().then(function (ok) { if (!ok) throw new Error("forbidden"); }); }
+
+  /* Tous les deals (l'admin les voit tous), les plus récents d'abord */
+  A.adminDeals = function () {
+    return needAdmin().then(client)
+      .then(function (c) { return c.from("deals").select("*").order("updated_at", { ascending: false }).limit(500); })
+      .then(check);
+  };
+  A.getConversation = function (id) {
+    return client().then(function (c) { return getConv(c, id); });
+  };
+  /* Message de l'équipe Dealr dans la conversation d'un deal (visible par les deux participants) */
+  A.adminPost = function (convId, text) {
+    text = String(text || "").trim().slice(0, 2000);
+    if (!text) return Promise.reject(new Error("empty"));
+    return needAdmin().then(function () { return A.user(); }).then(function (u) {
+      return client().then(function (c) {
+        return getConv(c, convId).then(function (conv) {
+          if (!conv) throw new Error("not_found");
+          var now = new Date().toISOString();
+          return c.from("messages").insert({ id: newId(), conv: convId, sender: u.id, text: text, kind: "admin", deal: null, created_at: now }).then(check).then(function () {
+            return c.from("conversations").upsert(Object.assign({}, conv, { last_text: ("Équipe Dealr : " + text).slice(0, 200), last_sender: u.id, updated_at: now, read_a: false, read_b: false })).then(check);
+          });
+        });
+      });
+    });
+  };
+  /* Décision sur un litige : « released » (payer le prestataire) ou « refunded » (rembourser le client) */
+  A.resolveDispute = function (deal, outcome, note) {
+    if (outcome !== "released" && outcome !== "refunded") return Promise.reject(new Error("deal_state"));
+    note = String(note || "").trim();
+    if (note.length < 10) return Promise.reject(new Error("admin_note"));
+    return needAdmin().then(client).then(function (c) {
+      return c.from("deals").select("*").eq("id", deal.id).maybeSingle().then(check).then(function (cur) {
+        if (!cur || cur.status !== "disputed") throw new Error("deal_state");
+        var now = new Date().toISOString(), patch = { status: outcome, updated_at: now };
+        patch[outcome + "_at"] = now;
+        return c.from("deals").update(patch).eq("id", cur.id).then(check).then(function () {
+          var head = outcome === "released"
+            ? "Décision de l’équipe Dealr : le paiement de " + A.eur(cur.amount) + " est versé au prestataire."
+            : "Décision de l’équipe Dealr : le client est remboursé de " + A.eur(cur.amount) + ".";
+          return A.adminPost(cur.conv, head + "\n" + note);
+        }).then(function () { return Object.assign({}, cur, patch); });
+      });
+    });
+  };
+
+  /* Pour l'admin : lien « Litiges » avec pastille et bandeau d'alerte quand un nouveau litige arrive */
+  function adminAlerts(anchor) {
+    A.isAdmin().then(function (ok) {
+      if (!ok) return;
+      return A.adminDeals().then(function (all) {
+        var open = all.filter(function (d) { return d.status === "disputed"; });
+        if (anchor && !document.getElementById("navAdmin") && !/admin\.html/.test(location.pathname)) {
+          var a = document.createElement("a"); a.id = "navAdmin"; a.href = "admin.html"; a.textContent = "Litiges";
+          var b = document.createElement("span"); b.className = "mbadge red"; b.textContent = String(open.length); b.hidden = !open.length;
+          a.appendChild(b); anchor.parentNode.insertBefore(a, anchor);
+        }
+        var key = "dealr_admin_seen", seen = "";
+        try { seen = localStorage.getItem(key) || ""; } catch (e) {}
+        var fresh = open.filter(function (d) { return String(d.disputed_at || d.updated_at) > seen; });
+        if (!fresh.length || /admin\.html/.test(location.pathname) || document.getElementById("adminAlert")) return;
+        var latest = fresh.map(function (d) { return String(d.disputed_at || d.updated_at); }).sort().pop();
+        var box = document.createElement("div"); box.id = "adminAlert"; box.setAttribute("role", "alert");
+        box.style.cssText = "position:fixed;right:16px;top:80px;z-index:70;max-width:min(380px,calc(100vw - 32px));background:#fff;border:2px solid #c0270f;border-radius:18px;padding:14px 16px;box-shadow:0 20px 50px rgba(0,0,0,.2);font:500 14px/1.45 Figtree,system-ui,sans-serif;color:#111";
+        var t = document.createElement("b"); t.style.cssText = "display:block;color:#a1230f;font-size:15px;margin-bottom:4px";
+        t.textContent = fresh.length > 1 ? fresh.length + " nouveaux litiges" : "Nouveau litige ouvert";
+        var p = document.createElement("div");
+        p.textContent = fresh.length > 1 ? "Des membres attendent une décision de l’équipe Dealr." : "« " + fresh[0].title + " » · " + A.eur(fresh[0].amount) + " bloqués au coffre.";
+        var row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;margin-top:10px";
+        var go = document.createElement("a"); go.href = "admin.html"; go.textContent = "Examiner";
+        go.style.cssText = "background:#111;color:#fff;border-radius:99px;padding:7px 16px;font-weight:600;text-decoration:none";
+        var later = document.createElement("button"); later.type = "button"; later.textContent = "Plus tard";
+        later.style.cssText = "border:0;background:none;color:#6b6b73;text-decoration:underline;cursor:pointer;font:inherit";
+        function done() { try { localStorage.setItem(key, latest); } catch (e) {} box.remove(); }
+        later.onclick = done; go.onclick = done;
+        row.appendChild(go); row.appendChild(later); box.appendChild(t); box.appendChild(p); box.appendChild(row);
+        document.body.appendChild(box);
+      });
+    }).catch(function () {});
+  }
+
   /* Lien « Messages » avec pastille de messages non lus, à placer dans un en-tête */
   A.messagesLink = function (el) {
     if (!el) return;
     if (!document.getElementById("mbadgeCss")) {
       var st = document.createElement("style"); st.id = "mbadgeCss";
-      st.textContent = ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}.mbadge[hidden]{display:none}";
+      st.textContent = ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}.mbadge.red{background:#c0270f}.mbadge[hidden]{display:none}";
       document.head.appendChild(st);
     }
     A.user().then(function (u) {
       if (!u) return;
       el.hidden = false;
+      adminAlerts(el);
       A.unreadCount().then(function (n) {
         var b = el.querySelector(".mbadge");
         if (!b) { b = document.createElement("span"); b.className = "mbadge"; el.appendChild(b); }
@@ -446,6 +548,8 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/admin_note/.test(m)) return "Expliquez votre décision en quelques mots (10 caractères minimum) : elle sera envoyée aux deux parties.";
+    if (/forbidden|permission denied|row-level security/i.test(m)) return "Action réservée : vous n’avez pas les droits nécessaires.";
     if (/deal_title/.test(m)) return "Indiquez la prestation concernée par le deal.";
     if (/deal_amount/.test(m)) return "Montant invalide : entre 1 € et 100 000 €.";
     if (/deal_state|statut non autoris/i.test(m)) return "Ce deal a changé entre-temps. La conversation a été mise à jour.";

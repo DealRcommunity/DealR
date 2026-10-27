@@ -140,6 +140,12 @@ main{flex:1;min-height:0;padding-bottom:22px}
 .btn.ghost:hover{background:none;color:var(--ink)}
 .btn[disabled]{opacity:.55;cursor:wait}
 .wait{margin:0;color:var(--mute);font-size:.88rem;flex:1 1 100%}
+.adm{align-self:center;width:min(460px,100%);background:#eef0ff;border:1.5px solid #c9cff5;border-radius:18px;padding:12px 15px;margin:10px 0}
+.adh{display:flex;align-items:center;gap:7px;font-size:.84rem;color:#2d3a8c}
+.adh i{width:8px;height:8px;border-radius:50%;background:var(--o)}
+.adh time{margin-left:auto;color:var(--mute);font-size:.76rem}
+.adm p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.94rem}
+.deal.refd{border-color:#3b4a9e}
 .ev{align-self:center;text-align:center;font-size:.8rem;color:var(--mute);margin:8px 0}
 .ev b{color:var(--ink);font-weight:600}
 
@@ -346,8 +352,8 @@ dialog textarea{min-height:80px;resize:vertical}
 var A=window.DealrAuth,$=function(i){return document.getElementById(i)};
 var me=null,convs=[],cur=null,lastSig="",deals=[],busy=false;
 var QUICK=["Bonjour, êtes-vous disponible ?","Pouvez-vous m’envoyer un devis ?","Merci, c’est parfait !"];
-var ST={proposed:"En attente de réponse",accepted:"Deal conclu",funded:"Argent au coffre",delivered:"Livré · à valider",released:"Payé",disputed:"Litige en cours",declined:"Refusé",cancelled:"Annulé",countered:"Remplacé"};
-var STEP={proposed:0,accepted:1,funded:2,delivered:3,disputed:2,released:4};
+var ST={proposed:"En attente de réponse",accepted:"Deal conclu",funded:"Argent au coffre",delivered:"Livré · à valider",released:"Payé",disputed:"Litige en cours",refunded:"Remboursé",declined:"Refusé",cancelled:"Annulé",countered:"Remplacé"};
+var STEP={proposed:0,accepted:1,funded:2,delivered:3,disputed:2,released:4,refunded:2};
 var LIVE=/^(proposed|accepted|funded|delivered|disputed)$/,DEAD=/^(declined|cancelled|countered)$/;
 function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function eur(n){return A.eur(n)}
@@ -361,7 +367,7 @@ function short(s){var d=new Date(s);if(isNaN(d))return"";return d.toDateString()
 function other(){return cur?cur.other.n:"l’autre membre"}
 /* Termine une phrase sans doubler le point d’un nom abrégé (« Inès M. ») */
 function end(s){return /[.!?]$/.test(s)?s:s+"."}
-function who(id){return id===me?"Vous":other()}
+function who(id){return id===me?"Vous":cur&&id===cur.other.id?other():"Équipe Dealr"}
 
 /* ---------- Liste des conversations ---------- */
 function renderList(){
@@ -410,6 +416,8 @@ function loadThread(scroll){
       var d=new Date(m.created_at),dk=d.toDateString(),mine=m.sender===me,next=ms[i+1];
       if(dk!==lastDay){box.appendChild(h("div","day",day(d)));lastDay=dk}
       if(m.kind==="deal"){var dd=byId[m.deal];if(dd){var w=h("div","drow");w.appendChild(dealCard(dd));box.appendChild(w)}return}
+      if(m.kind==="admin"){var ad=h("div","adm"),ah=h("div","adh");ah.appendChild(h("i"));ah.appendChild(h("b","","Équipe Dealr"));ah.appendChild(h("time","",hm(d)));
+        ad.appendChild(ah);ad.appendChild(h("p","",m.text));box.appendChild(ad);return}
       if(m.kind==="event"){var ev=h("div","ev");ev.appendChild(h("b","",who(m.sender)));ev.appendChild(document.createTextNode(" · "+m.text+" · "+hm(d)));box.appendChild(ev);return}
       var last=!next||!isText(next)||next.sender!==m.sender||new Date(next.created_at).toDateString()!==dk;
       var row=h("div","row"+(mine?" me":"")+(last?" last":""));
@@ -426,7 +434,7 @@ function loadThread(scroll){
 /* ---------- Deals ---------- */
 function active(){return deals.filter(function(d){return LIVE.test(d.status)}).pop()}
 function renderPin(){
-  var p=$("pin"),d=active()||deals.filter(function(x){return x.status==="released"}).pop();p.textContent="";
+  var p=$("pin"),d=active()||deals.filter(function(x){return x.status==="released"||x.status==="refunded"}).pop();p.textContent="";
   if(!d){p.hidden=true;return}p.hidden=false;
   p.appendChild(h("span","tag","DEAL"));var t=h("span","pt2");t.appendChild(h("b","",d.title));t.appendChild(h("small","",eur(d.amount)));p.appendChild(t);
   p.appendChild(h("span","st s-"+d.status,ST[d.status]));
@@ -435,7 +443,7 @@ function renderPin(){
 function btn(label,cls,fn){var b=h("button","btn"+(cls?" "+cls:""),label);b.type="button";b.onclick=fn;return b}
 function waitTxt(t){return h("p","wait",t)}
 function dealCard(d){
-  var dead=DEAD.test(d.status),el=h("div","deal"+(dead?" dead":"")+(d.status==="released"?" paid":""));el.dataset.deal=d.id;
+  var dead=DEAD.test(d.status),el=h("div","deal"+(dead?" dead":"")+(d.status==="released"?" paid":"")+(d.status==="refunded"?" refd":""));el.dataset.deal=d.id;
   var top=h("div","dh");top.appendChild(h("span","tag","DEAL"));top.appendChild(h("span","st s-"+d.status,ST[d.status]));el.appendChild(top);
   el.appendChild(h("div","amt",eur(d.amount)));el.appendChild(h("div","ttl",d.title));
   var meta=[];if(d.deadline)meta.push("Livraison avant le "+new Date(d.deadline+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"long"}));
@@ -475,8 +483,10 @@ function actions(d){
         box.appendChild(btn("Signaler un problème","ghost",function(){dispute(d)}))}
       else box.appendChild(waitTxt(end("Travail livré. En attente de la validation de "+o)));
       break;
-    case "released":box.appendChild(waitTxt(d.payee===me?eur(d.amount)+" ont été versés sur votre compte Dealr.":end("Paiement versé à "+o)+" Mission terminée !"));break;
-    case "disputed":box.appendChild(waitTxt("Litige ouvert : l’argent reste bloqué au coffre. L’équipe Dealr va contacter les deux parties."));break;
+    case "released":box.appendChild(waitTxt(d.disputed_at?(d.payee===me?"L’équipe Dealr a tranché en votre faveur : "+eur(d.amount)+" ont été versés sur votre compte.":end("L’équipe Dealr a tranché : le paiement a été versé à "+o))
+      :d.payee===me?eur(d.amount)+" ont été versés sur votre compte Dealr.":end("Paiement versé à "+o)+" Mission terminée !"));break;
+    case "disputed":box.appendChild(waitTxt("Litige ouvert : l’argent reste bloqué au coffre. Un administrateur Dealr examine la situation et vous répondra dans cette conversation."));break;
+    case "refunded":box.appendChild(waitTxt(d.payer===me?"L’équipe Dealr a tranché : "+eur(d.amount)+" vous ont été remboursés.":"L’équipe Dealr a tranché : le client a été remboursé."));break;
     case "countered":box.appendChild(waitTxt("Remplacé par une contre-proposition."));break;
     case "declined":box.appendChild(waitTxt("Ce deal a été refusé."));break;
     case "cancelled":box.appendChild(waitTxt("Ce deal a été annulé."));break}
@@ -532,15 +542,17 @@ function seen(d,set){try{if(set){localStorage.setItem(seenKey(d),"1");return tru
 /* Le prestataire voit l'animation quand le client a mis l'argent au coffre, puis quand il le libère */
 function replayForPayee(){
   if(!$("vov").hidden)return;
-  var d=deals.filter(function(x){return x.payee===me&&(x.status==="funded"||x.status==="released")&&!seen(x)}).pop();
+  var d=deals.filter(function(x){return !seen(x)&&((x.payee===me&&(x.status==="funded"||x.status==="released"))||(x.payer===me&&x.status==="refunded"))}).pop();
   if(!d)return;seen(d,true);vault(d.status==="funded"?"lock":"open",d,true)}
 function vault(mode,d,passive){
   var ov=$("vov"),o=other(),a=eur(d.amount);
   $("vCoin").textContent=a;$("vPlus").textContent="+"+a;
   if(mode==="lock"){$("vT").innerHTML="L’argent part <em>au coffre.</em>";$("vBadge").textContent="Fonds sécurisés · "+a;
     $("vS").textContent=passive?o+" a sécurisé "+a+". Vous pouvez commencer : vous serez payé dès que la livraison sera validée.":a+" sont bloqués chez Dealr. Ils seront versés à "+o+" seulement quand vous validerez la livraison."}
-  else{$("vT").innerHTML="Le coffre <em>s’ouvre.</em>";$("vBadge").textContent="Paiement versé";
-    $("vS").textContent=passive?o+" a validé votre travail : "+a+" sont versés sur votre compte Dealr.":end(a+" ont été versés à "+o)+" Merci pour votre confiance !"}
+  else{$("vT").innerHTML="Le coffre <em>s’ouvre.</em>";$("vBadge").textContent=d.status==="refunded"?"Remboursement effectué":"Paiement versé";
+    $("vS").textContent=d.status==="refunded"?"L’équipe Dealr a tranché le litige : "+a+" vous sont remboursés."
+      :d.disputed_at&&passive?"L’équipe Dealr a tranché en votre faveur : "+a+" sont versés sur votre compte Dealr."
+      :passive?o+" a validé votre travail : "+a+" sont versés sur votre compte Dealr.":end(a+" ont été versés à "+o)+" Merci pour votre confiance !"}
   ov.className="vov "+mode;ov.hidden=false;void ov.offsetWidth;ov.classList.add("play");
   setTimeout(function(){if(!ov.hidden)$("vOk").focus()},mode==="lock"?3000:3300)}
 function closeVault(){var ov=$("vov");ov.hidden=true;ov.className="vov";$("txt").focus()}
