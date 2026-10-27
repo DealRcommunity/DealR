@@ -21,8 +21,31 @@ em.i{color:var(--ind)}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--o);outline-offset:3px}
 .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
-header{position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);background:rgba(255,255,255,.7)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+/* Barre du haut : capsule centrée en verre dépoli */
+header.gh{position:sticky;top:0;z-index:50;padding:18px 16px 0;display:flex;justify-content:center;pointer-events:none}
+.gh-in{pointer-events:auto;display:flex;align-items:center;gap:26px;padding:7px 7px 7px 22px;border-radius:99px;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);border:1px solid rgba(255,255,255,.85);box-shadow:0 0 0 5px rgba(255,255,255,.35),0 10px 34px rgba(40,50,120,.09),inset 0 1px 0 rgba(255,255,255,.95)}
+.gh .logo i{background:linear-gradient(135deg,#3448f0,var(--o))}
+.gh nav,.gh .dnav{gap:2px}
+.gh nav a,.gh .dnav a,.gh .dnav button.lk{color:#4a4a52;padding:8px 12px;border-radius:99px;font-size:.97rem;transition:background .2s,color .2s}
+.gh nav a:hover,.gh .dnav a:hover,.gh .dnav button.lk:hover{background:rgba(255,255,255,.8);color:var(--ink)}
+.gh .dnav .dn-dd a,.gh .dnav .dn-dd button.lk{border-radius:10px}
+.gh .dnav .dn-dd a:hover,.gh .dnav .dn-dd button.lk:hover{background:#f5f5f7}
+.gh .dnav a#dnSignup,.gh .dnav button.dn-accbtn,.gh nav a.gh-mcta{color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.6);border-radius:99px;background:linear-gradient(100deg,rgba(64,86,255,.84) 0%,rgba(150,90,200,.8) 50%,rgba(245,90,31,.86) 100%);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 16px rgba(255,255,255,.12),-8px 10px 24px rgba(52,72,240,.26),8px 10px 24px rgba(245,90,31,.26);transition:transform .2s ease,box-shadow .2s ease}
+.gh .dnav a#dnSignup{display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 20px;margin-left:10px}
+.gh .dnav a#dnSignup:after{content:"";width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6' fill='none' stroke='%23111' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/15px no-repeat}
+.gh .dnav button.dn-accbtn{padding:10px 18px;margin-left:10px}
+.gh .dnav a#dnSignup:hover,.gh .dnav button.dn-accbtn:hover,.gh .dnav button.dn-accbtn[aria-expanded=true],.gh nav a.gh-mcta:hover{color:#fff;transform:translateY(-2px);background:linear-gradient(100deg,rgba(64,86,255,.92) 0%,rgba(150,90,200,.88) 50%,rgba(245,90,31,.94) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),-10px 14px 30px rgba(52,72,240,.34),10px 14px 30px rgba(245,90,31,.34)}
+.gh nav a.gh-mcta{display:none;padding:9px 14px;font-size:.88rem;white-space:nowrap}
+.gh .dnav-tg{width:40px;height:40px;padding:0;justify-content:center;position:relative;font-size:0;border:1px solid rgba(17,17,17,.08);background:rgba(255,255,255,.75) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 7h16M4 12h16M4 17h16' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/18px no-repeat}
+.gh .dnav-tg .mbadge{position:absolute;top:-4px;right:-4px}
+@media(max-width:760px){
+ .gh-in{width:100%;justify-content:space-between;gap:10px;padding:6px 6px 6px 16px}
+ .gh nav{gap:6px}
+ .gh nav a.gh-mcta{display:inline-flex}
+ .gh .dnav a#dnSignup{background:none;color:var(--ink);box-shadow:none;border:0;padding:11px 14px;margin:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+ .gh .dnav a#dnSignup:after{display:none}
+ .gh .dnav a#dnSignup:hover{transform:none;background:#f5f5f7;color:var(--ink);box-shadow:none}
+}
 .logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
 .logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
 nav{display:flex;gap:26px;align-items:center;font-weight:500}
@@ -33,9 +56,52 @@ nav a:hover{color:var(--ink)}
 .btn.out{background:transparent;color:var(--ink)}
 .btn.out:hover{background:#fff}
 .btn.sm{padding:9px 18px;font-size:.95rem}
-.hero{padding:70px 0 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+/* Introduction */
+.hero{position:relative;padding:70px 0 0;text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero:before{content:"";position:absolute;z-index:-1;pointer-events:none;left:50%;top:-140px;width:100vw;height:980px;transform:translateX(-50%);
+ background:radial-gradient(50% 42% at 100% 0,#ffd9bf 0,rgba(255,217,191,0) 72%),radial-gradient(48% 42% at 0 0,#dce2ff 0,rgba(220,226,255,0) 72%),radial-gradient(34% 24% at 44% 56%,rgba(255,222,200,.75) 0,rgba(255,222,200,0) 70%),radial-gradient(30% 22% at 58% 60%,rgba(208,216,255,.7) 0,rgba(208,216,255,0) 70%)}
 h1{font-size:clamp(2.6rem,6.4vw,5rem)}
-.lead{font-size:1.2rem;color:var(--mute);max-width:30em;margin:22px 0 30px}
+.hero h1{position:relative;max-width:980px;font-size:clamp(2.6rem,6vw,4.75rem);line-height:1.02;letter-spacing:-.045em}
+.hero h1 em{font-size:1.06em}
+.lead{font-size:1.2rem;color:#55555c;max-width:30em;margin:24px auto 0}
+.tile{position:absolute;display:grid;place-items:center;border:4px solid #fff;transform:rotate(var(--r));animation:tfloat 6s ease-in-out infinite}
+.tile svg{width:62%;height:62%}
+.tile.t1{--r:-12deg;left:0;top:170px;width:112px;height:112px;border-radius:30px;background:linear-gradient(150deg,#ff8248 0%,#f55a1f 55%,#e2461a 100%);box-shadow:0 22px 44px rgba(245,90,31,.32),0 2px 6px rgba(0,0,0,.08)}
+.tile.t2{--r:12deg;right:24px;top:72px;width:88px;height:88px;border-radius:25px;animation-delay:-3s;background:linear-gradient(150deg,#5a6bff 0%,#3448f0 55%,#2a38c4 100%);box-shadow:0 20px 40px rgba(52,72,240,.3),0 2px 6px rgba(0,0,0,.08)}
+@keyframes tfloat{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-10px) rotate(var(--r))}}
+.hero .ctas{margin-top:34px;gap:20px;justify-content:center}
+.cta{display:inline-flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 8px 8px 28px;border-radius:99px;color:#fff;font-weight:700;font-size:1.05rem;text-decoration:none;border:2px solid rgba(255,255,255,.6);transition:transform .2s ease,box-shadow .2s ease}
+.cta:hover{transform:translateY(-3px) scale(1.02)}
+.cta .ar{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;transition:transform .2s ease}
+.cta:hover .ar{transform:translateX(3px)}
+.cta.o{background:linear-gradient(100deg,#ff8f52 0%,#f55a1f 55%,#e8431a 100%);box-shadow:0 14px 32px rgba(245,90,31,.4),0 0 0 7px rgba(245,90,31,.12)}
+.cta.o:hover{box-shadow:0 20px 40px rgba(245,90,31,.5),0 0 0 9px rgba(245,90,31,.16)}
+.cta.b{background:linear-gradient(100deg,#6a7bff 0%,#3448f0 55%,#2a38c4 100%);box-shadow:0 14px 32px rgba(52,72,240,.36),0 0 0 7px rgba(52,72,240,.12)}
+.cta.b:hover{box-shadow:0 20px 40px rgba(52,72,240,.46),0 0 0 9px rgba(52,72,240,.16)}
+.trust{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;font-size:.95rem;color:#55555c;font-weight:500}
+.trust li{display:flex;align-items:center;gap:8px}
+.trust li:before{content:"";width:18px;height:18px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2322a863' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Bandeau des membres inscrits */
+.band{margin-top:80px}
+.band-h{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 20px;padding:0 22px}
+.band-h p{margin:0;font-weight:600}
+.stack{display:flex;padding-left:10px}
+.sav,.mav{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;overflow:hidden}
+.sav img,.mav img{width:100%;height:100%;object-fit:cover}
+.sav{width:36px;height:36px;border:3px solid #fff;margin-left:-10px;font-size:.72rem}
+.band-v{overflow:hidden;padding:6px 0 18px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%)}
+.track{display:flex;width:max-content;animation:slide 40s linear infinite}
+.band-v:hover .track,.band-v:focus-within .track{animation-play-state:paused}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mcard{display:flex;align-items:center;gap:12px;margin-right:16px;background:#fff;border-radius:18px;padding:12px 18px 12px 12px;box-shadow:0 10px 30px rgba(60,30,10,.09),0 1px 3px rgba(60,30,10,.06);min-width:260px;text-decoration:none;transition:transform .2s}
+.mcard:hover{transform:translateY(-3px)}
+.mav{width:46px;height:46px;font-size:.92rem}
+.mtx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mtop{display:flex;align-items:center;gap:8px}
+.mtop b{font-size:.95rem;white-space:nowrap}
+.mt{font-size:.7rem;font-weight:700;border-radius:99px;padding:2px 8px;background:#eef0ff;color:#2d3a8c;white-space:nowrap}
+.mt.co{background:#fff1cc;color:#6b4a00}
+.mtx small{font-size:.85rem;color:var(--mute);white-space:nowrap}
 .ctas{display:flex;gap:12px;flex-wrap:wrap}
 .card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 24px 60px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06)}
 .tilt{transform:rotate(-2.5deg)}
@@ -48,9 +114,9 @@ h1{font-size:clamp(2.6rem,6.4vw,5rem)}
 .price{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:-.04em;margin:16px 0 14px}
 .price small{font:500 .9rem Figtree;color:var(--mute);letter-spacing:0}
 .full{display:block;width:100%;text-align:center}
-.cats{padding:30px 0 10px}
+.cats{padding:50px 0 10px;text-align:center}
 .cats p{margin:0 0 14px;font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .chips a{border:1px solid #dcdce2;background:#fff;border-radius:99px;padding:8px 18px;text-decoration:none;font-weight:500}
 .chips a:hover{border-color:var(--ink)}
 section.row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:84px 0}
@@ -122,27 +188,38 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 .fgrid a{text-decoration:none}
 .fgrid a:hover{color:var(--ink);text-decoration:underline}
 .fbot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:20px 0;font-size:.88rem}
-@media(max-width:620px){nav a.navcta{display:none}nav{gap:14px}}
+@media(max-width:1000px){.tile.t1{width:84px;height:84px;border-radius:24px;top:200px}.tile.t2{width:66px;height:66px;border-radius:19px;right:6px}}
+@media(max-width:760px){
+ .hero{padding-top:104px}
+ .tile{border-width:3px}
+ .tile.t1{left:9%;top:18px;width:62px;height:62px;border-radius:19px}
+ .tile.t2{right:11%;top:30px;width:50px;height:50px;border-radius:15px}
+ .hero .ctas{flex-direction:column;align-self:stretch;gap:18px}
+ .cta{padding-left:24px}
+ .trust{flex-direction:column;align-items:flex-start}
+ .band{margin-top:56px}
+ .mcard{min-width:0;padding:10px 14px 10px 10px;margin-right:12px}
+ .mav{width:40px;height:40px}
+}
 @media(max-width:860px){
  .fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}
- .hero,section.row{grid-template-columns:1fr;gap:36px}
+ section.row{grid-template-columns:1fr;gap:36px}
  section.row{padding:56px 0}
  section.row.flip .txt{order:0}
  nav a.hide{display:none}
- .hero{padding-top:44px}
 }
-@media(prefers-reduced-motion:reduce){.hub{animation:none}html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.hub,.tile,.track{animation:none}.band-v{overflow-x:auto}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
+<header class="gh">
+  <div class="gh-in">
     <a class="logo" href="index.html"><i></i>Dealr</a>
     <nav data-nav="home">
       <a data-extra href="#entreprise">Entreprises</a>
       <a data-extra href="#freelance">Freelances</a>
       <a data-extra href="#paiement">Paiement</a>
-      <a data-extra="end" class="btn sm navcta member-only" href="marketplace.html">Publier un besoin</a>
+      <a data-extra="end" data-acc class="gh-mcta" id="ghSignup" href="connexion.html#inscription">Créer un compte</a>
     </nav>
   </div>
 </header>
@@ -150,25 +227,28 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 <main>
 <div class="wrap">
   <section class="hero">
-    <div>
-      <h1>Trouvez un prestataire <em class="i">fiable.</em><br>Soyez sûr d’être <em>payé.</em></h1>
-      <p class="lead">Dealr relie particuliers, entreprises et freelances. L’argent est bloqué jusqu’à la livraison, puis versé.</p>
-      <div class="ctas">
-        <a class="btn member-only" href="marketplace.html">Publier un besoin</a>
-        <a class="btn out" data-acc href="connexion.html#inscription">Proposer mes services</a>
-      </div>
+    <div class="tile t1" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="44" cy="54" r="32" fill="#fff"/><rect x="62" y="22" width="20" height="64" rx="5" fill="#fff"/><circle cx="44" cy="54" r="19" fill="#f55a1f"/><g stroke="#fff" stroke-width="6" stroke-linecap="round"><line x1="44" y1="54" x2="44" y2="72"/><line x1="44" y1="54" x2="28" y2="45"/><line x1="44" y1="54" x2="60" y2="45"/></g><circle cx="44" cy="54" r="6" fill="#fff"/></svg></div>
+    <div class="tile t2" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><line x1="16" y1="50" x2="62" y2="50" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="16" cy="50" r="9" fill="#fff"/><circle cx="42" cy="50" r="9" fill="#fff"/><circle cx="74" cy="50" r="13" stroke="#fff" stroke-width="8"/></svg></div>
+    <h1>Trouvez un prestataire <em class="i">fiable.</em><br>Soyez sûr d’être <em>payé.</em></h1>
+    <p class="lead">Publiez votre besoin, choisissez votre prestataire. L’argent reste au coffre jusqu’à la livraison.</p>
+    <div class="ctas">
+      <a class="cta o member-only" href="marketplace.html">Publier un besoin<span class="ar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f55a1f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a class="cta b" data-acc href="connexion.html#inscription">Proposer mes services<span class="ar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3448f0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
     </div>
-    <div class="card tilt" aria-label="Exemple d’annonce">
-      <h3>Nouvelle annonce</h3>
-      <div class="lbl">Service</div><div class="field">Montage vidéo</div>
-      <div class="lbl">Votre besoin</div><div class="field">3 Reels par semaine pour notre café</div>
-      <div class="lbl">Budget</div>
-      <div class="seg"><span class="on">Je fixe mon prix</span><span>Recevoir des offres</span></div>
-      <div class="price">336 € <small>/ mission</small></div>
-      <a class="btn full" href="marketplace.html">Publier l’annonce</a>
-    </div>
+    <ul class="trust">
+      <li>Paiement bloqué jusqu’à la livraison</li>
+      <li>Inscription sans frais</li>
+      <li>Litiges arbitrés par l’équipe Dealr</li>
+    </ul>
   </section>
+</div>
 
+<section class="band" aria-label="Membres inscrits sur Dealr">
+  <div class="band-h"><div class="stack" id="stack" aria-hidden="true"></div><p>Ils sont déjà sur Dealr</p></div>
+  <div class="band-v"><div class="track" id="track"></div></div>
+</section>
+
+<div class="wrap">
   <div class="cats">
     <p>Tous les métiers du numérique au même endroit.</p>
     <div class="chips">
@@ -323,10 +403,39 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 </script>
 <script src="config.js"></script>
 <script src="auth.js"></script>
+<script src="profils.js"></script>
+<script>
+/* Bandeau défilant des membres inscrits (vrais profils d'abord, puis profils de démonstration) */
+(function(){
+  var C=["#1f4fd8","#c2410c","#0f766e","#7c3aed","#be185d","#4d7c0f","#f55a1f","#3b4a9e"];
+  var track=document.getElementById("track"),stack=document.getElementById("stack");
+  function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function ini(n){return String(n||"?").trim().split(/\s+/).map(function(w){return w.charAt(0)}).slice(0,2).join("").toUpperCase()}
+  function av(p,i,cls){var ph=DealrAuth.safeImg(p.photo);return '<span class="'+cls+'" style="background:'+C[i%C.length]+'">'+(ph?'<img src="'+ph+'" alt="">':esc(ini(p.n)))+'</span>'}
+  function draw(list){
+    if(!list.length)return;
+    var one=list.map(function(p,i){var co=p.t==="Entreprise";
+      return '<a class="mcard" href="prestataire.html?id='+encodeURIComponent(p.id)+'">'+av(p,i,"mav")+
+        '<span class="mtx"><span class="mtop"><b>'+esc(p.n)+'</b><span class="mt'+(co?" co":"")+'">'+(co?"Entreprise":"Freelance")+'</span></span>'+
+        '<small>'+esc([p.job,p.city].filter(Boolean).join(" · "))+'</small></span></a>'}).join("");
+    track.innerHTML=one+one.replace(/<a class="mcard"/g,'<a class="mcard" tabindex="-1" aria-hidden="true"');
+    track.style.animationDuration=Math.max(30,list.length*5)+"s";
+    stack.innerHTML=list.slice(0,5).map(function(p,i){return av(p,i,"sav")}).join("");
+  }
+  var base=(window.DEALR_PROS||[]).slice();
+  draw(base);
+  DealrAuth.listProfiles().then(function(l){
+    l=(l||[]).filter(function(p){return p&&p.n});if(!l.length)return;
+    var ids={};l.forEach(function(p){ids[p.id]=1});
+    draw(l.concat(base.filter(function(p){return !ids[p.id]})));
+  });
+})();
+</script>
 <script>
 /* Membre connecté : les boutons « Créer mon compte » mènent à son profil */
 DealrAuth.user().then(function(u){
   if(!u)return;
+  var gs=document.getElementById("ghSignup");if(gs)gs.hidden=true;
   document.querySelectorAll("[data-acc]").forEach(function(a){a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"});
 });
 </script>
