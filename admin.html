@@ -26,7 +26,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 .logo{font-size:1.45rem;text-decoration:none;display:flex;align-items:center;gap:8px}
 .logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
 .pill{background:var(--ink);color:#fff;border-radius:99px;padding:3px 10px;font-size:.74rem;font-weight:700}
-nav{display:flex;gap:20px;font-weight:500}
+nav{display:flex;gap:20px;font-weight:500;align-items:center}
 nav a{text-decoration:none;color:var(--mute)}
 nav a:hover{color:var(--ink)}
 .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:99px;padding:10px 18px;font:600 .92rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
@@ -142,7 +142,7 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 <body class="wait">
 <header><div class="wrap">
   <div class="brand"><a class="logo" href="index.html"><i></i>Dealr</a><span class="pill">Admin</span></div>
-  <nav><a class="hide" href="marketplace.html">Marketplace</a><a id="navMsg" href="messages.html" hidden>Messages</a><a href="prestataire.html?id=moi">Mon profil</a></nav>
+  <nav><a class="hide" href="marketplace.html">Marketplace</a><a id="navMsg" href="messages.html" hidden>Messages</a><button type="button" class="btn out sm" id="logout">Se déconnecter</button></nav>
 </div></header>
 
 <main class="wrap" id="main">
@@ -337,6 +337,7 @@ function loadThread(){
 document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
   document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderList()}});
 $("q").oninput=renderList;
+$("logout").onclick=function(){this.disabled=true;A.signOut().then(function(){location.href="index.html"})};
 var email="";
 A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.isAdmin()}).then(function(ok){
   document.body.classList.remove("wait");
@@ -345,7 +346,7 @@ A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.
     var who=h("p","");who.style.margin="14px 0 0";who.appendChild(document.createTextNode("Vous êtes connecté avec "));who.appendChild(h("b","",email||"un autre compte"));
     who.appendChild(document.createTextNode(", qui n’est pas un compte administrateur."));dn.appendChild(who);
     var row=h("div","row");row.style.justifyContent="center";
-    row.appendChild(btn("Changer de compte","",function(){A.signOut().then(function(){location.href="connexion.html?next=admin.html"})}));
+    row.appendChild(btn("Se connecter en admin","",function(){A.signOut().then(function(){location.href="connexion.html?next=admin.html"})}));
     var a=h("a","btn out","Retour à l’accueil");a.href="index.html";row.appendChild(a);dn.appendChild(row);m.appendChild(dn);return}
   A.messagesLink($("navMsg"));
   return load().then(function(){var first=all.filter(function(d){return d.status==="disputed"})[0];

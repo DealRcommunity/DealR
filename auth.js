@@ -80,7 +80,8 @@
         if (q.op === "upsert") {
           if (!s) return ko("not_logged");
           var row = q.row;
-          if (table === "profiles" && row.id !== s.user.id) return ko("forbidden");
+          if (table === "profiles" && (row.id !== s.user.id || adm)) return ko("forbidden");
+          if (table === "deals" && adm) return ko("admin_member");
           if (table === "documents") row.owner = s.user.id;
           if (table === "conversations" && !adm && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
           if (table === "messages" && row.kind === "admin" && !adm) return ko("forbidden");
@@ -94,6 +95,10 @@
         var out = table === "documents" ? rows.filter(function (r) { return s && r.owner === s.user.id; })
           : table === "conversations" && !adm ? rows.filter(function (r) { return s && (r.user_a === s.user.id || r.user_b === s.user.id); })
           : rows.slice();
+        if (table === "profiles") {
+          var admIds = get("users", []).filter(function (u) { return isAdminEmail(u.email); }).map(function (u) { return u.id; });
+          out = out.filter(function (r) { return admIds.indexOf(r.id) < 0; });
+        }
         q.f.forEach(function (f) { out = out.filter(f); });
         if (q.sort) out.sort(function (a, c) { var x = String(a[q.sort.k] || ""), y = String(c[q.sort.k] || ""); return q.sort.asc ? (x < y ? -1 : x > y ? 1 : 0) : (x < y ? 1 : x > y ? -1 : 0); });
         if (q.lim) out = out.slice(0, q.lim);
@@ -187,8 +192,10 @@
     });
   };
   A.saveProfile = function (data) {
-    return A.user().then(function (u) {
+    return Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0];
       if (!u) throw new Error("not_logged");
+      if (r[1]) throw new Error("admin_member");
       return client()
         .then(function (c) { return c.from("profiles").upsert({ id: u.id, data: data, updated_at: new Date().toISOString() }); })
         .then(check);
@@ -363,8 +370,10 @@
     var amount = Math.round(parseFloat(String(f.amount).replace(",", ".")) * 100) / 100;
     if (!title) return Promise.reject(new Error("deal_title"));
     if (!(amount >= 1) || amount > 100000) return Promise.reject(new Error("deal_amount"));
-    return A.user().then(function (u) {
+    return Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0];
       if (!u) throw new Error("not_logged");
+      if (r[1]) throw new Error("admin_member");
       return client().then(function (c) {
         return getConv(c, convId).then(function (conv) {
           if (!conv) throw new Error("not_found");
@@ -433,7 +442,8 @@
      Démo : adresse présente dans ADMIN_EMAILS (config.js).
      Supabase : présence dans la table admins, vérifiée par la base (fonction is_admin). */
   var adminP = null;
-  A.isAdmin = function () {
+  A.isAdmin = function (refresh) {
+    if (refresh) adminP = null;
     if (!adminP) adminP = A.user().then(function (u) {
       if (!u) return false;
       if (demo) return isAdminEmail(u.email);
@@ -494,10 +504,15 @@
       if (!ok) return;
       return A.adminDeals().then(function (all) {
         var open = all.filter(function (d) { return d.status === "disputed"; });
-        if (anchor && !document.getElementById("navAdmin") && !/admin\.html/.test(location.pathname)) {
-          var a = document.createElement("a"); a.id = "navAdmin"; a.href = "admin.html"; a.textContent = "Litiges";
-          var b = document.createElement("span"); b.className = "mbadge red"; b.textContent = String(open.length); b.hidden = !open.length;
-          a.appendChild(b); anchor.parentNode.insertBefore(a, anchor);
+        if (anchor && !/admin\.html/.test(location.pathname)) {
+          var nav = anchor.closest("nav") || anchor.parentNode;
+          var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="prestataire.html?id=moi"],a#navAdmin'));
+          if (!links.length) { var na = document.createElement("a"); na.id = "navAdmin"; anchor.parentNode.insertBefore(na, anchor.nextSibling); links = [na]; }
+          links.forEach(function (a) {
+            a.href = "admin.html"; a.textContent = "Administration"; a.hidden = false;
+            var b = document.createElement("span"); b.className = "mbadge red"; b.textContent = String(open.length); b.hidden = !open.length;
+            a.appendChild(b);
+          });
         }
         var key = "dealr_admin_seen", seen = "";
         try { seen = localStorage.getItem(key) || ""; } catch (e) {}
@@ -548,6 +563,7 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/admin_member/.test(m)) return "Le compte administrateur sert à gérer le site : il ne peut pas avoir de profil ni faire de deal.";
     if (/admin_note/.test(m)) return "Expliquez votre décision en quelques mots (10 caractères minimum) : elle sera envoyée aux deux parties.";
     if (/forbidden|permission denied|row-level security/i.test(m)) return "Action réservée : vous n’avez pas les droits nécessaires.";
     if (/deal_title/.test(m)) return "Indiquez la prestation concernée par le deal.";
@@ -583,6 +599,19 @@
 
   /* Image enregistrée sous forme de data URL : on n'accepte que des images encodées proprement */
   A.safeImg = function (s) { return typeof s === "string" && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(s) ? s : ""; };
+
+  /* Le compte admin gère le site : il ne crée pas de profil, ne propose pas ses services, ne fait pas de deal.
+     Les éléments marqués « member-only » (ou data-acc) lui sont masqués. */
+  function adminMode() {
+    A.isAdmin().then(function (ok) {
+      if (!ok) return;
+      var st = document.createElement("style");
+      st.textContent = ".is-admin [data-acc],.is-admin .member-only{display:none!important}";
+      document.head.appendChild(st);
+      document.body.classList.add("is-admin");
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", adminMode); else adminMode();
 
   window.DealrAuth = A;
 })();

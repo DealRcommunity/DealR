@@ -115,7 +115,7 @@ footer a{text-decoration:none}
       <a class="hide" href="marketplace.html" aria-current="page">Marketplace</a>
       <a id="navMsg" href="messages.html" hidden>Messages</a>
       <a id="navAcc" href="connexion.html">Se connecter</a>
-      <button class="btn sm" type="button" id="openMission">Publier une mission</button>
+      <button class="btn sm member-only" type="button" id="openMission">Publier une mission</button>
     </nav>
   </div>
 </header>
@@ -212,14 +212,14 @@ const proCard=x=>{const img=DealrAuth.safeImg(x.photo),nm=x.n||"?",mine=me&&x.id
   <div class="meta"><span class="b ${cls(x.t)}">${esc(x.t||"Freelance")}</span>${x.dispo&&/maintenant/.test(x.dispo)?'<span class="b d">Disponible</span>':""}${x.demo?'<span class="b x">Exemple</span>':""}<span class="sub">${esc(x.city||"")}</span></div>
   <div class="tags">${(x.tags||[]).slice(0,4).map(t=>`<span>${esc(t)}</span>`).join("")}</div>
   <div class="foot"><div><div class="price">${esc(x.p||"Sur devis")}</div><div class="rating">${+x.a?`<b>★</b> ${String(+x.r).replace(".",",")} · ${+x.a} avis`:"Nouveau profil"}</div></div>
-  <div class="acts2"><a class="btn out sm" href="prestataire.html?id=${encodeURIComponent(mine?"moi":(x.id||""))}">Voir le profil</a>${mine?"":`<button type="button" class="btn sm" data-pro="${esc(x.id||"")}">Contacter</button>`}</div></div></article>`};
+  <div class="acts2"><a class="btn out sm" href="prestataire.html?id=${encodeURIComponent(mine?"moi":(x.id||""))}">Voir le profil</a>${mine?"":`<button type="button" class="btn sm member-only" data-pro="${esc(x.id||"")}">Contacter</button>`}</div></div></article>`};
 const misCard=(x,i)=>`<article class="card">
   <div class="meta"><span class="b ${cls(x.who)}">${esc(x.who)}</span><span class="b x">${esc(x.c)}</span>${x.demo?'<span class="b x">Exemple</span>':""}</div>
   <h3>${esc(x.title)}</h3>
   <p class="desc">${esc(x.desc)}</p>
   <div class="sub">${esc(x.by)}</div>
   <div class="foot"><div><div class="price">${esc(x.b)}</div><div class="rating">${esc(x.d)}</div></div>
-  <button type="button" class="btn sm" data-mis="${esc(x.by)}">Proposer mes services</button></div></article>`;
+  <button type="button" class="btn sm member-only" data-mis="${esc(x.by)}">Proposer mes services</button></div></article>`;
 
 /* Filtres */
 function setView(v){view=v;type="Tous";cat="Toutes";$("#vPros").setAttribute("aria-pressed",v==="pros");$("#vMis").setAttribute("aria-pressed",v==="missions");setup();render()}

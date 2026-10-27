@@ -458,7 +458,8 @@ $("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.v
   }).catch(function(){msg.textContent="Impossible de lire ce fichier. Ajoutez vos expériences à la main."})});
 A.messagesLink(document.getElementById("navMsg"));
 /* Accès réservé aux membres connectés */
-A.requireUser("profil.html").then(function(){return A.myProfile().catch(function(){return null})}).then(function(p){
+A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}
+  return A.myProfile().catch(function(){return null})}).then(function(p){
   if(p){editing=true;fillFrom(p);document.title="Dealr – Modifier mon profil"}
   renderSkills();renderExps();show();document.body.classList.remove("wait")});
 })();

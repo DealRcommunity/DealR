@@ -217,7 +217,7 @@ $("print").onclick=function(){
 
 /* Accès réservé : on charge le profil et les documents du compte */
 A.messagesLink(document.getElementById("navMsg"));
-A.requireUser("documents.html").then(function(u){
+A.requireUser("documents.html").then(function(u){return A.isAdmin().then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}return u})}).then(function(u){
   return Promise.all([A.myProfile().catch(function(){return null}),A.listDocs().catch(function(){return[]})]).then(function(r){
     var p=r[0];docs=r[1]||[];
     var last=docs[0]&&docs[0].data&&docs[0].data.issuer;

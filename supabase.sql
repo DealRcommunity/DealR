@@ -15,6 +15,12 @@ language sql stable security definer set search_path = public
 as $$ select exists (select 1 from public.admins where user_id = auth.uid()) $$;
 grant execute on function public.is_admin() to authenticated;
 
+-- Ce membre est-il administrateur ? (sert à masquer les comptes admin de la marketplace)
+create or replace function public.is_admin_id(uid uuid) returns boolean
+language sql stable security definer set search_path = public
+as $$ select exists (select 1 from public.admins where user_id = uid) $$;
+grant execute on function public.is_admin_id(uuid) to anon, authenticated;
+
 -- 1. Profils des prestataires
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -23,17 +29,18 @@ create table if not exists public.profiles (
 );
 alter table public.profiles enable row level security;
 
+-- Le compte admin gère le site : il n'a pas de profil public
 drop policy if exists "Profils visibles par tous" on public.profiles;
 create policy "Profils visibles par tous"
-  on public.profiles for select using (true);
+  on public.profiles for select using (not public.is_admin_id(id));
 
 drop policy if exists "Créer son propre profil" on public.profiles;
 create policy "Créer son propre profil"
-  on public.profiles for insert to authenticated with check (auth.uid() = id);
+  on public.profiles for insert to authenticated with check (auth.uid() = id and not public.is_admin());
 
 drop policy if exists "Modifier son propre profil" on public.profiles;
 create policy "Modifier son propre profil"
-  on public.profiles for update to authenticated using (auth.uid() = id) with check (auth.uid() = id);
+  on public.profiles for update to authenticated using (auth.uid() = id) with check (auth.uid() = id and not public.is_admin());
 
 drop policy if exists "Supprimer son propre profil" on public.profiles;
 create policy "Supprimer son propre profil"
@@ -168,7 +175,7 @@ drop policy if exists "Proposer un deal" on public.deals;
 create policy "Proposer un deal"
   on public.deals for insert to authenticated
   with check (
-    proposer = auth.uid() and status = 'proposed'
+    proposer = auth.uid() and status = 'proposed' and not public.is_admin()
     and exists (select 1 from public.conversations c
                 where c.id = conv and payer in (c.user_a, c.user_b) and payee in (c.user_a, c.user_b))
   );
@@ -253,3 +260,6 @@ create policy "Admins : trancher un litige"
 insert into public.admins (user_id)
   select id from auth.users where email = 'alexisguillory091@gmail.com'
   on conflict do nothing;
+
+-- Un compte admin n'a pas de profil de prestataire : on supprime celui qu'il aurait créé avant
+delete from public.profiles where id in (select user_id from public.admins);

@@ -92,7 +92,7 @@ var id=new URLSearchParams(location.search).get("id")||"";
 
 /* Chargement du profil : le sien (connecté), un membre (base de données) ou un exemple */
 function load(){
-  if(id==="moi")return A.requireUser("prestataire.html?id=moi").then(function(u){
+  if(id==="moi")return A.requireUser("prestataire.html?id=moi").then(function(u){return A.isAdmin().then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}return u})}).then(function(u){
     return A.myProfile().then(function(p){if(!p){location.replace("profil.html");return new Promise(function(){})}return{p:p,own:true,u:u}})});
   var demo=(window.DEALR_PROS||[]).filter(function(x){return x.id===id})[0];
   if(demo)return A.user().then(function(u){return{p:Object.assign({demo:true},demo),own:false,u:u}});
@@ -138,7 +138,7 @@ var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""
 if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(+p.a>=5)bd.appendChild(h("span","b c","✓ Certifié"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
 tx.appendChild(bd);
 tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
-if(!own){var ac=h("div","acts"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){contact()};
+if(!own){var ac=h("div","acts member-only"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){contact()};
   ac.appendChild(b1);ac.appendChild(link("Demander un devis","#devis","btn out"));tx.appendChild(ac)}
 hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
 
@@ -168,7 +168,7 @@ if(own){
     var r=h("a","tool");r.href=t[2];r.appendChild(h("b","",t[0]));r.appendChild(h("span","sub",t[1]));me.appendChild(r)});
   side.appendChild(me);return}
 
-var q=h("section","card q");q.id="devis";q.appendChild(h("h2","","Estimer un devis"));q.appendChild(h("p","sub","Choisissez les services pour obtenir une estimation, puis envoyez votre demande."));
+var q=h("section","card q member-only");q.id="devis";q.appendChild(h("h2","","Estimer un devis"));q.appendChild(h("p","sub","Choisissez les services pour obtenir une estimation, puis envoyez votre demande."));
 var boxes=[];
 if(!services.length)q.appendChild(h("p","sub","Ce prestataire travaille sur devis personnalisé."));
 services.forEach(function(s,i){var lb=h("label","it"),cb=document.createElement("input");cb.type="checkbox";cb.checked=i===0;

@@ -139,7 +139,11 @@ function emailOk(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)}
 
 /* Après connexion : vers la page demandée, sinon vers son profil (ou sa création) */
 function go(){
-  if(next){location.replace(next);return}
+  A.isAdmin(true).then(function(adm){
+    if(adm){location.replace(/^(admin|messages|marketplace|index)\.html/.test(next)?next:"admin.html");return}
+    if(next){location.replace(next);return}
+    member()})}
+function member(){
   A.myProfile().then(function(p){location.replace(p?"prestataire.html?id=moi":"profil.html")})
    .catch(function(){location.replace("profil.html")})}
 
