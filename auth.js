@@ -595,18 +595,29 @@
     ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}" +
     ".mbadge.red{background:#c0270f}.mbadge[hidden]{display:none}" +
     "nav[data-nav]{position:relative;display:flex;align-items:center}" +
+    ".dn-acc{position:relative;display:inline-flex}" +
+    ".dnav button.dn-accbtn{display:inline-flex;align-items:center;gap:4px;border:1.5px solid #111;border-radius:99px;padding:7px 15px;color:#111;font-weight:600}" +
+    ".dnav button.dn-accbtn:hover,.dnav button.dn-accbtn[aria-expanded=true]{background:#111;color:#fff}" +
+    ".dn-dd{display:none;position:absolute;top:calc(100% + 10px);right:0;flex-direction:column;gap:2px;background:#fff;border-radius:16px;padding:8px;min-width:210px;box-shadow:0 20px 50px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.08);z-index:61}" +
+    ".dn-dd.open{display:flex}" +
+    ".dn-dd a,.dn-dd button.lk{padding:10px 12px;border-radius:10px;text-align:left}" +
+    ".dn-dd a:hover,.dn-dd button.lk:hover{background:#f5f5f7;color:#111}" +
     ".dnav-tg{display:none;align-items:center;gap:8px;border:1.5px solid #111;background:#fff;border-radius:99px;padding:7px 14px;font:600 .92rem Figtree,system-ui,sans-serif;color:#111;cursor:pointer}" +
     ".dnav-tg .mbadge{margin-left:0}" +
     "@media(max-width:760px){nav[data-nav] [data-extra]:not([data-extra=end]){display:none!important}" +
     ".dnav{display:none;position:absolute;top:calc(100% + 10px);right:0;flex-direction:column;align-items:stretch;gap:2px;background:#fff;border-radius:18px;padding:8px;min-width:230px;box-shadow:0 20px 50px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.08);z-index:60}" +
     ".dnav.open{display:flex}.dnav a,.dnav button.lk{padding:11px 14px;border-radius:12px;text-align:left}.dnav a:hover,.dnav button.lk:hover{background:#f5f5f7}" +
-    ".dnav .dn-pill{border:0;padding:11px 14px}.dnav-tg{display:inline-flex}}";
+    ".dnav .dn-pill{border:0;padding:11px 14px}.dnav-tg{display:inline-flex}" +
+    ".dn-acc{display:contents}.dnav button.dn-accbtn{display:none}.dn-dd{display:flex;position:static;box-shadow:none;padding:0;min-width:0;gap:2px}" +
+    ".dn-dd a,.dn-dd button.lk{padding:11px 14px}}";
 
   function setBadge(id, n, cls, label) {
     var el = document.getElementById(id); if (!el) return;
     var b = el.querySelector(".mbadge");
     if (!b) { b = document.createElement("span"); b.className = "mbadge" + (cls ? " " + cls : ""); el.appendChild(b); }
     b.textContent = n > 9 ? "9+" : String(n); b.hidden = !n; b.setAttribute("aria-label", n + label);
+    var ab = document.getElementById("dnAccBadge");
+    if (ab) { var s2 = 0; ["dnAdmin", "dnDash"].forEach(function (k) { var x = document.querySelector("#" + k + " .mbadge"); if (x && !x.hidden) s2 += parseInt(x.textContent, 10) || 0; }); ab.textContent = String(s2); ab.hidden = !s2; }
     var t = document.getElementById("dnTgBadge");
     if (t) { var tot = 0; ["dnMsg", "dnAdmin", "dnDash"].forEach(function (k) { var x = document.querySelector("#" + k + " .mbadge"); if (x && !x.hidden) tot += parseInt(x.textContent, 10) || 0; }); t.textContent = String(tot); t.hidden = !tot; }
   }
@@ -649,11 +660,26 @@
         return;
       }
       add("Messages", "messages.html", "messages", "dnMsg");
-      if (adm) add("Administration", "admin.html", "admin", "dnAdmin");
-      else { add("Tableau de bord", "dashboard.html", "dashboard", "dnDash"); add("Mon profil", "prestataire.html?id=moi", "profil", "dnProfile"); }
-      var out = document.createElement("button"); out.type = "button"; out.className = "lk dn-pill"; out.id = "dnLogout"; out.textContent = "Se déconnecter";
+      /* Sur l'accueil (page avec ses propres liens), on garde la même forme que pour un visiteur :
+         les liens du compte sont regroupés derrière un bouton « Mon compte » */
+      var compact = !!nav.querySelector("[data-extra]:not([data-extra=end])"), target = box;
+      if (compact) {
+        var wrap = document.createElement("span"); wrap.className = "dn-acc";
+        var bt = document.createElement("button"); bt.type = "button"; bt.className = "lk dn-pill dn-accbtn"; bt.id = "dnAcc";
+        bt.setAttribute("aria-haspopup", "true"); bt.setAttribute("aria-expanded", "false");
+        bt.innerHTML = (adm ? "Administration" : "Mon compte") + "<span class=\"mbadge\" id=\"dnAccBadge\" hidden></span> <span aria-hidden=\"true\">▾</span>";
+        var dd = document.createElement("div"); dd.className = "dn-dd"; dd.id = "dnDd";
+        wrap.appendChild(bt); wrap.appendChild(dd); box.appendChild(wrap); target = dd;
+        bt.onclick = function (e) { e.stopPropagation(); var o = dd.classList.toggle("open"); bt.setAttribute("aria-expanded", o ? "true" : "false"); };
+        document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) { dd.classList.remove("open"); bt.setAttribute("aria-expanded", "false"); } });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") { dd.classList.remove("open"); bt.setAttribute("aria-expanded", "false"); } });
+      }
+      function addTo(label, href, key, id) { var a = add(label, href, key, id); target.appendChild(a); return a; }
+      if (adm) addTo("Administration", "admin.html", "admin", "dnAdmin");
+      else { addTo("Tableau de bord", "dashboard.html", "dashboard", "dnDash"); addTo("Mon profil", "prestataire.html?id=moi", "profil", "dnProfile"); }
+      var out = document.createElement("button"); out.type = "button"; out.className = "lk" + (compact ? "" : " dn-pill"); out.id = "dnLogout"; out.textContent = "Se déconnecter";
       out.onclick = function () { out.disabled = true; A.signOut().then(function () { location.href = "index.html"; }); };
-      box.appendChild(out);
+      target.appendChild(out);
       refreshBadges();
     });
   };
