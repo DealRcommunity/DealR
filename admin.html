@@ -142,7 +142,7 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 <body class="wait">
 <header><div class="wrap">
   <div class="brand"><a class="logo" href="index.html"><i></i>Dealr</a><span class="pill">Admin</span></div>
-  <nav><a class="hide" href="marketplace.html">Marketplace</a><a id="navMsg" href="messages.html" hidden>Messages</a><button type="button" class="btn out sm" id="logout">Se déconnecter</button></nav>
+  <nav data-nav="admin"></nav>
 </div></header>
 
 <main class="wrap" id="main">
@@ -337,7 +337,6 @@ function loadThread(){
 document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
   document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderList()}});
 $("q").oninput=renderList;
-$("logout").onclick=function(){this.disabled=true;A.signOut().then(function(){location.href="index.html"})};
 var email="";
 A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.isAdmin()}).then(function(ok){
   document.body.classList.remove("wait");
@@ -348,7 +347,6 @@ A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.
     var row=h("div","row");row.style.justifyContent="center";
     row.appendChild(btn("Se connecter en admin","",function(){A.signOut().then(function(){location.href="connexion.html?next=admin.html"})}));
     var a=h("a","btn out","Retour à l’accueil");a.href="index.html";row.appendChild(a);dn.appendChild(row);m.appendChild(dn);return}
-  A.messagesLink($("navMsg"));
   return load().then(function(){var first=all.filter(function(d){return d.status==="disputed"})[0];
     if(first&&window.innerWidth>980){sel=first;renderList();renderDetail()}});
 }).catch(function(e){document.body.classList.remove("wait");$("main").textContent=A.message(e)});

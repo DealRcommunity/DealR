@@ -112,7 +112,7 @@ body.wait main{visibility:hidden}
 </style>
 </head>
 <body class="wait">
-<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a id="navMsg" href="messages.html" hidden>Messages</a><a href="prestataire.html?id=moi">Mon profil</a></nav></div></header>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav data-nav="profil"></nav></div></header>
 
 <main class="wrap"><div class="layout">
 <div>
@@ -456,7 +456,6 @@ $("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.v
     else if(!t.trim())msg.textContent="Aucun texte lisible dans ce fichier (PDF scanné ?). Ajoutez vos expériences à la main.";
     else msg.textContent="Aucune expérience détectée automatiquement. Ajoutez-les à la main."
   }).catch(function(){msg.textContent="Impossible de lire ce fichier. Ajoutez vos expériences à la main."})});
-A.messagesLink(document.getElementById("navMsg"));
 /* Accès réservé aux membres connectés */
 A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}
   return A.myProfile().catch(function(){return null})}).then(function(p){

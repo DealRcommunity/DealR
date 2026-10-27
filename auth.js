@@ -499,21 +499,12 @@
   };
 
   /* Pour l'admin : lien « Litiges » avec pastille et bandeau d'alerte quand un nouveau litige arrive */
-  function adminAlerts(anchor) {
+  function adminAlerts() {
     A.isAdmin().then(function (ok) {
       if (!ok) return;
       return A.adminDeals().then(function (all) {
         var open = all.filter(function (d) { return d.status === "disputed"; });
-        if (anchor && !/admin\.html/.test(location.pathname)) {
-          var nav = anchor.closest("nav") || anchor.parentNode;
-          var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="prestataire.html?id=moi"],a#navAdmin'));
-          if (!links.length) { var na = document.createElement("a"); na.id = "navAdmin"; anchor.parentNode.insertBefore(na, anchor.nextSibling); links = [na]; }
-          links.forEach(function (a) {
-            a.href = "admin.html"; a.textContent = "Administration"; a.hidden = false;
-            var b = document.createElement("span"); b.className = "mbadge red"; b.textContent = String(open.length); b.hidden = !open.length;
-            a.appendChild(b);
-          });
-        }
+        setBadge("dnAdmin", open.length, "red", " litige" + (open.length > 1 ? "s" : "") + " ouvert" + (open.length > 1 ? "s" : ""));
         var key = "dealr_admin_seen", seen = "";
         try { seen = localStorage.getItem(key) || ""; } catch (e) {}
         var fresh = open.filter(function (d) { return String(d.disputed_at || d.updated_at) > seen; });
@@ -539,26 +530,86 @@
   }
 
   /* Lien « Messages » avec pastille de messages non lus, à placer dans un en-tête */
-  A.messagesLink = function (el) {
-    if (!el) return;
-    if (!document.getElementById("mbadgeCss")) {
-      var st = document.createElement("style"); st.id = "mbadgeCss";
-      st.textContent = ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}.mbadge.red{background:#c0270f}.mbadge[hidden]{display:none}";
-      document.head.appendChild(st);
-    }
+  /* ---------- Menu commun à toutes les pages ----------
+     Chaque page contient <nav data-nav="(page)"> ; le menu y est généré ici, identique partout :
+     visiteur : Marketplace · Se connecter · Créer un compte
+     membre   : Marketplace · Messages · Mon profil · Se déconnecter
+     admin    : Marketplace · Messages · Administration · Se déconnecter
+     Les éléments propres à une page (data-extra / data-extra="end") sont conservés autour. */
+  var NAV_CSS = ".dnav{display:flex;align-items:center;gap:22px}" +
+    ".dnav a,.dnav button.lk{text-decoration:none;color:#6b6b73;font:500 1rem Figtree,system-ui,sans-serif;white-space:nowrap;background:none;border:0;padding:0;cursor:pointer}" +
+    ".dnav a:hover,.dnav button.lk:hover,.dnav a[aria-current]{color:#111}" +
+    ".dnav a[aria-current]{font-weight:600}" +
+    ".dnav .dn-pill{border:1.5px solid #111;border-radius:99px;padding:7px 15px;color:#111;font-weight:600}" +
+    ".dnav .dn-pill:hover{background:#111;color:#fff}" +
+    ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}" +
+    ".mbadge.red{background:#c0270f}.mbadge[hidden]{display:none}" +
+    "nav[data-nav]{position:relative;display:flex;align-items:center}" +
+    ".dnav-tg{display:none;align-items:center;gap:8px;border:1.5px solid #111;background:#fff;border-radius:99px;padding:7px 14px;font:600 .92rem Figtree,system-ui,sans-serif;color:#111;cursor:pointer}" +
+    ".dnav-tg .mbadge{margin-left:0}" +
+    "@media(max-width:760px){nav[data-nav] [data-extra]:not([data-extra=end]){display:none!important}" +
+    ".dnav{display:none;position:absolute;top:calc(100% + 10px);right:0;flex-direction:column;align-items:stretch;gap:2px;background:#fff;border-radius:18px;padding:8px;min-width:230px;box-shadow:0 20px 50px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.08);z-index:60}" +
+    ".dnav.open{display:flex}.dnav a,.dnav button.lk{padding:11px 14px;border-radius:12px;text-align:left}.dnav a:hover,.dnav button.lk:hover{background:#f5f5f7}" +
+    ".dnav .dn-pill{border:0;padding:11px 14px}.dnav-tg{display:inline-flex}}";
+
+  function setBadge(id, n, cls, label) {
+    var el = document.getElementById(id); if (!el) return;
+    var b = el.querySelector(".mbadge");
+    if (!b) { b = document.createElement("span"); b.className = "mbadge" + (cls ? " " + cls : ""); el.appendChild(b); }
+    b.textContent = n > 9 ? "9+" : String(n); b.hidden = !n; b.setAttribute("aria-label", n + label);
+    var t = document.getElementById("dnTgBadge");
+    if (t) { var tot = 0; ["dnMsg", "dnAdmin"].forEach(function (k) { var x = document.querySelector("#" + k + " .mbadge"); if (x && !x.hidden) tot += parseInt(x.textContent, 10) || 0; }); t.textContent = String(tot); t.hidden = !tot; }
+  }
+  function refreshBadges() {
     A.user().then(function (u) {
       if (!u) return;
-      el.hidden = false;
-      adminAlerts(el);
-      A.unreadCount().then(function (n) {
-        var b = el.querySelector(".mbadge");
-        if (!b) { b = document.createElement("span"); b.className = "mbadge"; el.appendChild(b); }
-        b.textContent = n > 9 ? "9+" : String(n);
-        b.hidden = !n;
-        b.setAttribute("aria-label", n + " conversation" + (n > 1 ? "s" : "") + " non lue" + (n > 1 ? "s" : ""));
-      });
+      A.unreadCount().then(function (n) { setBadge("dnMsg", n, "", " conversation" + (n > 1 ? "s" : "") + " non lue" + (n > 1 ? "s" : "")); });
+      adminAlerts();
+    });
+  }
+  A.renderNav = function () {
+    var nav = document.querySelector("nav[data-nav]");
+    if (!nav || nav.querySelector(".dnav")) return;
+    if (!document.getElementById("dnavCss")) { var st = document.createElement("style"); st.id = "dnavCss"; st.textContent = NAV_CSS; document.head.appendChild(st); }
+    var page = nav.getAttribute("data-nav");
+    if (page === "profil-public" && /[?&]id=moi\b/.test(location.search)) page = "profil";
+    nav.setAttribute("aria-label", "Menu principal");
+    var box = document.createElement("div"); box.className = "dnav"; box.id = "dnav";
+    var firstEnd = nav.querySelector('[data-extra="end"]');
+    nav.insertBefore(box, firstEnd);
+    var tg = document.createElement("button"); tg.type = "button"; tg.className = "dnav-tg"; tg.setAttribute("aria-expanded", "false"); tg.setAttribute("aria-controls", "dnav");
+    tg.innerHTML = "Menu<span class=\"mbadge\" id=\"dnTgBadge\" hidden></span>";
+    nav.appendChild(tg);
+    tg.onclick = function (e) { e.stopPropagation(); var o = box.classList.toggle("open"); tg.setAttribute("aria-expanded", o ? "true" : "false"); };
+    document.addEventListener("click", function (e) { if (!nav.contains(e.target)) { box.classList.remove("open"); tg.setAttribute("aria-expanded", "false"); } });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { box.classList.remove("open"); tg.setAttribute("aria-expanded", "false"); } });
+    function add(label, href, key, id, cls) {
+      var a = document.createElement("a"); a.href = href; a.textContent = label;
+      if (id) a.id = id; if (cls) a.className = cls;
+      if (key && key === page) a.setAttribute("aria-current", "page");
+      box.appendChild(a); return a;
+    }
+    add("Marketplace", "marketplace.html", "marketplace");
+    Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0], adm = r[1];
+      if (!u) {
+        add("Se connecter", "connexion.html", page === "connexion" ? "connexion" : "", "dnLogin");
+        add("Créer un compte", "connexion.html#inscription", "", "dnSignup", "dn-pill");
+        return;
+      }
+      add("Messages", "messages.html", "messages", "dnMsg");
+      if (adm) add("Administration", "admin.html", "admin", "dnAdmin");
+      else add("Mon profil", "prestataire.html?id=moi", "profil", "dnProfile");
+      var out = document.createElement("button"); out.type = "button"; out.className = "lk dn-pill"; out.id = "dnLogout"; out.textContent = "Se déconnecter";
+      out.onclick = function () { out.disabled = true; A.signOut().then(function () { location.href = "index.html"; }); };
+      box.appendChild(out);
+      refreshBadges();
     });
   };
+  /* Ancien nom conservé : met à jour les pastilles du menu */
+  A.messagesLink = function () { refreshBadges(); };
+  A.refreshNav = refreshBadges;
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", A.renderNav); else A.renderNav();
 
   /* Messages d'erreur en français */
   A.message = function (e) {

@@ -138,14 +138,11 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 <header>
   <div class="wrap">
     <a class="logo" href="index.html"><i></i>Dealr</a>
-    <nav>
-      <a class="hide" href="#entreprise">Entreprises</a>
-      <a class="hide" href="#freelance">Freelances</a>
-      <a class="hide" href="#paiement">Paiement</a>
-      <a id="navMsg" href="messages.html" hidden>Messages</a>
-      <a id="navLogin" href="connexion.html">Se connecter</a>
-      <a class="btn sm out" id="navProfil" href="connexion.html#inscription">Créer un compte</a>
-      <a class="btn sm navcta member-only" href="marketplace.html">Publier un besoin</a>
+    <nav data-nav="home">
+      <a data-extra href="#entreprise">Entreprises</a>
+      <a data-extra href="#freelance">Freelances</a>
+      <a data-extra href="#paiement">Paiement</a>
+      <a data-extra="end" class="btn sm navcta member-only" href="marketplace.html">Publier un besoin</a>
     </nav>
   </div>
 </header>
@@ -327,11 +324,9 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 <script src="config.js"></script>
 <script src="auth.js"></script>
 <script>
-/* Membre connecté : « Mon profil » remplace « Se connecter » et « Créer un compte » */
+/* Membre connecté : les boutons « Créer mon compte » mènent à son profil */
 DealrAuth.user().then(function(u){
   if(!u)return;
-  var l=document.getElementById("navLogin"),b=document.getElementById("navProfil");
-  l.hidden=true;DealrAuth.messagesLink(document.getElementById("navMsg"));b.textContent="Mon profil";b.href="prestataire.html?id=moi";b.classList.remove("out");
   document.querySelectorAll("[data-acc]").forEach(function(a){a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"});
 });
 </script>

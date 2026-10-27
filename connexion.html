@@ -52,7 +52,7 @@ input:focus{background:#fff;border-color:var(--ink);outline:0}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="marketplace.html">Voir la marketplace</a></nav></div></header>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav data-nav="connexion"></nav></div></header>
 <main>
   <h1 id="title">Bienvenue sur <em>Dealr.</em></h1>
   <p class="lead" id="lead">Connectez-vous ou créez votre compte pour publier votre profil.</p>
@@ -194,6 +194,10 @@ if(recovery){$("title").innerHTML="Nouveau <em>mot de passe.</em>";$("lead").tex
 else if(location.hash==="#inscription"){$("title").innerHTML="Créez votre <em>compte.</em>";$("lead").textContent="Un compte suffit pour publier votre profil, puis gérer vos devis et factures.";show("fUp")}
 else show("fIn");
 A.onAuth(function(ev){if(ev==="PASSWORD_RECOVERY")show("fReset")});
+/* Le menu « Créer un compte » / « Se connecter » change seulement la fin de l'adresse : on suit ce changement */
+window.addEventListener("hashchange",function(){if(recovery)return;
+  if(location.hash==="#inscription"){$("title").innerHTML="Créez votre <em>compte.</em>";$("lead").textContent="Un compte suffit pour publier votre profil, puis gérer vos devis et factures.";show("fUp")}
+  else{$("title").innerHTML="Bienvenue sur <em>Dealr.</em>";$("lead").textContent="Connectez-vous ou créez votre compte pour publier votre profil.";show("fIn")}});
 if(!recovery)A.user().then(function(u){if(u)go()});
 })();
 </script>

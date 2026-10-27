@@ -74,7 +74,7 @@ a.tool b{display:block}
 </head>
 <body>
 <header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a>
-<nav><a href="marketplace.html">← Prestataires</a><a id="navMsg" href="messages.html" hidden>Messages</a><a id="navAcc" href="connexion.html">Se connecter</a></nav></div></header>
+<nav data-nav="profil-public"></nav></div></header>
 <main class="wrap" id="app"></main>
 <div id="toast" role="status"></div>
 <script src="profils.js"></script>
@@ -103,9 +103,7 @@ function load(){
 
 load().then(function(res){
 var p=res.p,own=res.own,u=res.u;
-var acc=document.getElementById("navAcc");A.messagesLink(document.getElementById("navMsg"));
-if(u){acc.textContent="Mon profil";acc.href="prestataire.html?id=moi"}
-if(own)acc.hidden=true;
+
 if(!p){var nf=h("div","card","Ce profil est introuvable. ");nf.style.marginTop="30px";nf.appendChild(link("Retour aux prestataires","marketplace.html"));app.appendChild(nf);return}
 
 /* Contacter : ouvre la messagerie avec ce prestataire (message pré-rempli possible) */

@@ -249,7 +249,7 @@ dialog textarea{min-height:80px;resize:vertical}
 </head>
 <body class="wait">
 <header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a>
-<nav><a class="hide" href="marketplace.html">Marketplace</a><a href="messages.html" aria-current="page">Messages</a><a href="prestataire.html?id=moi">Mon profil</a></nav></div></header>
+<nav data-nav="messages"></nav></div></header>
 
 <main class="wrap m">
   <div class="app" id="app">
@@ -385,7 +385,7 @@ function renderList(){
 function loadList(){return A.listConversations().then(function(l){convs=l;
   if(cur){var n=l.filter(function(c){return c.id===cur.id})[0];if(n){cur=n;if(n.unread){n.unread=false;A.markRead(n.id).then(badge)}}}
   renderList();return l})}
-function badge(){A.messagesLink(document.querySelector("nav a[aria-current]"))}
+function badge(){A.refreshNav()}
 
 /* ---------- Ouverture d'une conversation ---------- */
 function select(id,push){
