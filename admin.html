@@ -337,10 +337,16 @@ function loadThread(){
 document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
   document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderList()}});
 $("q").oninput=renderList;
-A.requireUser("admin.html").then(function(u){me=u.id;return A.isAdmin()}).then(function(ok){
+var email="";
+A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.isAdmin()}).then(function(ok){
   document.body.classList.remove("wait");
   if(!ok){var m=$("main");m.textContent="";var dn=h("div","denied");dn.appendChild(h("h1","","Accès réservé."));
-    dn.appendChild(h("p","sub","Cette page est réservée à l’équipe Dealr."));var a=h("a","btn","Retour à l’accueil");a.href="index.html";a.style.marginTop="14px";dn.appendChild(a);m.appendChild(dn);return}
+    dn.appendChild(h("p","sub","Cette page est réservée à l’équipe Dealr."));
+    var who=h("p","");who.style.margin="14px 0 0";who.appendChild(document.createTextNode("Vous êtes connecté avec "));who.appendChild(h("b","",email||"un autre compte"));
+    who.appendChild(document.createTextNode(", qui n’est pas un compte administrateur."));dn.appendChild(who);
+    var row=h("div","row");row.style.justifyContent="center";
+    row.appendChild(btn("Changer de compte","",function(){A.signOut().then(function(){location.href="connexion.html?next=admin.html"})}));
+    var a=h("a","btn out","Retour à l’accueil");a.href="index.html";row.appendChild(a);dn.appendChild(row);m.appendChild(dn);return}
   A.messagesLink($("navMsg"));
   return load().then(function(){var first=all.filter(function(d){return d.status==="disputed"})[0];
     if(first&&window.innerWidth>980){sel=first;renderList();renderDetail()}});
