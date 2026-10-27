@@ -19,7 +19,7 @@ header{background:#fff;border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
 .logo{font-size:1.4rem;text-decoration:none;display:flex;align-items:center;gap:8px}
 .logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
-nav{display:flex;gap:20px;font-size:.95rem;font-weight:500}nav a{text-decoration:none;color:var(--mute)}
+[hidden]{display:none!important}nav{display:flex;gap:20px;font-size:.95rem;font-weight:500}nav a{text-decoration:none;color:var(--mute)}
 .btn{display:inline-block;border-radius:99px;padding:10px 20px;font:600 .95rem Figtree,sans-serif;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;text-decoration:none}
 .btn:hover{background:#333}.btn.out{background:#fff;color:var(--ink)}.btn.out:hover{background:#f1f1f4}.btn.sm{padding:6px 14px;font-size:.85rem}
 .grid{display:grid;grid-template-columns:430px 1fr;gap:24px;align-items:start;padding:22px 0 60px}
@@ -71,7 +71,7 @@ body.wait main{visibility:hidden}
 </style>
 </head>
 <body class="wait">
-<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="prestataire.html?id=moi">← Mon profil</a></nav></div></header>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="prestataire.html?id=moi">← Mon profil</a><a id="navMsg" href="messages.html" hidden>Messages</a></nav></div></header>
 
 <main class="wrap"><div class="grid">
 <section class="tool" aria-label="Édition du document">
@@ -216,6 +216,7 @@ $("print").onclick=function(){
   .catch(function(e){btn.disabled=false;err.textContent="Document non enregistré : "+A.message(e)})};
 
 /* Accès réservé : on charge le profil et les documents du compte */
+A.messagesLink(document.getElementById("navMsg"));
 A.requireUser("documents.html").then(function(u){
   return Promise.all([A.myProfile().catch(function(){return null}),A.listDocs().catch(function(){return[]})]).then(function(r){
     var p=r[0];docs=r[1]||[];

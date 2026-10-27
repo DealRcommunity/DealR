@@ -59,6 +59,7 @@
         limit: function (n) { q.lim = n; return b; },
         maybeSingle: function () { q.single = true; return b; },
         upsert: function (row) { q.op = "upsert"; q.row = row; return b; },
+        insert: function (row) { q.op = "upsert"; q.row = row; return b; },
         then: function (res, rej) { return run().then(res, rej); }
       };
       function run() {
@@ -68,13 +69,17 @@
           var row = q.row;
           if (table === "profiles" && row.id !== s.user.id) return ko("forbidden");
           if (table === "documents") row.owner = s.user.id;
-          var same = table === "profiles" ? function (r) { return r.id === row.id; } : function (r) { return r.owner === row.owner && r.num === row.num; };
+          if (table === "conversations" && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
+          if (table === "messages" && row.sender !== s.user.id) return ko("forbidden");
+          var same = table === "documents" ? function (r) { return r.owner === row.owner && r.num === row.num; } : function (r) { return r.id === row.id; };
           var i = rows.findIndex(same);
           if (i >= 0) rows[i] = Object.assign(rows[i], row); else rows.push(Object.assign({ created_at: new Date().toISOString() }, row));
           try { put(table, rows); } catch (e) { return ko("quota"); }
           return ok(null);
         }
-        var out = table === "documents" ? rows.filter(function (r) { return s && r.owner === s.user.id; }) : rows.slice();
+        var out = table === "documents" ? rows.filter(function (r) { return s && r.owner === s.user.id; })
+          : table === "conversations" ? rows.filter(function (r) { return s && (r.user_a === s.user.id || r.user_b === s.user.id); })
+          : rows.slice();
         q.f.forEach(function (f) { out = out.filter(f); });
         if (q.sort) out.sort(function (a, c) { var x = String(a[q.sort.k] || ""), y = String(c[q.sort.k] || ""); return q.sort.asc ? (x < y ? -1 : x > y ? 1 : 0) : (x < y ? 1 : x > y ? -1 : 0); });
         if (q.lim) out = out.slice(0, q.lim);
@@ -215,9 +220,134 @@
     });
   };
 
+  /* Messagerie (tables conversations et messages : visibles par les deux participants uniquement) */
+  function pairId(a, b) { return [a, b].sort().join("_"); }
+  function snap(p, fallback) { return { id: p.id, n: p.n || fallback || "Membre", job: p.job || "", photo: A.safeImg(p.photo) }; }
+  function getConv(c, id) { return c.from("conversations").select("*").eq("id", id).maybeSingle().then(check); }
+
+  /* Ouvre (ou crée) la conversation avec un autre membre ; renvoie son identifiant */
+  A.openConversation = function (other) {
+    return A.user().then(function (u) {
+      if (!u) throw new Error("not_logged");
+      if (!other || !other.id) throw new Error("not_found");
+      if (other.id === u.id) throw new Error("self_chat");
+      var id = pairId(u.id, other.id);
+      return client().then(function (c) {
+        return getConv(c, id).then(function (row) {
+          if (row) return id;
+          return A.myProfile().catch(function () { return null; }).then(function (me) {
+            var mine = snap(Object.assign({ id: u.id }, me || {}), (me && me.n) || (u.email || "").split("@")[0]);
+            var theirs = snap(other);
+            var first = u.id < other.id;
+            var now = new Date().toISOString();
+            return c.from("conversations").upsert({
+              id: id, user_a: first ? u.id : other.id, user_b: first ? other.id : u.id,
+              a_snap: first ? mine : theirs, b_snap: first ? theirs : mine,
+              last_text: "", last_sender: null, read_a: true, read_b: true, updated_at: now
+            }).then(check).then(function () { return id; });
+          });
+        });
+      });
+    });
+  };
+
+  /* Liste de mes conversations, la plus récente en premier */
+  A.listConversations = function () {
+    return A.user().then(function (u) {
+      if (!u) return [];
+      return client().then(function (c) {
+        return Promise.all([
+          c.from("conversations").select("*").eq("user_a", u.id),
+          c.from("conversations").select("*").eq("user_b", u.id)
+        ]);
+      }).then(function (r) {
+        var rows = check(r[0]).concat(check(r[1])), seen = {}, out = [];
+        rows.forEach(function (row) { if (!seen[row.id]) { seen[row.id] = 1; out.push(row); } });
+        out.sort(function (x, y) { return String(y.updated_at || "").localeCompare(String(x.updated_at || "")); });
+        return out.map(function (row) {
+          var isA = row.user_a === u.id;
+          return {
+            id: row.id, other: (isA ? row.b_snap : row.a_snap) || { n: "Membre" }, me: u.id,
+            lastText: row.last_text || "", lastMine: row.last_sender === u.id,
+            updatedAt: row.updated_at, unread: !(isA ? row.read_a : row.read_b)
+          };
+        });
+      });
+    });
+  };
+
+  A.listMessages = function (convId) {
+    return client()
+      .then(function (c) { return c.from("messages").select("*").eq("conv", convId).order("created_at", { ascending: true }).limit(500); })
+      .then(check);
+  };
+
+  A.sendMessage = function (convId, text) {
+    text = String(text || "").trim().slice(0, 2000);
+    if (!text) return Promise.reject(new Error("empty"));
+    return A.user().then(function (u) {
+      if (!u) throw new Error("not_logged");
+      return client().then(function (c) {
+        return getConv(c, convId).then(function (conv) {
+          if (!conv) throw new Error("not_found");
+          var now = new Date().toISOString(), isA = conv.user_a === u.id;
+          var msgId = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+          return c.from("messages").insert({ id: msgId, conv: convId, sender: u.id, text: text, created_at: now }).then(check).then(function () {
+            var patch = Object.assign({}, conv, { last_text: text.slice(0, 200), last_sender: u.id, updated_at: now });
+            patch[isA ? "read_a" : "read_b"] = true;
+            patch[isA ? "read_b" : "read_a"] = false;
+            return c.from("conversations").upsert(patch).then(check);
+          });
+        });
+      });
+    });
+  };
+
+  A.markRead = function (convId) {
+    return A.user().then(function (u) {
+      if (!u) return;
+      return client().then(function (c) {
+        return getConv(c, convId).then(function (conv) {
+          if (!conv) return;
+          var k = conv.user_a === u.id ? "read_a" : "read_b";
+          if (conv[k]) return;
+          var patch = Object.assign({}, conv); patch[k] = true;
+          return c.from("conversations").upsert(patch).then(check);
+        });
+      });
+    }).catch(function () {});
+  };
+
+  A.unreadCount = function () {
+    return A.listConversations().then(function (l) { return l.filter(function (c) { return c.unread; }).length; }).catch(function () { return 0; });
+  };
+
+  /* Lien « Messages » avec pastille de messages non lus, à placer dans un en-tête */
+  A.messagesLink = function (el) {
+    if (!el) return;
+    if (!document.getElementById("mbadgeCss")) {
+      var st = document.createElement("style"); st.id = "mbadgeCss";
+      st.textContent = ".mbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:#f55a1f;color:#fff;font:700 11px/1 Figtree,system-ui,sans-serif;vertical-align:1px}.mbadge[hidden]{display:none}";
+      document.head.appendChild(st);
+    }
+    A.user().then(function (u) {
+      if (!u) return;
+      el.hidden = false;
+      A.unreadCount().then(function (n) {
+        var b = el.querySelector(".mbadge");
+        if (!b) { b = document.createElement("span"); b.className = "mbadge"; el.appendChild(b); }
+        b.textContent = n > 9 ? "9+" : String(n);
+        b.hidden = !n;
+        b.setAttribute("aria-label", n + " conversation" + (n > 1 ? "s" : "") + " non lue" + (n > 1 ? "s" : ""));
+      });
+    });
+  };
+
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/self_chat/.test(m)) return "C’est votre propre profil : vous ne pouvez pas vous écrire à vous-même.";
+    if (/empty/.test(m)) return "Le message est vide.";
     if (/demo_reset/.test(m)) return "En mode démonstration, aucun email n’est envoyé. Créez un nouveau compte pour tester.";
     if (/quota/.test(m)) return "Le stockage du navigateur est plein (mode démonstration). Retirez quelques photos et réessayez.";
     if (/not_configured/.test(m)) return "La connexion n’est pas encore configurée sur ce site (voir config.js).";

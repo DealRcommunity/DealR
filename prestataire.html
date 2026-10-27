@@ -74,7 +74,7 @@ a.tool b{display:block}
 </head>
 <body>
 <header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a>
-<nav><a href="marketplace.html">← Prestataires</a><a id="navAcc" href="connexion.html">Se connecter</a></nav></div></header>
+<nav><a href="marketplace.html">← Prestataires</a><a id="navMsg" href="messages.html" hidden>Messages</a><a id="navAcc" href="connexion.html">Se connecter</a></nav></div></header>
 <main class="wrap" id="app"></main>
 <div id="toast" role="status"></div>
 <script src="profils.js"></script>
@@ -103,11 +103,15 @@ function load(){
 
 load().then(function(res){
 var p=res.p,own=res.own,u=res.u;
-var acc=document.getElementById("navAcc");
+var acc=document.getElementById("navAcc");A.messagesLink(document.getElementById("navMsg"));
 if(u){acc.textContent="Mon profil";acc.href="prestataire.html?id=moi"}
 if(own)acc.hidden=true;
 if(!p){var nf=h("div","card","Ce profil est introuvable. ");nf.style.marginTop="30px";nf.appendChild(link("Retour aux prestataires","marketplace.html"));app.appendChild(nf);return}
 
+/* Contacter : ouvre la messagerie avec ce prestataire (message pré-rempli possible) */
+function contact(text){
+  if(p.demo){toast("Profil d’exemple : la messagerie fonctionne avec les membres inscrits.");return}
+  location.href="messages.html?with="+encodeURIComponent(p.id)+(text?"&text="+encodeURIComponent(text):"")}
 var m=(p.p||"").match(/(\d[\d\s]*)\s*€\s*\/\s*(\S+)/);
 var rate=+p.rate||(m?parseInt(m[1].replace(/\s/g,""),10):0),unit=p.unit||(m?m[2]:"forfait");
 var UNIT={jour:"Prestation à la journée",h:"Prestation à l’heure",mission:"Prestation à la mission"};
@@ -134,7 +138,7 @@ var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""
 if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(+p.a>=5)bd.appendChild(h("span","b c","✓ Certifié"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
 tx.appendChild(bd);
 tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
-if(!own){var ac=h("div","acts"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){toast("La messagerie arrive bientôt.")};
+if(!own){var ac=h("div","acts"),b1=h("button","btn","Contacter");b1.type="button";b1.onclick=function(){contact()};
   ac.appendChild(b1);ac.appendChild(link("Demander un devis","#devis","btn out"));tx.appendChild(ac)}
 hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
 
@@ -181,7 +185,9 @@ side.appendChild(q);
 function calc(){var ht=boxes.filter(function(x){return x.cb.checked}).reduce(function(a,x){return a+Math.max(1,parseFloat(x.n.value)||1)*x.s.price},0),t=ht*parseFloat(tv.value)/100;tot.textContent="";
   [["Total HT",eur(ht)],["TVA",eur(t)]].forEach(function(r){var d=h("div");d.appendChild(h("span","",r[0]));d.appendChild(h("span","",r[1]));tot.appendChild(d)});
   var d=h("div","big");d.appendChild(h("span","","Total TTC"));d.appendChild(h("span","",eur(ht+t)));tot.appendChild(d)}
-go.onclick=function(){if(!boxes.some(function(x){return x.cb.checked})){toast("Sélectionnez au moins un service.");return}toast("Demande prête : la messagerie arrive bientôt.")};
+go.onclick=function(){var sel=boxes.filter(function(x){return x.cb.checked});if(!sel.length){toast("Sélectionnez au moins un service.");return}
+  var lines=sel.map(function(x){var n=Math.max(1,parseFloat(x.n.value)||1);return"• "+x.s.t+" × "+n+" ("+eur(x.s.price)+" / "+x.s.unit+")"});
+  contact("Bonjour, je souhaiterais un devis pour :\n"+lines.join("\n")+"\nEstimation : "+tot.querySelector(".big span:last-child").textContent+" TTC.\nPouvez-vous me confirmer vos disponibilités ?")};
 calc();
 });
 })();

@@ -6,115 +6,162 @@
 <title>Dealr – Missions et prestataires</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f7fa;--ink:#16212e;--mute:#5d6b7e;--line:#d9dee7;--card:#fff;--blue:#1f4fd8;--blue-d:#173ba3;--sun:#ffc857;--r:10px}
+:root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--o-soft:#fff1e8;--ind:#3b4a9e;--g:#22a863;--card:#fff}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif}
-h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 Figtree,system-ui,sans-serif;
+ background-image:radial-gradient(55% 38% at 100% 0,#ffe3cf 0,transparent 70%),radial-gradient(45% 30% at 0 22%,#ecedff 0,transparent 70%);background-repeat:no-repeat}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.035em;font-weight:800;line-height:1.05}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em;font-size:1.12em;color:var(--o)}
+a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-header{border-bottom:1px solid var(--line);background:#fff}
-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
-.logo{font-weight:800;font-size:1.4rem;letter-spacing:-.02em}
-.logo i{display:inline-block;width:.62em;height:.62em;background:#f55a1f;border-radius:50%;margin-right:.3em}
-.hbtns{display:flex;gap:8px}
-.btn{border:1px solid var(--ink);background:#fff;border-radius:var(--r);padding:8px 14px;cursor:pointer;font-weight:600}
-.btn:hover{background:var(--bg)}
-.btn.main{background:var(--blue);border-color:var(--blue);color:#fff}
-.btn.main:hover{background:var(--blue-d)}
-.hero{padding:56px 0 28px}
-h1{font-size:clamp(2rem,5.4vw,3.6rem);line-height:1.04;letter-spacing:-.03em;font-weight:800;max-width:15em}
-.hero p{color:var(--mute);font-size:1.1rem;max-width:36em;margin:16px 0 28px}
-.seg{display:inline-flex;background:#e7ebf2;border-radius:12px;padding:4px;margin-bottom:14px}
-.seg button{border:0;background:none;padding:10px 18px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--mute)}
-.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(22,33,46,.18)}
-.search{display:flex;gap:8px;flex-wrap:wrap}
-.search input{flex:1 1 260px;border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;background:#fff}
-.search select{border:1px solid var(--line);border-radius:var(--r);padding:13px 12px;background:#fff}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 8px}
-.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 14px;cursor:pointer;font-size:.92rem}
+:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+
+/* En-tête commun */
+header{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);background:rgba(255,255,255,.75);border-bottom:1px solid rgba(0,0,0,.04)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:68px}
+.logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+nav{display:flex;align-items:center;gap:22px;font-weight:500}
+nav a{text-decoration:none;color:var(--mute)}
+nav a:hover,nav a[aria-current]{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:99px;padding:11px 20px;font:600 .95rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
+.btn:hover{background:#2a2a2e}
+.btn.out{background:#fff;color:var(--ink)}
+.btn.out:hover{background:#f6f6f8}
+.btn.sm{padding:8px 15px;font-size:.88rem}
+
+/* En-tête de page */
+.hero{padding:52px 0 8px}
+h1{font-size:clamp(2.3rem,5.6vw,4.2rem);max-width:12em}
+.lead{color:var(--mute);font-size:1.12rem;max-width:34em;margin:16px 0 30px}
+
+/* Barre de recherche : le sélecteur prestataire / mission fait partie de la barre */
+.finder{display:flex;align-items:center;gap:6px;background:#fff;border-radius:22px;padding:6px;box-shadow:0 18px 50px rgba(60,30,10,.1),0 1px 3px rgba(60,30,10,.06);max-width:860px}
+.seg{display:flex;background:#f3f3f6;border-radius:16px;padding:4px;flex:none}
+.seg button{border:0;background:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;color:var(--mute);font-size:.94rem}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.q{flex:1;display:flex;align-items:center;gap:10px;padding:0 10px;min-width:0}
+.q svg{flex:none;color:var(--mute)}
+.q input{flex:1;border:0;outline:0;background:none;padding:12px 0;min-width:0;font-size:1rem}
+.finder select{border:0;background:#f3f3f6;border-radius:14px;padding:12px 14px;cursor:pointer;font-weight:500;flex:none}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0}
+.chip{border:1px solid #dedee4;background:#fff;border-radius:99px;padding:7px 16px;cursor:pointer;font-weight:500;font-size:.93rem}
+.chip:hover{border-color:var(--ink)}
 .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
-.count{color:var(--mute);margin:20px 0 12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;padding-bottom:56px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
-.top{display:flex;gap:12px;align-items:center}
-.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none}
-.card h3{font-size:1.1rem;line-height:1.2}
-.sub{color:var(--mute);font-size:.92rem}
-.badge{display:inline-block;font-size:.8rem;font-weight:600;padding:2px 9px;border-radius:99px;background:#e6edff;color:var(--blue-d)}
-.badge.ent{background:#fff1cc;color:#6b4a00}
-.badge.par{background:#e3f4ea;color:#17613a}
+
+/* Résultats */
+.count{color:var(--mute);margin:34px 0 14px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding-bottom:70px}
+.card{background:var(--card);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 14px 40px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05);transition:transform .18s ease,box-shadow .18s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06)}
+.top{display:flex;gap:14px;align-items:center}
+.av{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o)) center/cover}
+.card h3{font-size:1.18rem;line-height:1.2;letter-spacing:-.025em}
+.sub{color:var(--mute);font-size:.9rem}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.b{font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px;background:#eef0ff;color:#2d3a8c}
+.b.ent{background:#fff1cc;color:#6b4a00}
+.b.par{background:#e3f4ea;color:#17613a}
+.b.d{background:#e3f4ea;color:#17613a}
+.b.x{background:#f3f3f6;color:var(--mute)}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
-.tags span{font-size:.82rem;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--mute)}
-.desc{margin:0;font-size:.95rem}
-.foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px;border-top:1px solid var(--line);gap:8px}
-.price{font-weight:700}
-.empty{grid-column:1/-1;background:#fff;border:1px dashed var(--line);border-radius:var(--r);padding:32px;text-align:center;color:var(--mute)}
-dialog{border:0;border-radius:14px;padding:24px;width:min(460px,94vw);box-shadow:0 20px 60px rgba(22,33,46,.35)}
-dialog::backdrop{background:rgba(22,33,46,.5)}
-dialog h2{font-size:1.4rem;margin-bottom:14px}
-label{display:block;font-weight:600;font-size:.92rem;margin:12px 0 4px}
-dialog input,dialog select,dialog textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
-textarea{min-height:90px;resize:vertical}
-.acts{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
-#toast.on{opacity:1}
-footer{border-top:1px solid var(--line);background:#fff;padding:20px 0;color:var(--mute);font-size:.9rem}
-@media(max-width:560px){.hbtns{gap:6px}.hbtns .btn{padding:8px 11px;font-size:.88rem}}
-.demo{font-size:.75rem;color:var(--mute);border:1px dashed var(--line);border-radius:99px;padding:1px 8px;margin-left:4px}
+.tags span{font-size:.82rem;background:#f6f6f8;border-radius:8px;padding:3px 9px;color:#4a4a52}
+.desc{margin:0;font-size:.96rem;color:#33333a}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:14px;border-top:1px solid var(--line);gap:10px}
+.price{font:800 1.2rem "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;white-space:nowrap}
+.rating{color:var(--mute);font-size:.86rem;white-space:nowrap}
+.rating b{color:#e8a317}
+.acts2{display:flex;gap:8px;width:100%}.acts2 .btn{flex:1}
+.empty{grid-column:1/-1;border:1.5px dashed #dedee4;border-radius:22px;padding:44px;text-align:center;color:var(--mute);background:rgba(255,255,255,.7)}
+.empty .btn{margin-top:14px}
+
+/* Boîte de dialogue */
+dialog{border:0;border-radius:22px;padding:28px;width:min(480px,94vw);box-shadow:0 30px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(17,17,17,.45);backdrop-filter:blur(3px)}
+dialog h2{font-size:1.6rem;margin-bottom:6px}
+label{display:block;font-weight:600;font-size:.88rem;margin:14px 0 5px}
+dialog input,dialog select,dialog textarea{width:100%;border:1px solid #e3e3e8;border-radius:12px;padding:11px 13px;background:#fafafb}
+dialog input:focus,dialog select:focus,dialog textarea:focus{outline:0;border-color:var(--ink);background:#fff}
+textarea{min-height:96px;resize:vertical}
+.dacts{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;z-index:60}
+#toast.on{opacity:1;transform:translateX(-50%)}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{text-decoration:none}
+
+@media(max-width:760px){
+ nav .hide{display:none}
+ nav{gap:14px}
+ .finder{flex-wrap:wrap;border-radius:20px}
+ .seg{width:100%}.seg button{flex:1;padding:10px 8px}
+ .q{flex:1 1 60%;padding:0 6px}
+ .hero{padding-top:34px}
+}
+@media(max-width:420px){header .btn{display:none}}
+@media(prefers-reduced-motion:reduce){.card,#toast{transition:none}.card:hover{transform:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <a class="logo" href="index.html" style="color:inherit;text-decoration:none"><i></i>Dealr</a>
-    <div class="hbtns">
-      <a class="btn sec" id="navAcc" href="connexion.html" style="text-decoration:none;color:inherit">Se connecter</a>
-      <button class="btn main" id="openMission">Publier une mission</button>
-    </div>
+    <a class="logo" href="index.html"><i></i>Dealr</a>
+    <nav>
+      <a class="hide" href="marketplace.html" aria-current="page">Marketplace</a>
+      <a id="navMsg" href="messages.html" hidden>Messages</a>
+      <a id="navAcc" href="connexion.html">Se connecter</a>
+      <button class="btn sm" type="button" id="openMission">Publier une mission</button>
+    </nav>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
-    <h1>Un besoin d’un côté, un savoir-faire de l’autre.</h1>
-    <p>Particuliers, entreprises et freelances se trouvent directement. Publiez une mission ou proposez vos services, sans intermédiaire.</p>
-    <div class="seg" role="group" aria-label="Que cherchez-vous ?">
-      <button id="vPros" aria-pressed="true">Je cherche un prestataire</button>
-      <button id="vMis" aria-pressed="false">Je cherche une mission</button>
-    </div>
-    <div class="search">
-      <input id="q" type="search" placeholder="Métier, compétence, ville…" aria-label="Recherche">
+    <h1>La bonne personne, <em>au bon prix.</em></h1>
+    <p class="lead">Parcourez les freelances et les agences, ou trouvez votre prochaine mission parmi les besoins publiés.</p>
+    <div class="finder">
+      <div class="seg" role="group" aria-label="Que cherchez-vous ?">
+        <button type="button" id="vPros" aria-pressed="true">Prestataires</button>
+        <button type="button" id="vMis" aria-pressed="false">Missions</button>
+      </div>
+      <label class="q" for="q" style="margin:0;font-weight:400">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Métier, compétence, ville…" aria-label="Recherche">
+      </label>
       <select id="type" aria-label="Type"></select>
     </div>
-    <div class="chips" id="chips" role="group" aria-label="Catégories"></div>
+    <div class="cats" id="chips" role="group" aria-label="Catégories"></div>
   </section>
   <div class="count" id="count" aria-live="polite"></div>
   <div class="grid" id="grid"></div>
 </main>
 
-<footer><div class="wrap">© 2026 Dealr. Tous droits réservés.</div></footer>
+<footer><div class="wrap"><span>© 2026 Dealr. Tous droits réservés.</span><a href="index.html">Retour à l’accueil</a></div></footer>
 
 <dialog id="dForm">
   <form method="dialog" id="fForm">
-    <h2 id="fTitle"></h2>
-    <label for="f1" id="l1"></label><input id="f1" required>
-    <label for="f2" id="l2"></label><input id="f2" required>
+    <h2>Publier une mission</h2>
+    <p class="sub" style="margin:0">Décrivez votre besoin : les prestataires vous répondront.</p>
+    <label for="f1">Titre de la mission</label><input id="f1" required placeholder="Ex. Montage de 3 Reels pour mon café">
+    <label for="f2">Votre nom ou entreprise</label><input id="f2" required>
     <label for="f3">Catégorie</label><select id="f3"></select>
-    <label for="f4" id="l4"></label><input id="f4" required>
+    <label for="f4">Budget</label><input id="f4" required placeholder="Ex. 1 500 €">
     <label for="f5">Description</label><textarea id="f5" required></textarea>
-    <div class="acts"><button type="button" class="btn" data-close>Annuler</button><button class="btn main">Publier</button></div>
+    <div class="dacts"><button type="button" class="btn out" data-close>Annuler</button><button class="btn">Publier</button></div>
   </form>
 </dialog>
 
 <dialog id="dContact">
   <form method="dialog" id="fContact">
     <h2 id="cTitle"></h2>
-    <label for="c1">Votre email</label><input id="c1" type="email" required>
+    <p class="sub" style="margin:0">Les missions d’exemple ne sont pas reliées à de vrais comptes : ce message n’est pas transmis.</p>
     <label for="c2">Votre message</label><textarea id="c2" required></textarea>
-    <div class="acts"><button type="button" class="btn" data-close>Annuler</button><button class="btn main">Envoyer</button></div>
+    <div class="dacts"><button type="button" class="btn out" data-close>Annuler</button><button class="btn">Envoyer</button></div>
   </form>
 </dialog>
 
@@ -133,48 +180,48 @@ const missions=[
  {title:"Rédaction de 10 articles de blog",who:"Entreprise",by:"Cabinet Lefèvre",c:"Rédaction",b:"1 500 €",d:"Sous 6 semaines",desc:"Articles de 1 000 mots sur le droit du travail, optimisés SEO."},
  {title:"Logo et charte graphique pour mon association",who:"Particulier",by:"Marc T.",c:"Design",b:"600 €",d:"Sous 2 semaines",desc:"Association sportive : logo, couleurs et modèles de documents."},
  {title:"Audit de notre stratégie d’acquisition",who:"Entreprise",by:"Lumio SAS",c:"Marketing",b:"3 000 €",d:"Sous 1 mois",desc:"Analyse de nos canaux payants et recommandations chiffrées."}
-];
-const COL=["#1f4fd8","#c2410c","#0f766e","#7c3aed","#be185d","#4d7c0f"];
-let view="pros",cat="Toutes",type="Tous",q="";
+].map(m=>Object.assign({demo:true},m));
+let view="pros",cat="Toutes",type="Tous",q="",me=null;
 const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const init=s=>s.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
-const color=s=>COL[[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const init=s=>String(s||"?").split(" ").map(w=>w[0]||"").slice(0,2).join("").toUpperCase();
 const cls=t=>t==="Entreprise"?"ent":t==="Particulier"?"par":"";
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2800)}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2800)}
 
 function setup(){
-  $("#chips").innerHTML=["Toutes",...CATS].map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("");
+  $("#chips").innerHTML=["Toutes",...CATS].map(c=>`<button type="button" class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("");
   const opts=view==="pros"?["Tous","Freelance","Entreprise"]:["Tous","Entreprise","Particulier"];
   $("#type").innerHTML=opts.map(o=>`<option>${o}</option>`).join("");
   $("#type").value=type;
+  $("#q").placeholder=view==="pros"?"Métier, compétence, ville…":"Mission, client, mot-clé…";
 }
 function render(){
-  const s=q.toLowerCase();
+  const s=q.toLowerCase().trim();
   const list=(view==="pros"?pros:missions).filter(x=>{
     const kind=view==="pros"?x.t:x.who;
-    const hay=(view==="pros"?[x.n,x.job,x.city,...(x.tags||[])]:[x.title,x.by,x.desc]).join(" ").toLowerCase();
+    const hay=(view==="pros"?[x.n,x.job,x.city,...(x.tags||[]),...(x.skills||[])]:[x.title,x.by,x.desc]).join(" ").toLowerCase();
     return (cat==="Toutes"||x.c===cat)&&(type==="Tous"||kind===type)&&hay.includes(s);
   });
   $("#count").textContent=`${list.length} ${view==="pros"?"prestataire":"mission"}${list.length>1?"s":""}`;
-  $("#grid").innerHTML=list.length?list.map((x,i)=>view==="pros"?proCard(x,i):misCard(x,i)).join(""):
-    `<div class="empty">Aucun résultat. Élargissez votre recherche ou publiez votre besoin.</div>`;
+  $("#grid").innerHTML=list.length?list.map(view==="pros"?proCard:misCard).join(""):
+    `<div class="empty">Aucun résultat pour cette recherche.<br><button type="button" class="btn out" data-reset>Effacer les filtres</button></div>`;
 }
-const proCard=(x,i)=>{const img=DealrAuth.safeImg(x.photo),nm=x.n||"?";return `<article class="card">
-  <div class="top">${img?`<div class="av" style="background:url('${img}') center/cover"></div>`:`<div class="av" style="background:${color(nm)}">${esc(init(nm))}</div>`}
-  <div><h3>${esc(nm)}${x.demo?'<span class="demo">exemple</span>':""}</h3><div class="sub">${esc(x.job||"")}</div></div></div>
-  <div><span class="badge ${cls(x.t)}">${esc(x.t||"Freelance")}</span> <span class="sub">${esc(x.c||"")} · ${esc(x.city||"")}${x.dispo?" · "+esc(x.dispo):""}</span></div>
-  <div class="tags">${(x.tags||[]).map(t=>`<span>${esc(t)}</span>`).join("")}</div>
-  <div class="foot"><div><span class="price">${esc(x.p||"Sur devis")}</span><div class="sub">${+x.a?`★ ${+x.r} (${+x.a} avis)`:"Nouveau profil"}</div></div>
-  <div style="display:flex;gap:6px"><a class="btn" href="prestataire.html?id=${encodeURIComponent(x.id||"")}" style="text-decoration:none;color:inherit">Voir le profil</a><button class="btn main" data-contact="${esc(nm)}">Contacter</button></div></div></article>`};
+const proCard=x=>{const img=DealrAuth.safeImg(x.photo),nm=x.n||"?",mine=me&&x.id===me;return `<article class="card">
+  <div class="top">${img?`<div class="av" style="background-image:url('${img}')"></div>`:`<div class="av">${esc(init(nm))}</div>`}
+  <div><h3>${esc(nm)}</h3><div class="sub">${esc(x.job||"")}</div></div></div>
+  <div class="meta"><span class="b ${cls(x.t)}">${esc(x.t||"Freelance")}</span>${x.dispo&&/maintenant/.test(x.dispo)?'<span class="b d">Disponible</span>':""}${x.demo?'<span class="b x">Exemple</span>':""}<span class="sub">${esc(x.city||"")}</span></div>
+  <div class="tags">${(x.tags||[]).slice(0,4).map(t=>`<span>${esc(t)}</span>`).join("")}</div>
+  <div class="foot"><div><div class="price">${esc(x.p||"Sur devis")}</div><div class="rating">${+x.a?`<b>★</b> ${String(+x.r).replace(".",",")} · ${+x.a} avis`:"Nouveau profil"}</div></div>
+  <div class="acts2"><a class="btn out sm" href="prestataire.html?id=${encodeURIComponent(mine?"moi":(x.id||""))}">Voir le profil</a>${mine?"":`<button type="button" class="btn sm" data-pro="${esc(x.id||"")}">Contacter</button>`}</div></div></article>`};
 const misCard=(x,i)=>`<article class="card">
-  <div><span class="badge ${cls(x.who)}">${x.who}</span> <span class="sub">${esc(x.c)} · ${esc(x.by)}</span></div>
+  <div class="meta"><span class="b ${cls(x.who)}">${esc(x.who)}</span><span class="b x">${esc(x.c)}</span>${x.demo?'<span class="b x">Exemple</span>':""}</div>
   <h3>${esc(x.title)}</h3>
   <p class="desc">${esc(x.desc)}</p>
-  <div class="foot"><div><span class="price">${esc(x.b)}</span><div class="sub">${esc(x.d)}</div></div>
-  <button class="btn main" data-contact="${esc(x.by)}">Proposer mes services</button></div></article>`;
+  <div class="sub">${esc(x.by)}</div>
+  <div class="foot"><div><div class="price">${esc(x.b)}</div><div class="rating">${esc(x.d)}</div></div>
+  <button type="button" class="btn sm" data-mis="${esc(x.by)}">Proposer mes services</button></div></article>`;
 
-/* Navigation et filtres */
+/* Filtres */
 function setView(v){view=v;type="Tous";cat="Toutes";$("#vPros").setAttribute("aria-pressed",v==="pros");$("#vMis").setAttribute("aria-pressed",v==="missions");setup();render()}
 $("#vPros").onclick=()=>setView("pros");
 $("#vMis").onclick=()=>setView("missions");
@@ -182,44 +229,36 @@ $("#q").oninput=e=>{q=e.target.value;render()};
 $("#type").onchange=e=>{type=e.target.value;render()};
 $("#chips").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;cat=b.dataset.c;setup();render()};
 
-/* Fiches : contact */
+/* Contacter un prestataire : ouvre la messagerie */
 $("#grid").onclick=e=>{
-  const b=e.target.closest("[data-contact]");if(!b)return;
-  $("#cTitle").textContent=(view==="pros"?"Contacter ":"Répondre à ")+b.dataset.contact;
-  $("#fContact").reset();$("#dContact").showModal();
+  if(e.target.closest("[data-reset]")){q="";$("#q").value="";cat="Toutes";type="Tous";setup();render();return}
+  const p=e.target.closest("[data-pro]");
+  if(p){const x=pros.find(y=>y.id===p.dataset.pro);
+    if(!x||x.demo){toast("Profil d’exemple : la messagerie fonctionne avec les membres inscrits.");return}
+    location.href="messages.html?with="+encodeURIComponent(x.id);return}
+  const m=e.target.closest("[data-mis]");
+  if(m){$("#cTitle").textContent="Répondre à "+m.dataset.mis;$("#fContact").reset();$("#dContact").showModal()}
 };
-$("#fContact").onsubmit=()=>toast("Message envoyé (démo : rien n’est réellement transmis).");
+$("#fContact").onsubmit=()=>toast("Mission d’exemple : message non transmis.");
 
-/* Formulaire de publication */
-let mode="mission";
-function openForm(m){
-  mode=m;$("#fForm").reset();
-  const mi=m==="mission";
-  $("#fTitle").textContent="Publier une mission";
-  $("#l1").textContent=mi?"Titre de la mission":"Nom ou nom d’entreprise";
-  $("#l2").textContent=mi?"Votre nom ou entreprise":"Métier ou activité";
-  $("#l4").textContent=mi?"Budget (ex. 1 500 €)":"Tarif (ex. 400 €/jour)";
-  $("#f3").innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");
-  $("#dForm").showModal();
-}
-$("#openMission").onclick=()=>openForm("mission");
+/* Publier une mission */
+$("#openMission").onclick=()=>{$("#fForm").reset();$("#f3").innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");$("#dForm").showModal()};
 $("#fForm").onsubmit=()=>{
   const v=id=>$(id).value.trim();
-  if(mode==="mission"){
-    missions.unshift({title:v("#f1"),who:"Particulier",by:v("#f2"),c:v("#f3"),b:v("#f4"),d:"À définir",desc:v("#f5")});
-    setView("missions");toast("Mission publiée.");
-  }
+  missions.unshift({title:v("#f1"),who:"Particulier",by:v("#f2"),c:v("#f3"),b:v("#f4"),d:"À définir",desc:v("#f5")});
+  setView("missions");toast("Mission publiée.");
 };
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 
 setup();render();
 
-/* Profils des membres (base de données) + bouton de compte */
+/* Profils des membres + en-tête selon la connexion */
 DealrAuth.listProfiles().then(list=>{if(!list.length)return;
   const ids=new Set(list.map(p=>p.id));
   for(let i=pros.length-1;i>=0;i--)if(ids.has(pros[i].id))pros.splice(i,1);
   pros.unshift(...list);if(view==="pros")render()});
-DealrAuth.user().then(u=>{if(!u)return;const a=$("#navAcc");a.textContent="Mon profil";a.href="prestataire.html?id=moi"});
+DealrAuth.user().then(u=>{if(!u)return;me=u.id;const a=$("#navAcc");a.textContent="Mon profil";a.href="prestataire.html?id=moi";
+  DealrAuth.messagesLink($("#navMsg"));if(view==="pros")render()});
 </script>
 </body>
 </html>

@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
+[hidden]{display:none!important}
 :root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--ind:#3b4a9e;--g:#22a863;--bg:#fff}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -141,6 +142,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
       <a class="hide" href="#entreprise">Entreprises</a>
       <a class="hide" href="#freelance">Freelances</a>
       <a class="hide" href="#paiement">Paiement</a>
+      <a id="navMsg" href="messages.html" hidden>Messages</a>
       <a id="navLogin" href="connexion.html">Se connecter</a>
       <a class="btn sm out" id="navProfil" href="connexion.html#inscription">Créer un compte</a>
       <a class="btn sm navcta" href="marketplace.html">Publier un besoin</a>
@@ -329,7 +331,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 DealrAuth.user().then(function(u){
   if(!u)return;
   var l=document.getElementById("navLogin"),b=document.getElementById("navProfil");
-  l.hidden=true;b.textContent="Mon profil";b.href="prestataire.html?id=moi";b.classList.remove("out");
+  l.hidden=true;DealrAuth.messagesLink(document.getElementById("navMsg"));b.textContent="Mon profil";b.href="prestataire.html?id=moi";b.classList.remove("out");
   document.querySelectorAll("[data-acc]").forEach(function(a){a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"});
 });
 </script>

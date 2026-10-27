@@ -21,7 +21,7 @@ a{color:inherit}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
 .logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
 .logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
-nav a{text-decoration:none;color:var(--mute);font-weight:500}
+nav{display:flex;gap:22px}nav a{text-decoration:none;color:var(--mute);font-weight:500}
 nav a:hover{color:var(--ink)}
 .btn{display:inline-block;border-radius:99px;padding:13px 26px;font:600 1rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer}
 .btn:hover{background:#333}
@@ -112,7 +112,7 @@ body.wait main{visibility:hidden}
 </style>
 </head>
 <body class="wait">
-<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a href="prestataire.html?id=moi">Mon profil</a></nav></div></header>
+<header><div class="wrap"><a class="logo" href="index.html"><i></i>Dealr</a><nav><a id="navMsg" href="messages.html" hidden>Messages</a><a href="prestataire.html?id=moi">Mon profil</a></nav></div></header>
 
 <main class="wrap"><div class="layout">
 <div>
@@ -456,6 +456,7 @@ $("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.v
     else if(!t.trim())msg.textContent="Aucun texte lisible dans ce fichier (PDF scanné ?). Ajoutez vos expériences à la main.";
     else msg.textContent="Aucune expérience détectée automatiquement. Ajoutez-les à la main."
   }).catch(function(){msg.textContent="Impossible de lire ce fichier. Ajoutez vos expériences à la main."})});
+A.messagesLink(document.getElementById("navMsg"));
 /* Accès réservé aux membres connectés */
 A.requireUser("profil.html").then(function(){return A.myProfile().catch(function(){return null})}).then(function(p){
   if(p){editing=true;fillFrom(p);document.title="Dealr – Modifier mon profil"}
