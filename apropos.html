@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>À propos – Dealr</title>
+<meta name="description" content="Dealr, une équipe de développeurs et de commerciaux qui met en avant les jobs du numérique et sécurise chaque paiement, des deux côtés.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--o)}
+.kick:before{content:"";width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,#3448f0,var(--o))}
+.kick.lt{color:#ffd2bd}.kick.lt:before{background:#fff}
+section{padding:0 22px}
+.hero{text-align:center;padding-top:80px;padding-bottom:30px;display:flex;flex-direction:column;align-items:center}
+.hero h1{font-size:clamp(2.5rem,6.2vw,4.6rem);margin-top:16px;line-height:1.02;letter-spacing:-.045em}
+.hero .lead{color:#55555c;font-size:1.2rem;max-width:34em;margin:24px auto 0}
+.sh{text-align:center;max-width:720px;margin:0 auto 34px}
+.sh h2{font-size:clamp(2rem,4.4vw,3rem);margin-top:12px}
+.sh .sub{color:#55555c;margin:14px auto 0;max-width:30em}
+.why,.what,.team,.values,.road{padding-top:90px}
+.fears{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fear{background:#fff;border-radius:22px;padding:26px;box-shadow:0 10px 30px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05)}
+.who{display:inline-block;font-size:.75rem;font-weight:700;border-radius:99px;padding:4px 10px}
+.who.b{background:#eef0ff;color:#2d3a8c}.who.o{background:#fff1e8;color:#a3390f}
+.fear .q{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-size:1.7rem;line-height:1.2;margin:16px 0 10px;color:var(--ink)}
+.fear p{margin:0;color:#55555c}
+.answer{grid-column:1/-1;display:flex;gap:24px;align-items:center;border-radius:24px;padding:28px;color:#fff;background:linear-gradient(110deg,#3448f0 0%,#7a54d8 50%,#f55a1f 100%);box-shadow:0 24px 50px rgba(90,70,200,.25)}
+.answer .vault{width:92px;height:92px;flex:none;border-radius:26px;display:grid;place-items:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4)}
+.answer h3{font-size:1.5rem}.answer p{margin:8px 0 0;opacity:.92;max-width:44em}
+.mission{margin-top:90px;padding:80px 22px;background:#111;color:#fff;text-align:center;position:relative;overflow:hidden}
+.mission:before{content:"";position:absolute;inset:0;background:radial-gradient(40% 80% at 0 0,rgba(52,72,240,.45),transparent 70%),radial-gradient(40% 80% at 100% 100%,rgba(245,90,31,.45),transparent 70%)}
+.mission .wrap{position:relative}
+.big{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:-.04em;font-size:clamp(1.8rem,4.2vw,3.1rem);line-height:1.1;max-width:22em;margin:18px auto 0}
+.big em{color:#ff9b6a}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pil{background:#fff;border-radius:22px;padding:26px;box-shadow:0 10px 30px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05);transition:transform .2s}
+.pil:hover{transform:translateY(-4px)}
+.pil i,.ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center}
+.pil i.o{background:linear-gradient(150deg,#ff8248,#f55a1f)}.pil i.b{background:linear-gradient(150deg,#5a6bff,#3448f0)}.pil i.v{background:linear-gradient(150deg,#6a7bff,#965ac8 50%,#f55a1f)}
+.pil h3{font-size:1.3rem;margin:18px 0 10px}
+.pil p{margin:0;color:#55555c}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.tags span{font-size:.78rem;font-weight:600;border:1px solid #e3e4ec;border-radius:99px;padding:4px 10px}
+.poles{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pole{border-radius:24px;padding:28px;background:#fff;box-shadow:0 10px 30px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05);position:relative;overflow:hidden}
+.pole:before{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;opacity:.14}
+.pole.dev:before{background:#3448f0}.pole.sales:before{background:#f55a1f}
+.pole.dev .ico{background:linear-gradient(150deg,#5a6bff,#3448f0)}.pole.sales .ico{background:linear-gradient(150deg,#ff8248,#f55a1f)}
+.ph{display:flex;align-items:center;gap:14px}
+.ph b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.45rem;letter-spacing:-.03em}
+.pole p{color:#55555c;margin:16px 0 0}
+.pole ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px}
+.pole li{display:flex;gap:10px;align-items:center;font-weight:500}
+.pole li:before{content:"";width:18px;height:18px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2322a863' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.vals{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.vals article{border-radius:20px;padding:22px;background:rgba(255,255,255,.75);border:1px solid #ececf3}
+.vals b{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.8rem;background:linear-gradient(100deg,#3448f0,#f55a1f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vals h3{font-size:1.2rem;margin:6px 0 8px}.vals p{margin:0;color:#55555c;font-size:.95rem}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
+.steps:before{content:"";position:absolute;left:0;right:0;top:15px;height:2px;background:linear-gradient(90deg,#3448f0,#f55a1f);opacity:.25}
+.steps li{position:relative;padding-top:42px}
+.steps li:before{content:"";position:absolute;top:6px;left:0;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #d3d6ea}
+.steps li.now:before{border-color:#f55a1f;box-shadow:0 0 0 6px rgba(245,90,31,.15)}
+.steps .tag{font-size:.75rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.steps li.now .tag{color:var(--o)}
+.steps h3{font-size:1.2rem;margin:6px 0 8px}.steps p{margin:0;color:#55555c;font-size:.95rem}
+.cta{margin:100px 0 90px;border-radius:28px;padding:36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:#fff;box-shadow:0 0 0 6px rgba(255,255,255,.5),0 30px 70px rgba(40,50,120,.12)}
+.cta h2{font-size:clamp(1.7rem,3.6vw,2.4rem)}.cta p{margin:8px 0 0;color:#55555c}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.c1{display:inline-flex;align-items:center;gap:12px;padding:8px 8px 8px 22px;border-radius:99px;color:#fff;font-weight:700;text-decoration:none;background:linear-gradient(100deg,#4056ff,#965ac8 50%,#f55a1f);box-shadow:-8px 10px 24px rgba(52,72,240,.25),8px 10px 24px rgba(245,90,31,.25);transition:transform .2s}
+.c1 span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.25)}
+.c2{display:inline-flex;align-items:center;padding:12px 22px;border-radius:99px;border:1.5px solid var(--ink);text-decoration:none;font-weight:700;transition:transform .2s}
+.c1:hover,.c2:hover{transform:translateY(-2px)}
+@media(max-width:860px){
+ .fears,.poles{grid-template-columns:1fr}.pillars{grid-template-columns:1fr}.vals{grid-template-columns:1fr 1fr}
+ .steps{grid-template-columns:1fr;gap:22px}.steps:before{left:9px;right:auto;top:0;bottom:0;width:2px;height:auto}
+ .steps li{padding:0 0 0 38px}.steps li:before{top:2px}
+ .answer{flex-direction:column;align-items:flex-start}
+ .why,.what,.team,.values,.road{padding-top:64px}.mission{margin-top:64px;padding:56px 22px}
+ .hero{padding-top:48px}
+}
+@media(max-width:520px){.vals{grid-template-columns:1fr}.cta{padding:24px}.ctas,.c1,.c2{width:100%}.c1{justify-content:space-between}.c2{justify-content:center}}
+</style>
+</head>
+<body>
+<header class="gh">
+  <div class="gh-in">
+    <a class="logo" href="index.html"><i></i>Dealr</a>
+    <nav data-nav="apropos">
+      <a data-extra href="index.html#entreprise">Entreprises</a>
+      <a data-extra href="index.html#freelance">Freelances</a>
+      <a data-extra href="index.html#paiement">Paiement</a>
+      <a data-extra="end" data-acc class="gh-mcta" id="ghSignup" href="connexion.html#inscription">Créer un compte</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <span class="kick">À propos de Dealr</span>
+    <h1>Les jobs du moment,<br>payés en toute <em>confiance.</em></h1>
+    <p class="lead">Dealr est né d’une équipe de développeurs et de commerciaux. Notre mission : mettre en avant les métiers du numérique qui recrutent aujourd’hui, et sécuriser chaque paiement, des deux côtés.</p>
+  </section>
+
+  <section class="wrap why">
+    <div class="sh"><span class="kick">Le déclic</span><h2>Deux peurs, <em>une seule</em> réponse.</h2></div>
+    <div class="fears">
+      <article class="fear">
+        <span class="who b">Côté client</span>
+        <p class="q">« Et si je paie, et que le travail n’est jamais livré ? »</p>
+        <p>Particuliers et entreprises hésitent à confier un projet à quelqu’un qu’ils ne connaissent pas encore.</p>
+      </article>
+      <article class="fear">
+        <span class="who o">Côté freelance</span>
+        <p class="q">« Et si je livre, et que je ne suis jamais payé ? »</p>
+        <p>Relances, retards, impayés : beaucoup d’indépendants passent trop de temps à courir après leur argent.</p>
+      </article>
+      <article class="answer">
+        <div class="vault" aria-hidden="true"><svg viewBox="0 0 100 100" width="58" height="58"><circle cx="44" cy="54" r="32" fill="#fff"/><rect x="62" y="22" width="20" height="64" rx="5" fill="#fff"/><circle cx="44" cy="54" r="19" fill="#7a54d8"/><g stroke="#fff" stroke-width="6" stroke-linecap="round"><line x1="44" y1="54" x2="44" y2="72"/><line x1="44" y1="54" x2="28" y2="45"/><line x1="44" y1="54" x2="60" y2="45"/></g><circle cx="44" cy="54" r="6" fill="#fff"/></svg></div>
+        <div><h3>Notre réponse : le Deal et le coffre.</h3>
+        <p>Les deux parties valident le même accord. L’argent est bloqué chez Dealr au début de la mission, puis versé dès que la livraison est validée. Personne ne prend de risque.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="mission">
+    <div class="wrap">
+      <span class="kick lt">Notre mission</span>
+      <p class="big">Promouvoir les métiers du numérique <em>qui recrutent aujourd’hui</em>, et faire de chaque mission un accord clair, payé à coup sûr.</p>
+    </div>
+  </section>
+
+  <section class="wrap what">
+    <div class="sh"><span class="kick">Ce que nous faisons</span><h2>Trois engagements, <em>au quotidien.</em></h2></div>
+    <div class="pillars">
+      <article class="pil">
+        <i class="o"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></i>
+        <h3>Mettre en avant les jobs du moment</h3>
+        <p>Montage de Reels, création de contenu, IA et automatisation, SEO, no-code, design : nous suivons ce que les entreprises demandent vraiment et donnons de la visibilité aux talents qui y répondent.</p>
+        <div class="tags"><span>Reels</span><span>IA</span><span>SEO</span><span>No-code</span><span>Design</span></div>
+      </article>
+      <article class="pil">
+        <i class="b"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></i>
+        <h3>Sécuriser chaque paiement</h3>
+        <p>Le client paie au lancement du Deal, l’argent attend au coffre, le prestataire est payé à la validation. Le client est sûr d’être livré, le freelance est sûr d’être payé.</p>
+      </article>
+      <article class="pil">
+        <i class="v"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z"/></svg></i>
+        <h3>Arbitrer quand ça coince</h3>
+        <p>En cas de désaccord, l’argent reste bloqué. Notre équipe lit la conversation et les termes du Deal, échange avec chacun, puis tranche de façon équitable.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap team">
+    <div class="sh"><span class="kick">L’équipe</span><h2>Des devs et des commerciaux, <em>main dans la main.</em></h2>
+      <p class="sub">Une plateforme de confiance, ça se construit avec du code solide et beaucoup de terrain.</p></div>
+    <div class="poles">
+      <article class="pole dev">
+        <div class="ph"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></svg></span><b>Pôle développement</b></div>
+        <p>Il conçoit la plateforme : la marketplace, la messagerie, les Deals, le coffre et les outils de devis et de factures. Son obsession : un parcours simple et des paiements sûrs.</p>
+        <ul><li>Produit et expérience utilisateur</li><li>Sécurité des comptes et des données</li><li>Paiement bloqué et suivi des Deals</li></ul>
+      </article>
+      <article class="pole sales">
+        <div class="ph"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-6v14L3 13z"/><path d="M7 12.5V18a2 2 0 0 0 4 0v-4"/></svg></span><b>Pôle commercial</b></div>
+        <p>Il va à la rencontre des entreprises, repère les métiers les plus demandés et accompagne les freelances pour qu’ils décrochent leurs premières missions.</p>
+        <ul><li>Partenariats avec les entreprises</li><li>Veille sur les jobs qui recrutent</li><li>Accompagnement des freelances et du support</li></ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap values">
+    <div class="sh"><span class="kick">Nos valeurs</span><h2>Ce qui guide <em>chaque décision.</em></h2></div>
+    <div class="vals">
+      <article><b>01</b><h3>Confiance</h3><p>Personne ne devrait avoir à choisir entre payer d’avance et travailler gratuitement.</p></article>
+      <article><b>02</b><h3>Transparence</h3><p>Un Deal dit tout : la mission, le prix, le délai, les livrables. Pas de surprise.</p></article>
+      <article><b>03</b><h3>Simplicité</h3><p>Trouver, se mettre d’accord, être payé : trois étapes, rien de plus.</p></article>
+      <article><b>04</b><h3>Équité</h3><p>Client ou freelance, chacun est protégé de la même façon, et écouté de la même façon.</p></article>
+    </div>
+  </section>
+
+  <section class="wrap road">
+    <div class="sh"><span class="kick">Feuille de route</span><h2>Où nous en <em>sommes.</em></h2></div>
+    <ol class="steps">
+      <li class="now"><span class="tag">Aujourd’hui</span><h3>Le prototype</h3><p>Marketplace, profils, messagerie, Deals, coffre et support : le parcours complet est en test.</p></li>
+      <li><span class="tag">Prochaine étape</span><h3>Les premiers membres</h3><p>Ouverture aux premiers freelances et entreprises pour éprouver la plateforme sur de vraies missions.</p></li>
+      <li><span class="tag">Ensuite</span><h3>Les vrais paiements sécurisés</h3><p>Branchement d’un prestataire de paiement agréé pour bloquer et verser l’argent réellement.</p></li>
+      <li><span class="tag">Objectif</span><h3>Le lancement public</h3><p>La référence pour confier une mission digitale sans risque, partout en France.</p></li>
+    </ol>
+  </section>
+
+  <section class="wrap">
+    <aside class="cta">
+      <div><h2>Envie de construire Dealr <em>avec nous ?</em></h2><p>Freelance, entreprise ou futur partenaire : parlons-en.</p></div>
+      <div class="ctas">
+        <a class="c1" data-acc href="connexion.html#inscription">Rejoindre Dealr<span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="c2" href="contact.html?sujet=partenariat">Devenir partenaire</a>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a class="logo" href="index.html"><i></i>Dealr</a>
+        <p>La marketplace des services digitaux. Publiez un besoin, trouvez un freelance, payez à la livraison.</p>
+      </div>
+      <div>
+        <h4>Entreprises</h4>
+        <ul><li class="member-only"><a href="marketplace.html">Publier un besoin</a></li><li><a href="marketplace.html">Trouver un prestataire</a></li><li><a href="index.html#paiement">Paiement sécurisé</a></li></ul>
+      </div>
+      <div>
+        <h4>Freelances</h4>
+        <ul><li><a href="marketplace.html">Voir les missions</a></li><li><a data-acc href="connexion.html#inscription">Créer mon compte</a></li><li><a href="index.html#freelance">Comment ça marche</a></li></ul>
+      </div>
+      <div>
+        <h4>Dealr</h4>
+        <ul><li><a href="apropos.html" aria-current="page">À propos</a></li><li><a href="contact.html">Contact</a></li><li><a href="faq.html">Questions fréquentes</a></li></ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 Dealr. Tous droits réservés.</span>
+      <span><a href="#">Mentions légales</a> · <a href="#">Conditions d’utilisation</a> · <a href="#">Confidentialité</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+DealrAuth.user().then(function(u){if(!u)return;var g=document.getElementById("ghSignup");if(g)g.hidden=true;
+  document.querySelectorAll("[data-acc]").forEach(function(a){
+    if(a.classList.contains("c1")){a.href="marketplace.html";a.firstChild.textContent="Voir la marketplace";return}
+    a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"})});
+</script>
+</body>
+</html>
