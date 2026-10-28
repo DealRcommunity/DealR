@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact – Dealr</title>
+<meta name="description" content="Une question, un souci sur un Deal, un partenariat ? Écrivez à l’équipe Dealr.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:56px;align-items:start;padding:70px 0 100px}
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--o)}
+.kick:before{content:"";width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,#3448f0,var(--o))}
+h1{font-size:clamp(2.5rem,5.6vw,4rem);margin-top:14px}
+.intro>p{color:#55555c;font-size:1.15rem;margin:18px 0 0;max-width:26em}
+.infos{display:grid;gap:12px;margin-top:32px}
+.info{display:flex;gap:14px;align-items:flex-start;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 8px 24px rgba(40,50,120,.06)}
+.info i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.info i.o{background:linear-gradient(150deg,#ff8248,#f55a1f)}.info i.b{background:linear-gradient(150deg,#5a6bff,#3448f0)}.info i.v{background:linear-gradient(150deg,#6a7bff,#965ac8 50%,#f55a1f)}
+.info b{display:block}.info span{color:var(--mute);font-size:.94rem}
+.info a{color:var(--ind);font-weight:600}
+.card{position:relative;background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,.95);border-radius:28px;padding:32px;box-shadow:0 0 0 6px rgba(255,255,255,.35),0 30px 70px rgba(40,50,120,.12)}
+.card h2{font-size:1.6rem}
+.card .sub{color:var(--mute);margin:8px 0 20px;font-size:.95rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:600;font-size:.9rem;margin:14px 0 6px}
+input,select,textarea{width:100%;border:1px solid #e3e4ec;background:#fff;border-radius:14px;padding:13px 15px;font:500 1rem Figtree,sans-serif;color:var(--ink);transition:border-color .2s,box-shadow .2s}
+textarea{min-height:150px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shadow:0 0 0 4px rgba(52,72,240,.12)}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.topics label{margin:0;font-weight:500;font-size:.92rem}
+.topics input{position:absolute;opacity:0;width:1px;height:1px}
+.topics span{display:inline-block;border:1px solid #dcdce2;background:#fff;border-radius:99px;padding:8px 14px;cursor:pointer;transition:all .2s}
+.topics span:hover{border-color:var(--ink)}
+.topics input:checked+span{color:#fff;border-color:transparent;background:linear-gradient(100deg,#4056ff,#965ac8 50%,#f55a1f);box-shadow:0 8px 18px rgba(120,80,200,.25)}
+.topics input:focus-visible+span{outline:3px solid var(--o);outline-offset:2px}
+.count{text-align:right;font-size:.8rem;color:var(--mute);margin-top:4px}
+.hp{position:absolute;left:-9999px}
+.send{margin-top:20px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(255,255,255,.6);border-radius:99px;padding:8px 8px 8px 26px;color:#fff;font:700 1.05rem Figtree,sans-serif;cursor:pointer;
+ background:linear-gradient(100deg,rgba(64,86,255,.92) 0%,rgba(150,90,200,.88) 50%,rgba(245,90,31,.94) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),-10px 14px 30px rgba(52,72,240,.28),10px 14px 30px rgba(245,90,31,.28);transition:transform .2s,box-shadow .2s}
+.send:hover{transform:translateY(-2px)}
+.send:disabled{opacity:.7;cursor:wait;transform:none}
+.send span{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.err{color:#c0270f;font-size:.92rem;margin-top:12px;min-height:1.2em}
+.note{font-size:.82rem;color:var(--mute);margin-top:12px;text-align:center}
+.done{text-align:center;padding:30px 6px}
+.done .ok{width:84px;height:84px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#3448f0,#f55a1f);box-shadow:0 18px 40px rgba(120,80,200,.35);animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.done .ok path{stroke-dasharray:30;stroke-dashoffset:30;animation:draw .5s .3s forwards}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.done h2 em{font-size:1.1em}
+.done p{color:#55555c;margin:12px auto 22px;max-width:24em}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr);gap:36px;padding-top:44px}}
+@media(max-width:520px){.two{grid-template-columns:1fr}.card{padding:22px}}
+</style>
+</head>
+<body>
+<header class="gh">
+  <div class="gh-in">
+    <a class="logo" href="index.html"><i></i>Dealr</a>
+    <nav data-nav="contact">
+      <a data-extra href="index.html#entreprise">Entreprises</a>
+      <a data-extra href="index.html#freelance">Freelances</a>
+      <a data-extra href="index.html#paiement">Paiement</a>
+      <a data-extra="end" data-acc class="gh-mcta" id="ghSignup" href="connexion.html#inscription">Créer un compte</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="intro">
+      <span class="kick">Contact</span>
+      <h1>Parlons-en <em>ensemble.</em></h1>
+      <p>Une question sur Dealr, un souci avec votre compte ou une idée de partenariat ? Écrivez-nous, l’équipe vous répond rapidement.</p>
+      <div class="infos">
+        <div class="info"><i class="v"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><b>Réponse sous 48 h</b><span>Du lundi au vendredi, par email.</span></div></div>
+        <div class="info"><i class="o"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg></i><div><b>Un problème sur un Deal en cours ?</b><span>Ouvrez un litige directement depuis le Deal dans la <a href="messages.html">messagerie</a> : l’argent reste bloqué et l’équipe a tout le contexte.</span></div></div>
+        <div class="info"><i class="b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"/></svg></i><div><b>La réponse existe peut-être déjà</b><span>Consultez les <a href="faq.html">questions fréquentes</a>.</span></div></div>
+      </div>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <form id="f" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hp"><label>Ne pas remplir <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <h2>Envoyer un message</h2>
+        <p class="sub">Tous les champs sont obligatoires.</p>
+        <div class="l" style="font-weight:600;font-size:.9rem;margin-bottom:8px">Sujet</div>
+        <div class="topics" role="radiogroup" aria-label="Sujet">
+          <label><input type="radio" name="sujet" value="Question sur Dealr" checked><span>Question sur Dealr</span></label>
+          <label><input type="radio" name="sujet" value="Mon compte"><span>Mon compte</span></label>
+          <label><input type="radio" name="sujet" value="Un Deal ou un paiement"><span>Un Deal ou un paiement</span></label>
+          <label><input type="radio" name="sujet" value="Partenariat"><span>Partenariat</span></label>
+          <label><input type="radio" name="sujet" value="Autre"><span>Autre</span></label>
+        </div>
+        <div class="two">
+          <div><label for="nom">Nom</label><input id="nom" name="nom" autocomplete="name" maxlength="80" required></div>
+          <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="120" required></div>
+        </div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" maxlength="2000" placeholder="Expliquez-nous votre demande…" required></textarea>
+        <div class="count"><span id="cnt">0</span> / 2000</div>
+        <input type="hidden" name="compte" id="compte" value="Visiteur">
+        <button class="send" id="send" type="submit">Envoyer le message<span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3448f0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+        <div class="err" id="err" role="alert"></div>
+        <p class="note">Vos informations servent uniquement à vous répondre.</p>
+      </form>
+      <div class="done" id="done" hidden>
+        <div class="ok"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2>Message <em>envoyé.</em></h2>
+        <p>Merci <b id="who"></b> ! L’équipe Dealr a bien reçu votre message et vous répond à <b id="mail"></b> sous 48 h.</p>
+        <a class="btn out" href="index.html">Retour à l’accueil</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a class="logo" href="index.html"><i></i>Dealr</a>
+        <p>La marketplace des services digitaux. Publiez un besoin, trouvez un freelance, payez à la livraison.</p>
+      </div>
+      <div>
+        <h4>Entreprises</h4>
+        <ul><li class="member-only"><a href="marketplace.html">Publier un besoin</a></li><li><a href="marketplace.html">Trouver un prestataire</a></li><li><a href="index.html#paiement">Paiement sécurisé</a></li></ul>
+      </div>
+      <div>
+        <h4>Freelances</h4>
+        <ul><li><a href="marketplace.html">Voir les missions</a></li><li><a data-acc href="connexion.html#inscription">Créer mon compte</a></li><li><a href="index.html#freelance">Comment ça marche</a></li></ul>
+      </div>
+      <div>
+        <h4>Dealr</h4>
+        <ul><li><a href="#">À propos</a></li><li><a href="contact.html" aria-current="page">Contact</a></li><li><a href="faq.html">Questions fréquentes</a></li></ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 Dealr. Tous droits réservés.</span>
+      <span><a href="#">Mentions légales</a> · <a href="#">Conditions d’utilisation</a> · <a href="#">Confidentialité</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+  var f=document.getElementById("f"),msg=document.getElementById("message"),err=document.getElementById("err"),btn=document.getElementById("send");
+  function $(id){return document.getElementById(id)}
+  /* Sujet passé dans l'adresse : contact.html?sujet=partenariat */
+  var s=new URLSearchParams(location.search).get("sujet");
+  if(s){var r=Array.prototype.filter.call(f.querySelectorAll('input[name="sujet"]'),function(i){return i.value.toLowerCase().indexOf(s.toLowerCase())>=0})[0];if(r)r.checked=true}
+  msg.addEventListener("input",function(){$("cnt").textContent=msg.value.length});
+  /* Membre connecté : nom et email préremplis */
+  DealrAuth.user().then(function(u){
+    if(!u)return;
+    var g=$("ghSignup");if(g)g.hidden=true;
+    document.querySelectorAll("[data-acc]").forEach(function(a){a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"});
+    if(u.email&&!$("email").value)$("email").value=u.email;
+    $("compte").value="Membre "+(u.email||"")+" ("+u.id+")";
+    DealrAuth.myProfile().then(function(p){if(p&&p.n&&!$("nom").value)$("nom").value=p.company||[p.first,p.last].filter(Boolean).join(" ")||p.n}).catch(function(){});
+  });
+  f.addEventListener("submit",function(e){
+    e.preventDefault();err.textContent="";
+    var bad=["nom","email","message"].filter(function(id){var el=$(id);return !el.value.trim()||!el.checkValidity()})[0];
+    if(bad){err.textContent=bad==="email"?"Indiquez une adresse email valide.":bad==="nom"?"Indiquez votre nom.":"Écrivez votre message.";$(bad).focus();return}
+    if(msg.value.trim().length<10){err.textContent="Votre message est un peu court : détaillez votre demande.";msg.focus();return}
+    var label=btn.firstChild.textContent;btn.disabled=true;btn.firstChild.textContent="Envoi en cours…";
+    var body=new URLSearchParams(new FormData(f)).toString();
+    fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body})
+      .then(function(r){if(!r.ok)throw new Error(r.status);
+        $("who").textContent=$("nom").value.trim().split(" ")[0];$("mail").textContent=$("email").value.trim();
+        f.hidden=true;$("done").hidden=false;$("done").closest(".card").scrollIntoView({behavior:"smooth",block:"center"})})
+      .catch(function(){btn.disabled=false;btn.firstChild.textContent=label;err.textContent="L’envoi n’a pas fonctionné. Vérifiez votre connexion et réessayez."});
+  });
+})();
+</script>
+</body>
+</html>

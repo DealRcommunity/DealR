@@ -758,7 +758,7 @@
   A.profileComplete = function (p) { return !A.profileMissing(p).length; };
   function profileGate() {
     var page = location.pathname.split("/").pop() || "index.html";
-    if (/^(profil|connexion)\.html$/.test(page)) return;
+    if (/^(profil|connexion|contact|faq)\.html$/.test(page)) return;
     /* Sans session enregistrée dans le navigateur, c'est un visiteur : rien à vérifier */
     var likely = false;
     try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k === "dealr_demo_session" || /^sb-.*-auth-token$/.test(k)) { likely = true; break; } } } catch (e) {}

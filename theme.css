@@ -1,0 +1,59 @@
+/* Thème commun Dealr (barre en verre, couleurs, pied de page) – utilisé par faq.html et contact.html */
+[hidden]{display:none!important}
+:root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--ind:#3b4a9e;--g:#22a863;--bg:#fff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.04em;font-weight:800;line-height:1}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em;font-size:1.12em;color:var(--o)}
+em.i{color:var(--ind)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+/* Barre du haut : capsule centrée en verre dépoli */
+body{margin:0;color:var(--ink);background:#fff;font:17px/1.55 Figtree,system-ui,sans-serif;overflow-x:hidden}
+body:before{content:"";position:absolute;z-index:-1;left:0;right:0;top:0;height:820px;pointer-events:none;background:radial-gradient(50% 60% at 100% 0,#ffd9bf 0,rgba(255,217,191,0) 72%),radial-gradient(48% 60% at 0 0,#dce2ff 0,rgba(220,226,255,0) 72%)}
+header.gh{position:sticky;top:0;z-index:50;padding:18px 16px 0;display:flex;justify-content:center;pointer-events:none}
+.gh-in{pointer-events:auto;display:flex;align-items:center;gap:26px;padding:7px 7px 7px 22px;border-radius:99px;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);border:1px solid rgba(255,255,255,.85);box-shadow:0 0 0 5px rgba(255,255,255,.35),0 10px 34px rgba(40,50,120,.09),inset 0 1px 0 rgba(255,255,255,.95)}
+.gh .logo i{background:linear-gradient(135deg,#3448f0,var(--o))}
+.gh nav,.gh .dnav{gap:2px}
+.gh nav a,.gh .dnav a,.gh .dnav button.lk{color:#4a4a52;padding:8px 12px;border-radius:99px;font-size:.97rem;transition:background .2s,color .2s}
+.gh nav a:hover,.gh .dnav a:hover,.gh .dnav button.lk:hover{background:rgba(255,255,255,.8);color:var(--ink)}
+.gh .dnav .dn-dd a,.gh .dnav .dn-dd button.lk{border-radius:10px}
+.gh .dnav .dn-dd a:hover,.gh .dnav .dn-dd button.lk:hover{background:#f5f5f7}
+.gh .dnav a#dnSignup,.gh .dnav button.dn-accbtn,.gh nav a.gh-mcta{color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.6);border-radius:99px;background:linear-gradient(100deg,rgba(64,86,255,.84) 0%,rgba(150,90,200,.8) 50%,rgba(245,90,31,.86) 100%);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 16px rgba(255,255,255,.12),-8px 10px 24px rgba(52,72,240,.26),8px 10px 24px rgba(245,90,31,.26);transition:transform .2s ease,box-shadow .2s ease}
+.gh .dnav a#dnSignup{display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 20px;margin-left:10px}
+.gh .dnav a#dnSignup:after{content:"";width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6' fill='none' stroke='%23111' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/15px no-repeat}
+.gh .dnav button.dn-accbtn{padding:10px 18px;margin-left:10px}
+.gh .dnav a#dnSignup:hover,.gh .dnav button.dn-accbtn:hover,.gh .dnav button.dn-accbtn[aria-expanded=true],.gh nav a.gh-mcta:hover{color:#fff;transform:translateY(-2px);background:linear-gradient(100deg,rgba(64,86,255,.92) 0%,rgba(150,90,200,.88) 50%,rgba(245,90,31,.94) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),-10px 14px 30px rgba(52,72,240,.34),10px 14px 30px rgba(245,90,31,.34)}
+.gh nav a.gh-mcta{display:none;padding:9px 14px;font-size:.88rem;white-space:nowrap}
+.gh .dnav-tg{width:40px;height:40px;padding:0;justify-content:center;position:relative;font-size:0;border:1px solid rgba(17,17,17,.08);background:rgba(255,255,255,.75) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 7h16M4 12h16M4 17h16' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/18px no-repeat}
+.gh .dnav-tg .mbadge{position:absolute;top:-4px;right:-4px}
+@media(max-width:760px){
+ .gh-in{width:100%;justify-content:space-between;gap:10px;padding:6px 6px 6px 16px}
+ .gh nav{gap:6px}
+ .gh nav a.gh-mcta{display:inline-flex}
+ .gh .dnav a#dnSignup{background:none;color:var(--ink);box-shadow:none;border:0;padding:11px 14px;margin:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+ .gh .dnav a#dnSignup:after{display:none}
+ .gh .dnav a#dnSignup:hover{transform:none;background:#f5f5f7;color:var(--ink);box-shadow:none}
+}
+.logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+nav{display:flex;gap:26px;align-items:center;font-weight:500}
+nav a{text-decoration:none;color:var(--mute)}
+nav a:hover{color:var(--ink)}
+.btn{display:inline-block;border-radius:99px;padding:13px 24px;font-weight:600;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;font:600 1rem Figtree,sans-serif}
+.btn:hover{background:#333}
+.btn.out{background:transparent;color:var(--ink)}
+.btn.out:hover{background:#fff}
+.btn.sm{padding:9px 18px;font-size:.95rem}
+footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-size:.95rem}
+.fgrid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:36px;padding:56px 0 40px}
+.fgrid .logo{color:var(--ink);margin-bottom:14px}
+.fgrid p{margin:0;max-width:20em}
+.fgrid h4{margin:0 0 14px;color:var(--ink);font:600 .95rem Figtree,sans-serif}
+.fgrid ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.fgrid a{text-decoration:none}
+.fgrid a:hover{color:var(--ink);text-decoration:underline}
+.fbot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:20px 0;font-size:.88rem}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
