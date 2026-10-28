@@ -214,9 +214,8 @@ body.wait main{visibility:hidden}
 
       <div class="l">Formations</div>
       <div id="eduList"></div>
-      <div class="two"><div><label for="ed">Diplôme ou formation</label><input id="ed" maxlength="90" placeholder="BTS Audiovisuel"></div><div><label for="es">École ou organisme</label><input id="es" maxlength="90" placeholder="Lycée Jean Moulin"></div></div>
-      <label for="ey">Année</label><input id="ey" maxlength="20" placeholder="2022" style="max-width:200px">
-      <button type="button" class="btn out sm" id="eAdd" style="margin-top:12px">Ajouter cette formation</button>
+      <div class="two"><div><label for="elv">Niveau reconnu par l’État</label><select id="elv"><option value="">Choisir un niveau…</option><option>Baccalauréat (niveau 4)</option><option>CAP (niveau 3)</option><option>BEP (niveau 3)</option><option>BTS (niveau 5)</option><option>DUT (niveau 5)</option><option>BUT (niveau 6)</option><option>Licence (niveau 6)</option><option>Bachelor (niveau 6, titre RNCP)</option><option>Master (niveau 7)</option><option>Titre d’ingénieur (niveau 7)</option><option>Mastère spécialisé (niveau 7, titre RNCP)</option><option>Doctorat (niveau 8)</option><option>Autre formation</option></select></div><div><label for="ed">Intitulé</label><input id="ed" maxlength="90" placeholder="Électronique et systèmes"></div></div><div class="two"><div><label for="es">École ou organisme</label><input id="es" maxlength="90" placeholder="ESIGELEC"></div><div><label for="ey">Année</label><input id="ey" maxlength="20" placeholder="2022"></div></div>
+            <button type="button" class="btn out sm" id="eAdd" style="margin-top:12px">Ajouter cette formation</button>
       <div class="err" id="eErr" role="alert"></div>
 
       <div class="l" style="margin-top:26px">Certifications</div>
@@ -410,7 +409,7 @@ function listBox(id,arr,line,edit){var box=$(id);box.textContent="";
     var m=mk("button","Modifier");m.type="button";m.onclick=function(){edit(x);arr.splice(i,1);renderEdu()};
     var ac=mk("div","","acts");ac.appendChild(m);ac.appendChild(b);d.appendChild(w);d.appendChild(ac);box.appendChild(d)})}
 function renderEdu(){
-  listBox("eduList",st.edus,function(x){return[x.t,[x.s,x.y].filter(Boolean).join(" · ")]},function(x){$("ed").value=x.t;$("es").value=x.s||"";$("ey").value=x.y||"";$("ed").focus()});
+  listBox("eduList",st.edus,function(x){return[(x.lv?x.lv+" · ":"")+x.t,[x.s,x.y].filter(Boolean).join(" · ")]},function(x){$("elv").value=x.lv||"";$("ed").value=x.t;$("es").value=x.s||"";$("ey").value=x.y||"";$("ed").focus()});
   renderCerts();draw()}
 var CST={pending:"En attente de vérification",verified:"Vérifiée",rejected:"Refusée"};
 function renderCerts(){var box=$("certList");box.textContent="";
@@ -422,9 +421,10 @@ function renderCerts(){var box=$("certList");box.textContent="";
 function loadCerts(){return A.myCerts().then(function(l){st.certs=l||[];renderCerts();draw()}).catch(function(){})}
 var proof=null;
 function resetProof(){proof=null;$("cpf").value="";$("cpBox").classList.remove("ok");$("cpName").textContent="Ajouter l’attestation ou le certificat";$("cpHint").textContent="PDF, JPG ou PNG · 1,5 Mo maximum · obligatoire"}
-function addEdu(){var t=v("ed");if(!t){$("eErr").textContent="Indiquez le nom du diplôme ou de la formation.";return false}
+function addEdu(){var t=v("ed"),lv=v("elv");if(!t){$("eErr").textContent="Indiquez l’intitulé du diplôme ou de la formation.";return false}
+  if(!lv){$("eErr").textContent="Choisissez le niveau du diplôme dans la liste.";$("elv").focus();return false}
   if(st.edus.length>=6){$("eErr").textContent="6 formations au maximum.";return false}
-  st.edus.push({t:t,s:v("es"),y:v("ey")});["ed","es","ey"].forEach(function(i){$(i).value=""});$("eErr").textContent="";renderEdu();return true}
+  st.edus.push({t:t,lv:lv,s:v("es"),y:v("ey")});["ed","es","ey"].forEach(function(i){$(i).value=""});$("elv").value="";$("eErr").textContent="";renderEdu();return true}
 function addCert(){$("cErr").textContent="";
   if(st.certs.length>=8){$("cErr").textContent="8 certifications au maximum.";return}
   if(!proof){$("cErr").textContent="Le justificatif est obligatoire : ajoutez votre attestation (PDF, JPG ou PNG).";$("cpf").focus();return}
@@ -443,7 +443,7 @@ function valid(){
   if(st.step===2&&st.skills.length<3){$("skErr").textContent="Ajoutez au moins 3 compétences.";return false}
   if(st.step===3&&(v("xr")||v("xc"))){if(!addExp())return false}
   if(st.step===4){
-    if((v("ed")||v("es"))&&!addEdu())return false;
+    if((v("ed")||v("es")||v("elv"))&&!addEdu())return false;
     if(v("cn")||v("co2")||proof){$("cErr").textContent="Cliquez sur « Envoyer pour vérification » pour ajouter cette certification, ou videz les champs.";$("cAdd").focus();return false}
     var bad=Object.keys(SOC).filter(function(k){return v(SOC[k][0])&&!socUrl(SOC[k][1],v(SOC[k][0]))})[0];
     if(bad){$("sErr").textContent=bad==="ot"?"Pour « Autre », collez le lien complet (https://…).":"Ce pseudo ou ce lien n’est pas valide.";$(SOC[bad][0]).focus();return false}

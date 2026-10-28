@@ -236,7 +236,7 @@ if(exps.length){c=sec("Expériences");var tl=h("div","tl");exps.forEach(function
 function empty(c,k,title,txt,btn){var e=h("div","empt");e.appendChild(ico(k,"eic"));e.appendChild(h("b","",title));e.appendChild(h("p","sub",txt));
   var a=link("+ "+btn,"profil.html#etape-5","btn out");e.appendChild(a);c.appendChild(e)}
 if(edus.length||own){c=sec("Formations");
-  if(edus.length){var tl2=h("div","tl");edus.forEach(function(x){var d=h("div");d.appendChild(h("b","",x.t));d.appendChild(h("div","sub",[x.s,x.y].filter(Boolean).join(" · ")));tl2.appendChild(d)});c.appendChild(tl2)}
+  if(edus.length){var tl2=h("div","tl");edus.forEach(function(x){var d=h("div");d.appendChild(h("b","",(x.lv?x.lv+" · ":"")+x.t));d.appendChild(h("div","sub",[x.s,x.y].filter(Boolean).join(" · ")));tl2.appendChild(d)});c.appendChild(tl2)}
   else empty(c,"edu","Où vous êtes-vous formé ?","Vos diplômes et formations donnent confiance aux clients.","Ajouter une formation")}
 if(certs.length||own){c=sec("Certifications");
   if(certs.length){var cg=h("div","certs"),CST={pending:"En attente de vérification",verified:"✓ Vérifiée par Dealr",rejected:"Refusée"};
