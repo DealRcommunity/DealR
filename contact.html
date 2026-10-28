@@ -52,6 +52,9 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
 @keyframes draw{to{stroke-dashoffset:0}}
 .done h2 em{font-size:1.1em}
 .done p{color:#55555c;margin:12px auto 22px;max-width:24em}
+.done .btn+.btn{margin-left:8px}
+.chatnote{display:flex;gap:10px;align-items:center;background:linear-gradient(100deg,#eef0ff,#fff1e8);border-radius:14px;padding:12px 14px;font-size:.92rem;margin:0 0 6px}
+.chatnote i{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;background:linear-gradient(135deg,#3448f0,#f55a1f)}
 @media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr);gap:36px;padding-top:44px}}
 @media(max-width:520px){.two{grid-template-columns:1fr}.card{padding:22px}}
 </style>
@@ -76,7 +79,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
       <h1>Parlons-en <em>ensemble.</em></h1>
       <p>Une question sur Dealr, un souci avec votre compte ou une idée de partenariat ? Écrivez-nous, l’équipe vous répond rapidement.</p>
       <div class="infos">
-        <div class="info"><i class="v"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><b>Réponse sous 48 h</b><span>Du lundi au vendredi, par email.</span></div></div>
+        <div class="info"><i class="v"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><b>Réponse sous 48 h</b><span>Du lundi au vendredi : dans votre messagerie si vous êtes connecté, sinon par email.</span></div></div>
         <div class="info"><i class="o"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg></i><div><b>Un problème sur un Deal en cours ?</b><span>Ouvrez un litige directement depuis le Deal dans la <a href="messages.html">messagerie</a> : l’argent reste bloqué et l’équipe a tout le contexte.</span></div></div>
         <div class="info"><i class="b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"/></svg></i><div><b>La réponse existe peut-être déjà</b><span>Consultez les <a href="faq.html">questions fréquentes</a>.</span></div></div>
       </div>
@@ -87,7 +90,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
         <input type="hidden" name="form-name" value="contact">
         <p class="hp"><label>Ne pas remplir <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <h2>Envoyer un message</h2>
-        <p class="sub">Tous les champs sont obligatoires.</p>
+        <p class="sub" id="sub">Tous les champs sont obligatoires.</p>
         <div class="l" style="font-weight:600;font-size:.9rem;margin-bottom:8px">Sujet</div>
         <div class="topics" role="radiogroup" aria-label="Sujet">
           <label><input type="radio" name="sujet" value="Question sur Dealr" checked><span>Question sur Dealr</span></label>
@@ -96,7 +99,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
           <label><input type="radio" name="sujet" value="Partenariat"><span>Partenariat</span></label>
           <label><input type="radio" name="sujet" value="Autre"><span>Autre</span></label>
         </div>
-        <div class="two">
+        <div class="two" id="ident">
           <div><label for="nom">Nom</label><input id="nom" name="nom" autocomplete="name" maxlength="80" required></div>
           <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="120" required></div>
         </div>
@@ -111,8 +114,10 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
       <div class="done" id="done" hidden>
         <div class="ok"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
         <h2>Message <em>envoyé.</em></h2>
-        <p>Merci <b id="who"></b> ! L’équipe Dealr a bien reçu votre message et vous répond à <b id="mail"></b> sous 48 h.</p>
-        <a class="btn out" href="index.html">Retour à l’accueil</a>
+        <p id="doneMail">Merci <b id="who"></b> ! L’équipe Dealr a bien reçu votre message et vous répond à <b id="mail"></b> sous 48 h.</p>
+        <p id="doneChat" hidden>Votre conversation avec l’équipe Dealr est ouverte dans votre messagerie. Vous recevrez la réponse là-bas, sous 48 h.</p>
+        <a class="btn" id="openConv" href="messages.html" hidden>Ouvrir la conversation</a>
+        <a class="btn out" id="home" href="index.html">Retour à l’accueil</a>
       </div>
     </section>
   </div>
@@ -155,9 +160,18 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
   var s=new URLSearchParams(location.search).get("sujet");
   if(s){var r=Array.prototype.filter.call(f.querySelectorAll('input[name="sujet"]'),function(i){return i.value.toLowerCase().indexOf(s.toLowerCase())>=0})[0];if(r)r.checked=true}
   msg.addEventListener("input",function(){$("cnt").textContent=msg.value.length});
-  /* Membre connecté : nom et email préremplis */
+  /* Membre connecté avec un profil terminé : la demande arrive dans la messagerie (conversation « Équipe Dealr »).
+     Visiteur (ou profil pas encore terminé) : la demande part par email. */
+  var chat=false;
   DealrAuth.user().then(function(u){
     if(!u)return;
+    Promise.all([DealrAuth.isAdmin(),DealrAuth.myProfile().catch(function(){return null})]).then(function(r){
+      if(r[0]||!DealrAuth.profileComplete(r[1]))return;
+      chat=true;$("ident").hidden=true;
+      $("sub").innerHTML="";var n=document.createElement("div");n.className="chatnote";
+      n.innerHTML='<i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></i><span>Vous êtes connecté : votre message arrive dans votre <b>messagerie Dealr</b>, et vous discutez ensuite avec l’équipe directement là-bas.</span>';
+      $("sub").appendChild(n);btn.firstChild.textContent="Envoyer au support";
+    });
     var g=$("ghSignup");if(g)g.hidden=true;
     document.querySelectorAll("[data-acc]").forEach(function(a){a.href="prestataire.html?id=moi";if(/Créer mon compte/.test(a.textContent))a.textContent="Mon profil"});
     if(u.email&&!$("email").value)$("email").value=u.email;
@@ -166,16 +180,25 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#8a96ff;box-shado
   });
   f.addEventListener("submit",function(e){
     e.preventDefault();err.textContent="";
-    var bad=["nom","email","message"].filter(function(id){var el=$(id);return !el.value.trim()||!el.checkValidity()})[0];
+    var bad=(chat?["message"]:["nom","email","message"]).filter(function(id){var el=$(id);return !el.value.trim()||!el.checkValidity()})[0];
     if(bad){err.textContent=bad==="email"?"Indiquez une adresse email valide.":bad==="nom"?"Indiquez votre nom.":"Écrivez votre message.";$(bad).focus();return}
     if(msg.value.trim().length<10){err.textContent="Votre message est un peu court : détaillez votre demande.";msg.focus();return}
     var label=btn.firstChild.textContent;btn.disabled=true;btn.firstChild.textContent="Envoi en cours…";
-    var body=new URLSearchParams(new FormData(f)).toString();
-    fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body})
-      .then(function(r){if(!r.ok)throw new Error(r.status);
-        $("who").textContent=$("nom").value.trim().split(" ")[0];$("mail").textContent=$("email").value.trim();
-        f.hidden=true;$("done").hidden=false;$("done").closest(".card").scrollIntoView({behavior:"smooth",block:"center"})})
-      .catch(function(){btn.disabled=false;btn.firstChild.textContent=label;err.textContent="L’envoi n’a pas fonctionné. Vérifiez votre connexion et réessayez."});
+    function mail(){return fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(new FormData(f)).toString()})
+      .then(function(r){if(!r.ok)throw new Error(r.status)})}
+    function done(conv){
+      $("who").textContent=$("nom").value.trim().split(" ")[0];$("mail").textContent=$("email").value.trim();
+      if(conv){$("doneMail").hidden=true;$("doneChat").hidden=false;$("openConv").hidden=false;$("openConv").href="messages.html?c="+encodeURIComponent(conv);$("home").hidden=true}
+      f.hidden=true;$("done").hidden=false;$("done").closest(".card").scrollIntoView({behavior:"smooth",block:"center"})}
+    function fail(){btn.disabled=false;btn.firstChild.textContent=label;err.textContent="L’envoi n’a pas fonctionné. Vérifiez votre connexion et réessayez."}
+    var sujet=(f.querySelector('input[name="sujet"]:checked')||{}).value||"";
+    if(chat){
+      DealrAuth.contactSupport(sujet,msg.value).then(function(conv){
+        /* L'email d'alerte part aussi, pour que l'équipe soit prévenue tout de suite */
+        $("compte").value+=" · réponse attendue dans la messagerie (conversation "+conv+")";
+        mail().catch(function(){});done(conv);
+      }).catch(function(){mail().then(function(){done(null)}).catch(fail)});
+    }else mail().then(function(){done(null)}).catch(fail);
   });
 })();
 </script>

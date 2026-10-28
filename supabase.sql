@@ -176,6 +176,7 @@ create policy "Proposer un deal"
   on public.deals for insert to authenticated
   with check (
     proposer = auth.uid() and status = 'proposed' and not public.is_admin()
+    and not public.is_admin_id(payer) and not public.is_admin_id(payee)   -- pas de deal avec le support
     and exists (select 1 from public.conversations c
                 where c.id = conv and payer in (c.user_a, c.user_b) and payee in (c.user_a, c.user_b))
   );
@@ -263,3 +264,42 @@ insert into public.admins (user_id)
 
 -- Un compte admin n'a pas de profil de prestataire : on supprime celui qu'il aurait créé avant
 delete from public.profiles where id in (select user_id from public.admins);
+
+-- 7. Support : un membre connecté écrit à l'équipe Dealr depuis la page Contact.
+--    La conversation est ouverte avec un administrateur choisi par la base ;
+--    le membre ne connaît jamais l'identité du compte admin.
+create or replace function public.open_support(member_snap jsonb) returns text
+language plpgsql security definer set search_path = public
+as $$
+declare
+  me uuid := auth.uid();
+  adm uuid;
+  ua uuid;
+  ub uuid;
+  cid text;
+  mine jsonb;
+  team jsonb;
+begin
+  if me is null then raise exception 'not_logged'; end if;
+  if public.is_admin_id(me) then raise exception 'admin_member'; end if;
+  select user_id into adm from public.admins order by created_at, user_id limit 1;
+  if adm is null then raise exception 'no_support'; end if;
+  ua := least(me, adm);
+  ub := greatest(me, adm);
+  cid := ua::text || '_' || ub::text;
+  mine := jsonb_build_object(
+    'id', me,
+    'n', left(coalesce(nullif(member_snap->>'n', ''), 'Membre'), 80),
+    'job', left(coalesce(member_snap->>'job', ''), 80),
+    'photo', coalesce(member_snap->>'photo', ''));
+  team := jsonb_build_object('id', adm, 'n', 'Équipe Dealr', 'job', 'Support Dealr', 'photo', '', 'support', true);
+  insert into public.conversations (id, user_a, user_b, a_snap, b_snap, last_text, read_a, read_b, updated_at)
+  values (cid, ua, ub,
+          case when ua = me then mine else team end,
+          case when ua = me then team else mine end,
+          '', true, true, now())
+  on conflict (id) do nothing;
+  return cid;
+end $$;
+revoke all on function public.open_support(jsonb) from public, anon;
+grant execute on function public.open_support(jsonb) to authenticated;

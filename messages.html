@@ -250,6 +250,8 @@ dialog textarea{min-height:80px;resize:vertical}
  .pin{padding:9px 14px}
 }
 @media(max-width:420px){.two{grid-template-columns:1fr}.pin small{display:none}}
+.av.sup{background:linear-gradient(135deg,#3448f0,#f55a1f)!important;color:#fff;font-family:"Bricolage Grotesque",sans-serif;font-weight:800}
+.stag{display:inline-block;margin-left:6px;font:700 .66rem Figtree,sans-serif;color:#fff;border-radius:99px;padding:2px 7px;vertical-align:2px;background:linear-gradient(100deg,#4056ff,#f55a1f)}
 </style>
 </head>
 <body class="wait">
@@ -363,7 +365,7 @@ var LIVE=/^(proposed|accepted|funded|delivered|disputed)$/,DEAD=/^(declined|canc
 function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function eur(n){return A.eur(n)}
 function initials(n){return String(n||"?").split(" ").map(function(w){return w[0]||""}).slice(0,2).join("").toUpperCase()}
-function avatar(p,cls){var a=h("div","av"+(cls?" "+cls:""));var img=A.safeImg(p&&p.photo);if(img)a.style.backgroundImage="url('"+img+"')";else a.textContent=initials(p&&p.n);return a}
+function avatar(p,cls){var a=h("div","av"+(cls?" "+cls:"")+(A.isSupport(p)?" sup":""));if(A.isSupport(p)){a.textContent="D";return a}var img=A.safeImg(p&&p.photo);if(img)a.style.backgroundImage="url('"+img+"')";else a.textContent=initials(p&&p.n);return a}
 function day(d){var t=new Date(),y=new Date();y.setDate(t.getDate()-1);
   if(d.toDateString()===t.toDateString())return"Aujourd’hui";if(d.toDateString()===y.toDateString())return"Hier";
   return d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}
@@ -383,7 +385,7 @@ function renderList(){
   if(!list.length){box.appendChild(h("div","none","Aucun résultat."));return}
   list.forEach(function(c){
     var b=h("button","cv"+(c.unread?" unread":""));b.type="button";b.setAttribute("aria-current",cur&&cur.id===c.id?"true":"false");
-    var t=h("span","t"),r1=h("span","r1");r1.appendChild(h("b","",c.other.n));r1.appendChild(h("time","",short(c.updatedAt)));
+    var t=h("span","t"),r1=h("span","r1");var nm=h("b","",c.other.n);if(A.isSupport(c.other))nm.appendChild(h("span","stag","Support"));r1.appendChild(nm);r1.appendChild(h("time","",short(c.updatedAt)));
     t.appendChild(r1);t.appendChild(h("span","pv",c.lastText?(c.lastMine?"Vous : ":"")+c.lastText:"Nouvelle conversation"));
     b.appendChild(avatar(c.other));b.appendChild(t);if(c.unread)b.appendChild(h("span","dot"));
     b.onclick=function(){select(c.id,true)};box.appendChild(b)})}
@@ -400,6 +402,8 @@ function select(id,push){
   var na=avatar(cur.other);$("thAv").replaceWith(na);na.id="thAv";
   $("thName").textContent=cur.other.n;$("thJob").textContent=cur.other.job||"Membre Dealr";
   $("thProfile").href="prestataire.html?id="+encodeURIComponent(cur.other.id||"");
+  var sup=A.isSupport(cur.other);$("thProfile").hidden=sup;$("dealBtn").hidden=sup;
+  if(sup)$("thJob").textContent="Support Dealr · réponse sous 48 h";
   lastSig="";deals=[];$("err").textContent="";renderList();loadThread(true);
   A.markRead(id).then(function(){cur.unread=false;renderList();badge()});
   setTimeout(function(){$("txt").focus()},50)}
@@ -415,7 +419,7 @@ function loadThread(scroll){
     var byId={};ds.forEach(function(d){byId[d.id]=d});
     var box=$("msgs"),atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<80;box.textContent="";
     if(!ms.length){var it=h("div","intro");it.appendChild(avatar(cur.other));it.appendChild(h("b","",cur.other.n));
-      it.appendChild(h("p","","Présentez votre besoin et posez vos questions. Quand vous êtes d’accord, proposez un deal : le paiement sera bloqué au coffre jusqu’à la livraison."));box.appendChild(it)}
+      it.appendChild(h("p","",A.isSupport(cur.other)?"Posez votre question à l’équipe Dealr : elle vous répond ici, dans cette conversation.":"Présentez votre besoin et posez vos questions. Quand vous êtes d’accord, proposez un deal : le paiement sera bloqué au coffre jusqu’à la livraison."));box.appendChild(it)}
     var lastDay="",isText=function(m){return !m||!m.kind||m.kind==="text"};
     ms.forEach(function(m,i){
       var d=new Date(m.created_at),dk=d.toDateString(),mine=m.sender===me,next=ms[i+1];

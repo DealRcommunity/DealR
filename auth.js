@@ -243,7 +243,13 @@
 
   /* Messagerie (tables conversations et messages : visibles par les deux participants uniquement) */
   function pairId(a, b) { return [a, b].sort().join("_"); }
-  function snap(p, fallback) { return { id: p.id, n: p.n || fallback || "Membre", job: p.job || "", photo: A.safeImg(p.photo) }; }
+  function snap(p, fallback) {
+    var o = { id: p.id, n: p.n || fallback || "Membre", job: p.job || "", photo: A.safeImg(p.photo) };
+    if (p.support) o.support = true;
+    return o;
+  }
+  /* Conversation avec l'équipe Dealr (support) : pas de deal, pas de profil public */
+  A.isSupport = function (o) { return !!o && (o.support === true || o.n === "Équipe Dealr"); };
   function getConv(c, id) { return c.from("conversations").select("*").eq("id", id).maybeSingle().then(check); }
 
   /* Ouvre (ou crée) la conversation avec un autre membre ; renvoie son identifiant */
@@ -271,6 +277,40 @@
           });
         });
       });
+    });
+  };
+
+  /* Support : un membre connecté écrit à l'équipe Dealr dans la messagerie.
+     Démo : la conversation est ouverte avec le compte admin créé dans ce navigateur.
+     Supabase : la base choisit un administrateur (fonction open_support), le membre ne voit jamais son identité. */
+  function demoAdminId() {
+    try {
+      var us = JSON.parse(localStorage.getItem("dealr_demo_users")) || [];
+      var a = us.filter(function (x) { return isAdminEmail(x.email); })[0];
+      return a ? a.id : null;
+    } catch (e) { return null; }
+  }
+  A.openSupport = function () {
+    return Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0];
+      if (!u) throw new Error("not_logged");
+      if (r[1]) throw new Error("admin_member");
+      return A.myProfile().catch(function () { return null; }).then(function (me) {
+        if (demo) {
+          var adm = demoAdminId();
+          if (!adm) throw new Error("no_support");
+          return A.openConversation({ id: adm, n: "Équipe Dealr", job: "Support Dealr", photo: "", support: true });
+        }
+        var mine = snap(Object.assign({ id: u.id }, me || {}), (me && me.n) || (u.email || "").split("@")[0]);
+        return client().then(function (c) { return c.rpc("open_support", { member_snap: mine }); }).then(check);
+      });
+    });
+  };
+  /* Envoie la demande de contact dans la conversation support ; renvoie l'identifiant de la conversation */
+  A.contactSupport = function (subject, text) {
+    return A.openSupport().then(function (id) {
+      var body = (subject ? "Sujet : " + subject + "\n\n" : "") + String(text || "").trim();
+      return A.sendMessage(id, body).then(function () { return id; });
     });
   };
 
@@ -691,6 +731,7 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/no_support/.test(m)) return "Le support n’est pas joignable par la messagerie pour le moment. Réessayez plus tard.";
     if (/admin_member/.test(m)) return "Le compte administrateur sert à gérer le site : il ne peut pas avoir de profil ni faire de deal.";
     if (/admin_note/.test(m)) return "Expliquez votre décision en quelques mots (10 caractères minimum) : elle sera envoyée aux deux parties.";
     if (/forbidden|permission denied|row-level security/i.test(m)) return "Action réservée : vous n’avez pas les droits nécessaires.";
