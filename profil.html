@@ -147,7 +147,8 @@ body.wait main{visibility:hidden}
         <div><label class="fileup"><input id="photo" type="file" accept="image/*"><span class="btn out sm" id="phB">Ajouter une photo</span></label><div class="sub" style="margin-top:6px" id="phH">JPG ou PNG, visage bien visible.</div></div></div>
       <div class="two"><div><label for="first" id="firstL">Prénom</label><input id="first" autocomplete="given-name" required></div>
       <div><label for="last" id="lastL">Nom</label><input id="last" autocomplete="family-name" required></div></div>
-      <label for="city">Ville</label><input id="city" placeholder="Paris" required>
+      <label for="city">Ville</label><input id="city" placeholder="Tapez le nom de votre ville ou son code postal" required>
+      <div class="sub" id="cityH" style="margin-top:6px">Choisissez votre ville dans la liste : France métropolitaine et outre-mer.</div>
       <div class="l">Où travaillez-vous ?</div>
       <div class="opts h">
         <label class="opt"><input type="radio" name="mob" value="À distance" checked><span>À distance</span></label>
@@ -301,6 +302,7 @@ body.wait main{visibility:hidden}
 
 <script src="config.js"></script>
 <script src="auth.js"></script>
+<script src="villes.js"></script>
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)},A=window.DealrAuth,editing=false,prev={};
@@ -317,6 +319,9 @@ function socUrl(kind,val){val=String(val||"").trim();if(!val)return"";
   var h=val.replace(/^@/,"");if(!/^[\w.\-]{1,60}$/.test(h))return null;
   return kind==="instagram"?"https://www.instagram.com/"+h+"/":kind==="tiktok"?"https://www.tiktok.com/@"+h:kind==="linkedin"?"https://www.linkedin.com/in/"+h+"/":null}
 function socials(){var o={};Object.keys(SOC).forEach(function(k){var u=socUrl(SOC[k][1],v(SOC[k][0]));if(u)o[SOC[k][1]]=u});return o}
+/* Ville : choisie dans la liste officielle des communes (avec code postal) */
+var villes=DealrVilles.attach($("city"),{onPick:function(c){$("cityH").textContent=c?c.nom+" · "+c.cp+" · "+c.depNom:"Choisissez votre ville dans la liste : France métropolitaine et outre-mer.";$("cityH").style.color="";draw()}}),villesOk=false;
+villes.ready().then(function(ok){villesOk=ok});
 function isCo(){return radio("kind")==="Entreprise"}
 function fullName(){if(isCo())return v("company");var f=v("first"),l=v("last");return (f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim()}
 /* Freelance ou entreprise : le formulaire s'adapte */
@@ -342,7 +347,7 @@ function draw(){
   $("pJob").textContent=v("job")||"Votre titre";
   $("pCat").textContent=$("cat").value;
   $("pDispo").textContent=radio("dispo");
-  $("pCity").textContent=v("city")||"Ville";
+  var pc=villes.picked();$("pCity").textContent=pc?pc.nom+" ("+pc.dep+")":v("city")||"Ville";
   $("pBio").textContent=v("bio")||"Votre présentation apparaîtra ici.";
   $("bn").textContent=$("bio").value.length;
   $("pPrice").textContent=v("rate")?v("rate")+" "+$("unit").value:"Tarif à renseigner";
@@ -402,6 +407,7 @@ function addCert(){var t=v("cn"),u=v("cu");if(!t){$("cErr").textContent="Indique
   if(st.certs.length>=8){$("cErr").textContent="8 certifications au maximum.";return false}
   st.certs.push({t:t,o:v("co2"),y:v("cy"),u:u});["cn","co2","cy","cu"].forEach(function(i){$(i).value=""});$("cErr").textContent="";renderEdu();return true}
 function valid(){
+  if(st.step===0&&v("city")&&villesOk&&!villes.picked()){$("cityH").textContent="Choisissez votre ville dans la liste proposée.";$("cityH").style.color="#c0270f";$("city").focus();return false}
   var sec=document.querySelectorAll(".step")[st.step],els=sec.querySelectorAll("input,select,textarea");
   for(var i=0;i<els.length;i++){if(!els[i].checkValidity()){els[i].reportValidity();return false}}
   if(st.step===2&&st.skills.length<3){$("skErr").textContent="Ajoutez au moins 3 compétences.";return false}
@@ -424,7 +430,9 @@ function show(){
 function publish(){
   var unitSel=$("unit").value;
   var co=isCo();
-  var p={first:v("first"),last:v("last"),company:co?v("company"):"",n:fullName(),t:co?"Entreprise":"Freelance",job:v("job"),c:$("cat").value,city:v("city"),
+  var vc=villes.picked();
+  var p={first:v("first"),last:v("last"),company:co?v("company"):"",n:fullName(),t:co?"Entreprise":"Freelance",job:v("job"),c:$("cat").value,city:vc?vc.nom:v("city"),
+    cp:vc?vc.cp:"",dep:vc?vc.dep:"",depNom:vc?vc.depNom:"",
     p:v("rate")+" "+unitSel,rate:parseFloat(v("rate"))||0,unit:unitSel.replace("€/",""),unitSel:unitSel,
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
     tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
@@ -438,7 +446,8 @@ function publish(){
 function setRadio(n,val){if(!val)return;var r=Array.prototype.filter.call(document.querySelectorAll('input[name="'+n+'"]'),function(i){return i.value===val})[0];if(r)r.checked=true}
 function fillFrom(p){
   prev=p;var parts=(p.n||"").split(" ");
-  $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";$("city").value=p.city||"";
+  $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";
+  villes.set(p.cp?{nom:p.city,cp:p.cp,dep:p.dep,depNom:p.depNom}:(p.city||""));if(p.cp)$("cityH").textContent=p.city+" · "+p.cp+(p.depNom?" · "+p.depNom:"");
   setRadio("kind",p.t==="Entreprise"?"Entreprise":"Freelance");$("company").value=p.company||(p.t==="Entreprise"?p.n||"":"");
   setRadio("mob",p.mob);$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise")setRadio("size",p.lvl);else setRadio("lvl",p.lvl);syncKind();
   st.skills=(p.skills||p.tags||[]).slice(0,15);st.exps=(p.exps||[]).slice(0,8);

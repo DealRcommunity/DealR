@@ -220,7 +220,7 @@ if(own){
 /* Sections */
 var c=sec("À propos");c.appendChild(h("p","bio",p.bio||"Pas encore de présentation."));
 c=sec("Informations clés");var inf=h("div","info");
-[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Équipe":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
+[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Équipe":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
   var d=h("div");d.appendChild(h("small","",r[0]));d.appendChild(h("span","",r[1]));inf.appendChild(d)});c.appendChild(inf);
 c=sec("Compétences");var ch=h("div","chips");skills.forEach(function(s){ch.appendChild(h("span","",s))});c.appendChild(ch);
 if(services.length){c=sec("Services et tarifs");services.forEach(function(s){var r=h("div","row"),l=h("div");l.appendChild(h("b","",s.t));l.appendChild(h("span","sub",s.d||""));
