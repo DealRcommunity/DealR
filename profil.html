@@ -64,6 +64,14 @@ textarea{min-height:120px;resize:vertical}
 .err{color:#c0270f;font-size:.88rem;min-height:1.3em;margin:8px 0 0}
 .exp{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
 .exp b{display:block}.exp small{color:var(--mute)}
+.socs{display:grid;gap:8px}
+.soc{display:flex;align-items:center;gap:10px;margin:0;border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 8px;background:#fff;font-weight:600}
+.soc input{border:0;flex:1;min-width:0;padding:8px;background:transparent}.soc input:focus{outline:0}
+.soc:focus-within{border-color:var(--ink)}
+.si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none}
+.si.ig{background:linear-gradient(135deg,#f9ce34,#ee2a7b 50%,#6228d7)}.si.tt{background:#111}.si.li{background:#0a66c2}.si.ot{background:linear-gradient(135deg,#3448f0,#f55a1f)}
+.sr{width:78px;flex:none;font-size:.9rem}
+@media(max-width:520px){.sr{display:none}}
 .exp button{border:0;background:none;color:var(--mute);cursor:pointer;text-decoration:underline;font:inherit;font-size:.85rem}
 .nav{display:flex;justify-content:space-between;margin-top:30px}
 .side{position:sticky;top:20px}
@@ -123,8 +131,8 @@ body.wait main{visibility:hidden}
 <div>
   <div class="must" id="must" role="status" hidden><b>Votre profil est obligatoire.</b> Terminez ces étapes pour accéder à Dealr : marketplace, messages, deals et tableau de bord.</div>
   <form class="card" id="wiz" novalidate>
-    <div class="prog" id="prog"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="lbl0" id="stepLbl">Étape 1 sur 6</div>
+    <div class="prog" id="prog"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="lbl0" id="stepLbl">Étape 1 sur 7</div>
 
     <section class="step">
       <h2>Faisons <em>connaissance.</em></h2>
@@ -189,6 +197,35 @@ body.wait main{visibility:hidden}
       <label for="xd">Ce que vous avez réalisé</label><input id="xd" maxlength="140" placeholder="Montage de 40 Reels pour les réseaux sociaux">
       <button type="button" class="btn out sm" id="xAdd" style="margin-top:14px">Ajouter cette expérience</button>
       <div class="err" id="xErr" role="alert"></div>
+    </section>
+
+    <section class="step">
+      <h2>Ce qui vous <em>distingue.</em></h2>
+      <p class="help">Formations, certifications et réseaux renforcent la confiance des clients. Tout est facultatif : vous pourrez compléter plus tard.</p>
+
+      <div class="l">Formations</div>
+      <div id="eduList"></div>
+      <div class="two"><div><label for="ed">Diplôme ou formation</label><input id="ed" maxlength="90" placeholder="BTS Audiovisuel"></div><div><label for="es">École ou organisme</label><input id="es" maxlength="90" placeholder="Lycée Jean Moulin"></div></div>
+      <label for="ey">Année</label><input id="ey" maxlength="20" placeholder="2022" style="max-width:200px">
+      <button type="button" class="btn out sm" id="eAdd" style="margin-top:12px">Ajouter cette formation</button>
+      <div class="err" id="eErr" role="alert"></div>
+
+      <div class="l" style="margin-top:26px">Certifications</div>
+      <div id="certList"></div>
+      <div class="two"><div><label for="cn">Certification</label><input id="cn" maxlength="90" placeholder="Google Ads Search"></div><div><label for="co2">Délivrée par</label><input id="co2" maxlength="90" placeholder="Google"></div></div>
+      <div class="two"><div><label for="cy">Année</label><input id="cy" maxlength="20" placeholder="2025"></div><div><label for="cu">Lien de vérification <span class="sub" style="font-weight:400">(facultatif)</span></label><input id="cu" type="url" placeholder="https://"></div></div>
+      <button type="button" class="btn out sm" id="cAdd" style="margin-top:12px">Ajouter cette certification</button>
+      <div class="err" id="cErr" role="alert"></div>
+
+      <div class="l" style="margin-top:26px">Réseaux</div>
+      <p class="sub" style="margin:0 0 6px">Votre pseudo (@exemple) ou le lien complet.</p>
+      <div class="socs">
+        <label class="soc"><span class="si ig"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span><span class="sr">Instagram</span><input id="sIg" maxlength="120" placeholder="@votre.compte" aria-label="Instagram"></label>
+        <label class="soc"><span class="si tt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.4 4.4 5 4.6"/></svg></span><span class="sr">TikTok</span><input id="sTt" maxlength="120" placeholder="@votrecompte" aria-label="TikTok"></label>
+        <label class="soc"><span class="si li"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V16M8 7.5v.01M12 16v-3.2a2.3 2.3 0 0 1 4.6 0V16M12 10.5V16"/></svg></span><span class="sr">LinkedIn</span><input id="sLi" maxlength="160" placeholder="https://www.linkedin.com/in/…" aria-label="LinkedIn"></label>
+        <label class="soc"><span class="si ot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span><span class="sr">Autre</span><input id="sOt" type="url" maxlength="200" placeholder="Behance, YouTube, site… https://" aria-label="Autre réseau"></label>
+      </div>
+      <div class="err" id="sErr" role="alert"></div>
     </section>
 
     <section class="step">
@@ -268,11 +305,18 @@ body.wait main{visibility:hidden}
 (function(){
 var $=function(i){return document.getElementById(i)},A=window.DealrAuth,editing=false,prev={};
 var SUG={"Développement":["JavaScript","React","Node.js","HTML/CSS","WordPress","Shopify","Python"],"Design":["Figma","UI/UX","Logo","Identité visuelle","Illustrator","Photoshop"],"Marketing":["SEO","Google Ads","Réseaux sociaux","Emailing","Analytics","Stratégie de contenu"],"Rédaction":["Articles de blog","Copywriting","SEO","Newsletters","Relecture","Fiches produit"],"Vidéo":["Premiere Pro","After Effects","Reels","Motion design","DaVinci Resolve","Sous-titrage"],"Conseil":["Gestion de projet","Stratégie","Audit","Formation","E-commerce","Organisation"]};
-var N=6,st={step:0,skills:[],exps:[],photo:"",port:[],extra:[]};
+var N=7,st={step:0,skills:[],exps:[],edus:[],certs:[],photo:"",port:[],extra:[]};
 function v(id){return $(id).value.trim()}
 function radio(n){var r=document.querySelector('input[name="'+n+'"]:checked');return r?r.value:""}
 function langs(){return Array.prototype.map.call(document.querySelectorAll('input[name="lang"]:checked'),function(i){return i.value}).concat($("otherLang").checked?st.extra:[])}
 function links(){return ["l1","l2","l3"].map(v).filter(Boolean)}
+/* Réseaux : un pseudo (@exemple) devient un lien ; sinon un lien https complet */
+var SOC={ig:["sIg","instagram"],tt:["sTt","tiktok"],li:["sLi","linkedin"],ot:["sOt","other"]};
+function socUrl(kind,val){val=String(val||"").trim();if(!val)return"";
+  if(/^https?:\/\/[^\s]+$/i.test(val))return val.replace(/^http:/i,"https:");
+  var h=val.replace(/^@/,"");if(!/^[\w.\-]{1,60}$/.test(h))return null;
+  return kind==="instagram"?"https://www.instagram.com/"+h+"/":kind==="tiktok"?"https://www.tiktok.com/@"+h:kind==="linkedin"?"https://www.linkedin.com/in/"+h+"/":null}
+function socials(){var o={};Object.keys(SOC).forEach(function(k){var u=socUrl(SOC[k][1],v(SOC[k][0]));if(u)o[SOC[k][1]]=u});return o}
 function isCo(){return radio("kind")==="Entreprise"}
 function fullName(){if(isCo())return v("company");var f=v("first"),l=v("last");return (f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim()}
 /* Freelance ou entreprise : le formulaire s'adapte */
@@ -289,7 +333,7 @@ function setAv(el){var t=(isCo()?v("company").split(/\s+/).map(function(w){retur
   if(st.photo){el.style.backgroundImage="url("+st.photo+")";el.textContent=""}else{el.style.backgroundImage="";el.textContent=t}}
 function score(){var s=0,b=v("bio").length;
   if(st.photo)s+=10;if(v("first")&&v("last")&&v("city")&&(!isCo()||v("company")))s+=10;if(v("job").length>=8)s+=15;
-  s+=Math.min(st.skills.length,5)*3;s+=Math.min(st.exps.length,3)*5;
+  s+=Math.min(st.skills.length,5)*3;s+=Math.min(st.exps.length,3)*5;if(st.edus.length)s+=4;if(st.certs.length)s+=4;if(Object.keys(socials()).length)s+=4;
   if(b>=150)s+=15;else if(b>=40)s+=8;if(links().length||st.port.length)s+=10;if(v("rate"))s+=5;if(radio("dispo"))s+=5;
   return Math.min(s,100)}
 function draw(){
@@ -340,12 +384,35 @@ function addExp(){var role=v("xr"),co=v("xc");
   if(st.exps.length>=8){$("xErr").textContent="Vous pouvez ajouter 8 expériences au maximum.";return false}
   st.exps.push({role:role,co:co,period:v("xp"),desc:v("xd")});
   ["xr","xc","xp","xd"].forEach(function(i){$(i).value=""});$("xErr").textContent="";renderExps();return true}
+function listBox(id,arr,line,edit){var box=$(id);box.textContent="";
+  arr.forEach(function(x,i){var d=mk("div","","exp"),w=document.createElement("div"),l=line(x);
+    w.appendChild(mk("b",l[0]));if(l[1])w.appendChild(mk("small",l[1]));
+    var b=mk("button","Retirer");b.type="button";b.onclick=function(){arr.splice(i,1);renderEdu()};
+    var m=mk("button","Modifier");m.type="button";m.onclick=function(){edit(x);arr.splice(i,1);renderEdu()};
+    var ac=mk("div","","acts");ac.appendChild(m);ac.appendChild(b);d.appendChild(w);d.appendChild(ac);box.appendChild(d)})}
+function renderEdu(){
+  listBox("eduList",st.edus,function(x){return[x.t,[x.s,x.y].filter(Boolean).join(" · ")]},function(x){$("ed").value=x.t;$("es").value=x.s||"";$("ey").value=x.y||"";$("ed").focus()});
+  listBox("certList",st.certs,function(x){return[x.t,[x.o,x.y].filter(Boolean).join(" · ")]},function(x){$("cn").value=x.t;$("co2").value=x.o||"";$("cy").value=x.y||"";$("cu").value=x.u||"";$("cn").focus()});
+  draw()}
+function addEdu(){var t=v("ed");if(!t){$("eErr").textContent="Indiquez le nom du diplôme ou de la formation.";return false}
+  if(st.edus.length>=6){$("eErr").textContent="6 formations au maximum.";return false}
+  st.edus.push({t:t,s:v("es"),y:v("ey")});["ed","es","ey"].forEach(function(i){$(i).value=""});$("eErr").textContent="";renderEdu();return true}
+function addCert(){var t=v("cn"),u=v("cu");if(!t){$("cErr").textContent="Indiquez le nom de la certification.";return false}
+  if(u&&!/^https?:\/\/[^\s]+$/i.test(u)){$("cErr").textContent="Le lien doit commencer par https://";return false}
+  if(st.certs.length>=8){$("cErr").textContent="8 certifications au maximum.";return false}
+  st.certs.push({t:t,o:v("co2"),y:v("cy"),u:u});["cn","co2","cy","cu"].forEach(function(i){$(i).value=""});$("cErr").textContent="";renderEdu();return true}
 function valid(){
   var sec=document.querySelectorAll(".step")[st.step],els=sec.querySelectorAll("input,select,textarea");
   for(var i=0;i<els.length;i++){if(!els[i].checkValidity()){els[i].reportValidity();return false}}
   if(st.step===2&&st.skills.length<3){$("skErr").textContent="Ajoutez au moins 3 compétences.";return false}
   if(st.step===3&&(v("xr")||v("xc"))){if(!addExp())return false}
-  if(st.step===4&&v("bio").length<40){$("bio").focus();$("bio").setCustomValidity("Écrivez au moins 40 caractères.");$("bio").reportValidity();$("bio").setCustomValidity("");return false}
+  if(st.step===4){
+    if((v("ed")||v("es"))&&!addEdu())return false;
+    if((v("cn")||v("co2"))&&!addCert())return false;
+    var bad=Object.keys(SOC).filter(function(k){return v(SOC[k][0])&&!socUrl(SOC[k][1],v(SOC[k][0]))})[0];
+    if(bad){$("sErr").textContent=bad==="ot"?"Pour « Autre », collez le lien complet (https://…).":"Ce pseudo ou ce lien n’est pas valide.";$(SOC[bad][0]).focus();return false}
+    $("sErr").textContent=""}
+  if(st.step===5&&v("bio").length<40){$("bio").focus();$("bio").setCustomValidity("Écrivez au moins 40 caractères.");$("bio").reportValidity();$("bio").setCustomValidity("");return false}
   return true}
 function show(){
   Array.prototype.forEach.call(document.querySelectorAll(".step"),function(s,i){s.hidden=i!==st.step});
@@ -361,7 +428,8 @@ function publish(){
     p:v("rate")+" "+unitSel,rate:parseFloat(v("rate"))||0,unit:unitSel.replace("€/",""),unitSel:unitSel,
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
     tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
-    lvl:co?radio("size"):radio("lvl"),langs:langs(),links:links(),port:st.port};
+    lvl:co?radio("size"):radio("lvl"),langs:langs(),links:links(),port:st.port,
+    edus:st.edus,certs:st.certs,socials:socials()};
   var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
   A.saveProfile(p).then(function(){location.href="prestataire.html?id=moi"})
    .catch(function(e){b.disabled=false;b.textContent=label;$("pubErr").textContent=A.message(e)})}
@@ -381,6 +449,8 @@ function fillFrom(p){
   document.querySelectorAll('input[name="lang"]').forEach(function(c){c.checked=L.indexOf(c.value)>=0});
   st.extra=L.filter(function(l){return base.indexOf(l)<0});
   if(st.extra.length){$("otherLang").checked=true;$("langPanel").hidden=false}
+  st.edus=(p.edus||[]).slice(0,6);st.certs=(p.certs||[]).slice(0,8);
+  var so=p.socials||{};Object.keys(SOC).forEach(function(k){$(SOC[k][0]).value=so[SOC[k][1]]||""});
   renderThumbs();renderLangs()}
 
 $("wiz").addEventListener("submit",function(e){e.preventDefault();
@@ -392,6 +462,7 @@ $("back").onclick=function(){if(st.step>0){st.step--;show()}};
 $("skAdd").onclick=function(){addSkill($("skIn").value)};
 $("skIn").addEventListener("keydown",function(e){if(e.key===","){e.preventDefault();addSkill($("skIn").value)}});
 $("xAdd").onclick=addExp;
+$("eAdd").onclick=addEdu;$("cAdd").onclick=addCert;
 $("cat").addEventListener("change",renderSkills);
 $("wiz").addEventListener("input",draw);
 $("wiz").addEventListener("change",draw);
@@ -490,7 +561,9 @@ A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(
   return A.myProfile().catch(function(){return null})}).then(function(p){
   if(p){editing=true;fillFrom(p);document.title="Dealr – Modifier mon profil"}
   if(!A.profileComplete(p))$("must").hidden=false;
-  renderSkills();renderExps();show();document.body.classList.remove("wait")});
+  /* Lien direct vers une étape (depuis la checklist du profil) : profil.html#etape-5 */
+  var m=location.hash.match(/^#etape-([1-7])$/);if(m&&A.profileComplete(p))st.step=parseInt(m[1],10)-1;
+  renderSkills();renderExps();renderEdu();show();document.body.classList.remove("wait")});
 })();
 </script>
 </body>
