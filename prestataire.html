@@ -50,7 +50,19 @@ h2{font-size:1.3rem;margin-bottom:14px}
 .port{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .port div{aspect-ratio:1;border-radius:12px;background:#f1f1f4 center/cover}
 .stars{color:#f5a623;letter-spacing:1px}
-.rv{border-top:1px solid var(--line);padding:14px 0}.rv:first-of-type{border-top:0;padding-top:0}
+.rv{border-top:1px solid var(--line);padding:16px 0}.rv:last-child{padding-bottom:0}
+.rvsum{display:flex;gap:26px;align-items:center;padding-bottom:18px;flex-wrap:wrap}
+.rvscore{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:110px}
+.rvscore b{font:800 2.6rem/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em}
+.rvbars{flex:1;min-width:200px;display:grid;gap:5px;font-size:.85rem}
+.rvbar{display:grid;grid-template-columns:34px 1fr 22px;align-items:center;gap:10px}
+.rvbar .tr{height:7px;border-radius:9px;background:#efeff4;overflow:hidden}.rvbar .tr i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#f5a623,#f55a1f)}
+.rst i{font-style:normal;color:#dcdce4;font-size:1.05rem;letter-spacing:1px}.rst i.on{color:#f5a623}
+.rvhd{display:flex;align-items:center;gap:12px}
+.rva{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;background:linear-gradient(135deg,#3448f0,#f55a1f) center/cover}
+.rvw{flex:1;min-width:0;display:flex;flex-direction:column}.rvn{font-weight:700;color:var(--ink);text-decoration:none}a.rvn:hover{text-decoration:underline}
+.rvt{margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:560px){.rvhd{flex-wrap:wrap}.rvhd .rst{width:100%;padding-left:52px}}
 .side{position:sticky;top:16px}
 .q label.it{display:grid;grid-template-columns:22px 1fr 58px;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
 .q label.it:first-of-type{border-top:0}
@@ -109,6 +121,12 @@ function load(){
 }
 
 load().then(function(res){
+  /* Vrais avis (laissés à la fin des deals) : ils remplacent la note par défaut du profil */
+  if(!res.p||res.p.demo)return res;
+  return A.listReviews(res.p.id).then(function(rv){var st=A.summarize(rv);
+    res.p.reviews=rv.map(function(r){var s=r.author_snap||{};return{note:r.rating,txt:r.text,by:s.n||"Membre",photo:s.photo,role:s.role,title:r.deal_title,date:r.created_at,author:r.author}});
+    res.p.r=st.avg;res.p.a=st.n;return res},function(){res.p.reviews=[];res.p.a=0;return res});
+}).then(function(res){
 var p=res.p,own=res.own,u=res.u;
 
 if(!p){var nf=h("div","card","Ce profil est introuvable. ");nf.style.marginTop="30px";nf.appendChild(link("Retour aux prestataires","marketplace.html"));app.appendChild(nf);return}
@@ -125,6 +143,7 @@ var services=p.services&&p.services.length?p.services:(rate?[{t:UNIT[unit]||"Pre
 document.title="Dealr – "+(own?"Mon profil":p.n);
 
 var layout=h("div","layout"),main=h("div","main"),side=h("aside","side");layout.appendChild(main);layout.appendChild(side);app.appendChild(layout);
+function starRow(n){var s=h("span","rst");s.setAttribute("aria-label",n+" sur 5");for(var i=1;i<=5;i++)s.appendChild(h("i",i<=n?"on":"","★"));return s}
 function sec(title){var c=h("section","card");c.appendChild(h("h2","",title));main.appendChild(c);return c}
 
 
@@ -156,9 +175,20 @@ c=sec("Portfolio");var port=(p.port||[]).map(A.safeImg).filter(Boolean),links=(p
 if(port.length){var g=h("div","port");port.forEach(function(s){var d=h("div");d.style.backgroundImage="url('"+s+"')";g.appendChild(d)});c.appendChild(g)}
 links.forEach(function(x){var a=link(x,x);a.target="_blank";a.rel="noopener noreferrer";a.style.cssText="display:block;margin-top:8px;overflow-wrap:anywhere";c.appendChild(a)});
 if(!port.length&&!links.length)c.appendChild(h("p","sub","Portfolio à venir."));
-c=sec("Avis clients");var rv=p.reviews||[];
-if(rv.length)rv.forEach(function(r){var d=h("div","rv");d.appendChild(h("div","stars",new Array((+r.note||0)+1).join("★")));d.appendChild(h("div","",r.txt));d.appendChild(h("div","sub","— "+r.by));c.appendChild(d)});
-else c.appendChild(h("p","sub","Aucun avis pour le moment."));
+c=sec("Avis");var rv=p.reviews||[];
+if(rv.length){
+  var sum=h("div","rvsum"),sc=h("div","rvscore");sc.appendChild(h("b","",String(+p.r||0).replace(".",",")));sc.appendChild(starRow(Math.round(+p.r||0)));
+  sc.appendChild(h("span","sub",(+p.a||rv.length)+" avis"));sum.appendChild(sc);
+  var bars=h("div","rvbars");[5,4,3,2,1].forEach(function(n){var k=rv.filter(function(r){return Math.round(+r.note)===n}).length,row=h("div","rvbar");
+    row.appendChild(h("span","",n+" ★"));var tr=h("span","tr"),fl=h("i");fl.style.width=(rv.length?k/rv.length*100:0)+"%";tr.appendChild(fl);row.appendChild(tr);row.appendChild(h("span","sub",String(k)));bars.appendChild(row)});
+  sum.appendChild(bars);c.appendChild(sum);
+  rv.forEach(function(r){var d=h("div","rv"),hd=h("div","rvhd"),ra=h("span","rva"),img2=A.safeImg(r.photo);
+    if(img2)ra.style.backgroundImage="url('"+img2+"')";else ra.textContent=String(r.by||"?").split(" ").map(function(w){return w[0]}).slice(0,2).join("").toUpperCase();
+    var who=h("div","rvw");var nm=r.author?link(r.by,"prestataire.html?id="+encodeURIComponent(r.author)):h("b","",r.by);nm.className="rvn";who.appendChild(nm);
+    var meta=[r.role,r.title?"« "+r.title+" »":"",r.date?new Date(r.date).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}):""].filter(Boolean).join(" · ");
+    if(meta)who.appendChild(h("span","sub",meta));
+    hd.appendChild(ra);hd.appendChild(who);hd.appendChild(starRow(+r.note||0));d.appendChild(hd);d.appendChild(h("p","rvt",r.txt));c.appendChild(d)})}
+else c.appendChild(h("p","sub",p.demo?"Aucun avis pour le moment.":"Aucun avis pour le moment. Les avis sont laissés à la fin de chaque deal, par les membres qui ont travaillé avec "+(own?"vous":p.n)+"."));
 
 /* Colonne de droite */
 if(own){

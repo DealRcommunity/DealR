@@ -86,6 +86,15 @@
           if (table === "conversations" && !adm && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
           if (table === "messages" && row.kind === "admin" && !adm) return ko("forbidden");
           if (table === "messages" && row.sender !== s.user.id) return ko("forbidden");
+          if (table === "reviews") {
+            if (adm) return ko("admin_member");
+            if (row.author !== s.user.id) return ko("forbidden");
+            if (rows.some(function (r) { return r.id === row.id; })) return ko("already_reviewed");
+            var dl = get("deals", []).filter(function (d) { return d.id === row.deal; })[0];
+            if (!dl || !/^(released|refunded)$/.test(dl.status)) return ko("review_not_allowed");
+            var other = dl.payer === s.user.id ? dl.payee : dl.payee === s.user.id ? dl.payer : null;
+            if (!other || other !== row.target) return ko("review_not_allowed");
+          }
           var same = table === "documents" ? function (r) { return r.owner === row.owner && r.num === row.num; } : function (r) { return r.id === row.id; };
           var i = rows.findIndex(same);
           if (i >= 0) rows[i] = Object.assign(rows[i], row); else rows.push(Object.assign({ created_at: new Date().toISOString() }, row));
@@ -212,7 +221,67 @@
       .then(function (c) { return c.from("profiles").select("id,data").order("updated_at", { ascending: false }).limit(200); })
       .then(check)
       .then(function (rows) { return rows.map(function (r) { return Object.assign({}, r.data, { id: r.id }); }); })
+      .then(function (list) {
+        /* Note moyenne et nombre d'avis calculés à partir des vrais avis */
+        return A.reviewStats().then(function (st) {
+          list.forEach(function (p) { var x = st[p.id]; p.r = x ? x.avg : 0; p.a = x ? x.n : 0; });
+          return list;
+        }, function () { return list; });
+      })
       .catch(function () { return []; });
+  };
+
+  /* Avis : laissés uniquement à la fin d'un deal (payé ou remboursé), par chacun des deux participants,
+     sur l'autre participant. Une seule fois par deal. Visibles par tout le monde. */
+  A.REVIEW_END = /^(released|refunded)$/;
+  A.listReviews = function (targetId) {
+    return client()
+      .then(function (c) { return c.from("reviews").select("*").eq("target", targetId).order("created_at", { ascending: false }).limit(200); })
+      .then(check);
+  };
+  A.dealReviews = function (dealId) {
+    return client()
+      .then(function (c) { return c.from("reviews").select("*").eq("deal", dealId); })
+      .then(check);
+  };
+  A.reviewStats = function () {
+    return client()
+      .then(function (c) { return c.from("reviews").select("target,rating").limit(5000); })
+      .then(check)
+      .then(function (rows) {
+        var m = {};
+        (rows || []).forEach(function (r) { var x = m[r.target] || (m[r.target] = { sum: 0, n: 0 }); x.sum += +r.rating || 0; x.n++; });
+        Object.keys(m).forEach(function (k) { m[k].avg = Math.round(m[k].sum / m[k].n * 10) / 10; });
+        return m;
+      });
+  };
+  A.summarize = function (reviews) {
+    var n = reviews.length, sum = 0;
+    reviews.forEach(function (r) { sum += +r.rating || 0; });
+    return { n: n, avg: n ? Math.round(sum / n * 10) / 10 : 0 };
+  };
+  A.leaveReview = function (deal, rating, text) {
+    rating = Math.round(+rating);
+    text = String(text || "").trim().slice(0, 1000);
+    if (!(rating >= 1 && rating <= 5)) return Promise.reject(new Error("review_rating"));
+    if (text.length < 10) return Promise.reject(new Error("review_short"));
+    return Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0];
+      if (!u) throw new Error("not_logged");
+      if (r[1]) throw new Error("admin_member");
+      if (!deal || !A.REVIEW_END.test(deal.status)) throw new Error("review_not_allowed");
+      var target = deal.payer === u.id ? deal.payee : deal.payee === u.id ? deal.payer : null;
+      if (!target) throw new Error("review_not_allowed");
+      return A.myProfile().catch(function () { return null; }).then(function (me) {
+        var row = {
+          id: deal.id + "_" + u.id, deal: deal.id, author: u.id, target: target, rating: rating, text: text,
+          deal_title: String(deal.title || "").slice(0, 140),
+          author_snap: { n: (me && me.n) || "Membre", photo: A.safeImg(me && me.photo), role: deal.payer === u.id ? "Client" : "Prestataire" },
+          created_at: new Date().toISOString()
+        };
+        return client().then(function (c) { return c.from("reviews").insert(row); }).then(check).then(function () { return row; });
+      });
+    });
   };
 
   /* Devis et factures (table documents : visibles par leur propriétaire uniquement) */
@@ -731,6 +800,10 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/already_reviewed|duplicate key.*reviews|reviews_pkey/.test(m)) return "Vous avez déjà laissé un avis pour ce deal.";
+    if (/review_not_allowed|row-level security.*reviews/.test(m)) return "Un avis ne peut être laissé qu’à la fin d’un deal, par l’un des deux participants.";
+    if (/review_rating/.test(m)) return "Choisissez une note de 1 à 5 étoiles.";
+    if (/review_short/.test(m)) return "Votre commentaire est un peu court : au moins 10 caractères.";
     if (/no_support/.test(m)) return "Le support n’est pas joignable par la messagerie pour le moment. Réessayez plus tard.";
     if (/admin_member/.test(m)) return "Le compte administrateur sert à gérer le site : il ne peut pas avoir de profil ni faire de deal.";
     if (/admin_note/.test(m)) return "Expliquez votre décision en quelques mots (10 caractères minimum) : elle sera envoyée aux deux parties.";

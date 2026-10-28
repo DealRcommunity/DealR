@@ -303,3 +303,57 @@ begin
 end $$;
 revoke all on function public.open_support(jsonb) from public, anon;
 grant execute on function public.open_support(jsonb) to authenticated;
+
+-- 8. Avis : laissés à la fin d'un deal (payé ou remboursé), par chacun des deux participants
+--    sur l'autre, une seule fois par deal. Visibles par tout le monde, non modifiables.
+create table if not exists public.reviews (
+  id text primary key,
+  deal text not null references public.deals(id) on delete cascade,
+  author uuid not null references auth.users(id) on delete cascade,
+  target uuid not null references auth.users(id) on delete cascade,
+  rating int not null check (rating between 1 and 5),
+  text text not null check (char_length(text) between 10 and 1000),
+  deal_title text,
+  author_snap jsonb,
+  created_at timestamptz not null default now(),
+  unique (deal, author),
+  check (author <> target)
+);
+create index if not exists reviews_target_idx on public.reviews (target, created_at desc);
+alter table public.reviews enable row level security;
+
+drop policy if exists "Avis visibles par tous" on public.reviews;
+create policy "Avis visibles par tous"
+  on public.reviews for select to anon, authenticated using (true);
+
+drop policy if exists "Laisser un avis à la fin d'un deal" on public.reviews;
+create policy "Laisser un avis à la fin d'un deal"
+  on public.reviews for insert to authenticated
+  with check (
+    author = auth.uid() and not public.is_admin()
+    and exists (select 1 from public.deals d
+                where d.id = deal and d.status in ('released', 'refunded')
+                  and ((d.payer = author and d.payee = target) or (d.payee = author and d.payer = target)))
+  );
+
+-- Le nom, la photo, le rôle et le titre du deal viennent de la base, pas du navigateur
+create or replace function public.reviews_fill() returns trigger
+language plpgsql security definer set search_path = public
+as $$
+declare d public.deals; pdata jsonb;
+begin
+  select * into d from public.deals where id = new.deal;
+  select data into pdata from public.profiles where id = new.author;
+  new.id := new.deal || '_' || new.author::text;
+  new.deal_title := left(coalesce(d.title, ''), 140);
+  new.author_snap := jsonb_build_object(
+    'n', coalesce(pdata->>'n', 'Membre'),
+    'photo', coalesce(pdata->>'photo', ''),
+    'role', case when d.payer = new.author then 'Client' else 'Prestataire' end);
+  new.created_at := now();
+  return new;
+end $$;
+
+drop trigger if exists reviews_fill on public.reviews;
+create trigger reviews_fill before insert on public.reviews
+  for each row execute function public.reviews_fill();

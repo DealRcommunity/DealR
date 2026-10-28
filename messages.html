@@ -252,6 +252,19 @@ dialog textarea{min-height:80px;resize:vertical}
 @media(max-width:420px){.two{grid-template-columns:1fr}.pin small{display:none}}
 .av.sup{background:linear-gradient(135deg,#3448f0,#f55a1f)!important;color:#fff;font-family:"Bricolage Grotesque",sans-serif;font-weight:800}
 .stag{display:inline-block;margin-left:6px;font:700 .66rem Figtree,sans-serif;color:#fff;border-radius:99px;padding:2px 7px;vertical-align:2px;background:linear-gradient(100deg,#4056ff,#f55a1f)}
+/* Avis */
+.rvb{display:grid;gap:8px;width:100%;margin-top:4px}
+.btn.rvbtn{background:linear-gradient(100deg,#4056ff,#965ac8 50%,#f55a1f);border-color:transparent;color:#fff}
+.btn.rvbtn:hover{filter:brightness(1.05);background:linear-gradient(100deg,#4056ff,#965ac8 50%,#f55a1f)}
+.rvi{background:#f7f7fb;border-radius:12px;padding:10px 12px;font-size:.9rem}.rvi.in{background:#fff6ef}
+.rvh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.rvi p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#4a4a52}
+.rstars i{font-style:normal;color:#d9d9e2;letter-spacing:1px}.rstars i.on{color:#f5a623}
+.rvpick{display:flex;align-items:center;gap:14px;margin-top:16px}
+#rvStars{display:flex;gap:2px}
+#rvStars button{border:0;background:none;font-size:2.1rem;line-height:1;color:#dcdce4;cursor:pointer;padding:2px;transition:transform .12s,color .12s}
+#rvStars button.on{color:#f5a623}#rvStars button:hover{transform:scale(1.15)}
+#rvLab{font-weight:600;color:var(--mute);font-size:.95rem}
 </style>
 </head>
 <body class="wait">
@@ -319,6 +332,17 @@ dialog textarea{min-height:80px;resize:vertical}
   <div class="dacts"><button type="button" class="btn out" data-close>Annuler</button><button type="button" class="btn pay" id="dpOk"></button></div>
 </dialog>
 
+<dialog id="dRev" aria-labelledby="rvT">
+  <h2 id="rvT">Laisser un <em>avis.</em></h2>
+  <p class="sub" id="rvS"></p>
+  <div class="rvpick"><div id="rvStars" role="radiogroup" aria-label="Note">
+    <button type="button" role="radio" aria-label="1 étoile">★</button><button type="button" role="radio" aria-label="2 étoiles">★</button><button type="button" role="radio" aria-label="3 étoiles">★</button><button type="button" role="radio" aria-label="4 étoiles">★</button><button type="button" role="radio" aria-label="5 étoiles">★</button>
+  </div><span id="rvLab">Choisissez une note</span></div>
+  <label for="rvTx">Votre commentaire</label><textarea id="rvTx" maxlength="1000" placeholder="Qualité du travail, respect des délais, communication…"></textarea>
+  <p class="derr" id="rvErr" role="alert"></p>
+  <div class="dacts"><button type="button" class="btn out" data-close>Plus tard</button><button type="button" class="btn" id="rvOk">Publier l’avis</button></div>
+</dialog>
+
 <dialog id="dConf" aria-labelledby="cfT">
   <h2 id="cfT"></h2>
   <p class="sub" id="cfP"></p>
@@ -357,7 +381,7 @@ dialog textarea{min-height:80px;resize:vertical}
 <script>
 (function(){
 var A=window.DealrAuth,$=function(i){return document.getElementById(i)};
-var me=null,convs=[],cur=null,lastSig="",deals=[],busy=false;
+var me=null,convs=[],cur=null,lastSig="",deals=[],busy=false,revs={};
 var QUICK=["Bonjour, êtes-vous disponible ?","Pouvez-vous m’envoyer un devis ?","Merci, c’est parfait !"];
 var ST={proposed:"En attente de réponse",accepted:"Deal conclu",funded:"Argent au coffre",delivered:"Livré · à valider",released:"Payé",disputed:"Litige en cours",refunded:"Remboursé",declined:"Refusé",cancelled:"Annulé",countered:"Remplacé"};
 var STEP={proposed:0,accepted:1,funded:2,delivered:3,disputed:2,released:4,refunded:2};
@@ -412,9 +436,14 @@ function select(id,push){
 function loadThread(scroll){
   if(!cur)return Promise.resolve();var id=cur.id;
   return Promise.all([A.listMessages(id),A.listDeals(id)]).then(function(r){
+    /* Avis des deals terminés */
+    var fin=(r[1]||[]).filter(function(d){return A.REVIEW_END.test(d.status)});
+    return Promise.all(fin.map(function(d){return A.dealReviews(d.id).catch(function(){return[]})})).then(function(rr){
+      var m={};fin.forEach(function(d,i){m[d.id]=rr[i]||[]});r.push(m);return r})
+  }).then(function(r){
     if(!cur||cur.id!==id)return;
-    var ms=r[0],ds=r[1]||[];
-    var sig=ms.length+":"+(ms.length?ms[ms.length-1].id:"")+":"+ds.map(function(d){return d.id+d.status}).join(",");
+    var ms=r[0],ds=r[1]||[];revs=r[2]||{};
+    var sig=ms.length+":"+(ms.length?ms[ms.length-1].id:"")+":"+ds.map(function(d){return d.id+d.status+(revs[d.id]?revs[d.id].length:"")}).join(",");
     if(sig===lastSig)return;lastSig=sig;deals=ds;
     var byId={};ds.forEach(function(d){byId[d.id]=d});
     var box=$("msgs"),atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<80;box.textContent="";
@@ -496,10 +525,34 @@ function actions(d){
       :d.payee===me?eur(d.amount)+" ont été versés sur votre compte Dealr.":end("Paiement versé à "+o)+" Mission terminée !"));break;
     case "disputed":box.appendChild(waitTxt("Litige ouvert : l’argent reste bloqué au coffre. Un administrateur Dealr examine la situation et vous répondra dans cette conversation."));break;
     case "refunded":box.appendChild(waitTxt(d.payer===me?"L’équipe Dealr a tranché : "+eur(d.amount)+" vous ont été remboursés.":"L’équipe Dealr a tranché : le client a été remboursé."));break;
+  }
+  if(A.REVIEW_END.test(d.status))box.appendChild(reviewBlock(d));
+  switch(d.status){
     case "countered":box.appendChild(waitTxt("Remplacé par une contre-proposition."));break;
     case "declined":box.appendChild(waitTxt("Ce deal a été refusé."));break;
     case "cancelled":box.appendChild(waitTxt("Ce deal a été annulé."));break}
   return box}
+/* ---------- Avis (uniquement à la fin d'un deal) ---------- */
+function starsEl(n){var s=h("span","rstars");s.setAttribute("aria-label",n+" sur 5");for(var i=1;i<=5;i++)s.appendChild(h("i",i<=n?"on":"","★"));return s}
+function reviewBlock(d){
+  var list=revs[d.id]||[],mine=list.filter(function(r){return r.author===me})[0],theirs=list.filter(function(r){return r.author!==me})[0];
+  var box=h("div","rvb"),o=other();
+  if(mine){var a=h("div","rvi");var t=h("div","rvh");t.appendChild(h("b","","Votre avis sur "+o));t.appendChild(starsEl(mine.rating));a.appendChild(t);a.appendChild(h("p","",mine.text));box.appendChild(a)}
+  else box.appendChild(btn("★ Laisser un avis à "+o,"rvbtn",function(){openReview(d)}));
+  if(theirs){var b=h("div","rvi in");var t2=h("div","rvh");t2.appendChild(h("b","",o+" vous a laissé un avis"));t2.appendChild(starsEl(theirs.rating));b.appendChild(t2);b.appendChild(h("p","",theirs.text));box.appendChild(b)}
+  return box}
+var RLAB=["","Décevant","Moyen","Bien","Très bien","Excellent"],rvDeal=null,rvNote=0;
+function paintStars(n){Array.prototype.forEach.call(document.querySelectorAll("#rvStars button"),function(b,i){b.classList.toggle("on",i<n);b.setAttribute("aria-checked",i+1===rvNote?"true":"false")});$("rvLab").textContent=n?RLAB[n]:"Choisissez une note"}
+function openReview(d){rvDeal=d;rvNote=0;$("rvTx").value="";$("rvErr").textContent="";
+  $("rvS").textContent="Comment s’est passé le deal « "+d.title+" » avec "+other()+" ? Votre avis sera visible par tous sur son profil.";
+  paintStars(0);$("dRev").showModal()}
+Array.prototype.forEach.call(document.querySelectorAll("#rvStars button"),function(b,i){
+  b.onclick=function(){rvNote=i+1;paintStars(rvNote)};b.onmouseenter=function(){paintStars(i+1)};b.onfocus=function(){paintStars(i+1)}});
+$("rvStars").onmouseleave=function(){paintStars(rvNote)};
+$("rvOk").onclick=function(){var b=this;$("rvErr").textContent="";
+  if(!rvNote){$("rvErr").textContent="Choisissez une note de 1 à 5 étoiles.";return}
+  b.disabled=true;A.leaveReview(rvDeal,rvNote,$("rvTx").value).then(function(){$("dRev").close();return refreshAll()})
+   .catch(function(e){$("rvErr").textContent=A.message(e)}).then(function(){b.disabled=false})};
 function noop(){}
 function refreshAll(){lastSig="";return loadThread(true).then(loadList)}
 function go(d,to){
