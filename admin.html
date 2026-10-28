@@ -43,6 +43,7 @@ h1{font-size:clamp(2rem,4vw,2.8rem)}
 .stat{background:#fff;border-radius:18px;padding:14px 16px;border:1px solid var(--line)}
 .stat b{display:block;font:800 1.7rem "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin-top:2px}
 .stat.alert{border-color:#f3c2bb;background:#fff7f6}.stat.alert b{color:var(--red)}
+.cn{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:.72rem;margin-left:8px;padding:0 6px}
 
 .board{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start;padding-bottom:40px}
 .panel{background:#fff;border-radius:22px;border:1px solid var(--line);overflow:hidden}
@@ -148,7 +149,7 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 <main class="wrap" id="main">
   <div class="top">
     <div><h1>Centre des <em>litiges.</em></h1><p class="sub" style="margin:8px 0 0">Examinez les deals bloqués, lisez la conversation, décidez où va l’argent du coffre.</p></div>
-    <span class="sub" id="upd"></span>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><a class="btn out" href="admin-certifs.html" id="certLink">Certifications à vérifier<span class="cn" id="nCert" hidden></span></a><span class="sub" id="upd"></span></div>
   </div>
   <div class="stats" id="stats"></div>
   <div class="board" id="board">
@@ -199,6 +200,7 @@ function load(){
   }).then(function(){
     renderStats();renderList();
     if(sel){var n=all.filter(function(d){return d.id===sel.id})[0];if(n){var changed=n.status!==sel.status;sel=n;if(changed)renderDetail();else loadThread()}}
+    A.adminCerts().then(function(cl){var n=(cl||[]).filter(function(c){return c.status==="pending"}).length;$("nCert").textContent=n;$("nCert").hidden=!n}).catch(function(){});
     $("upd").textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
     var latest=all.filter(function(d){return d.status==="disputed"}).map(function(d){return String(d.disputed_at||d.updated_at)}).sort().pop();
     if(latest)try{if((localStorage.getItem("dealr_admin_seen")||"")<latest)localStorage.setItem("dealr_admin_seen",latest)}catch(e){}

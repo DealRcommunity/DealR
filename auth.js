@@ -65,10 +65,25 @@
         upsert: function (row) { q.op = "upsert"; q.row = row; return b; },
         insert: function (row) { q.op = "upsert"; q.row = row; return b; },
         update: function (patch) { q.op = "update"; q.patch = patch; return b; },
+        delete: function () { q.op = "delete"; return b; },
         then: function (res, rej) { return run().then(res, rej); }
       };
       function run() {
         var s = sess(), rows = get(table, []), adm = !!(s && isAdminEmail(s.user.email));
+        if (table === "certifications_public") {
+          table = "certifications"; rows = get(table, []);
+          q.f.push(function (r) { return r.status === "verified"; });
+          q.pub = true;
+        }
+        if (q.op === "delete") {
+          if (!s) return ko("not_logged");
+          var del = rows.filter(function (r) { return q.f.every(function (f) { return f(r); }); });
+          if (del.some(function (r) { return r.owner && r.owner !== s.user.id; })) return ko("forbidden");
+          rows = rows.filter(function (r) { return del.indexOf(r) < 0; });
+          try { put(table, rows); } catch (e) { return ko("quota"); }
+          return ok(null);
+        }
+        if (q.op === "update" && table === "certifications" && !adm) return ko("forbidden");
         if (q.op === "update") {
           if (!s) return ko("not_logged");
           var hit = rows.filter(function (r) { return q.f.every(function (f) { return f(r); }); });
@@ -86,6 +101,7 @@
           if (table === "conversations" && !adm && row.user_a !== s.user.id && row.user_b !== s.user.id) return ko("forbidden");
           if (table === "messages" && row.kind === "admin" && !adm) return ko("forbidden");
           if (table === "messages" && row.sender !== s.user.id) return ko("forbidden");
+          if (table === "certifications" && (adm || row.owner !== s.user.id || row.status !== "pending")) return ko(adm ? "admin_member" : "forbidden");
           if (table === "reviews") {
             if (adm) return ko("admin_member");
             if (row.author !== s.user.id) return ko("forbidden");
@@ -104,6 +120,11 @@
         var out = table === "documents" ? rows.filter(function (r) { return s && r.owner === s.user.id; })
           : table === "conversations" && !adm ? rows.filter(function (r) { return s && (r.user_a === s.user.id || r.user_b === s.user.id); })
           : rows.slice();
+        if (table === "certifications") {
+          /* Le justificatif reste privé : visible par son propriétaire et l'équipe Dealr uniquement */
+          out = out.filter(function (r) { return adm || (s && r.owner === s.user.id) || r.status === "verified"; })
+            .map(function (r) { return (adm || (s && r.owner === s.user.id)) && !q.pub ? r : { id: r.id, owner: r.owner, title: r.title, issuer: r.issuer, year: r.year, url: r.url, status: r.status, created_at: r.created_at, reviewed_at: r.reviewed_at }; });
+        }
         if (table === "profiles") {
           var admIds = get("users", []).filter(function (u) { return isAdminEmail(u.email); }).map(function (u) { return u.id; });
           out = out.filter(function (r) { return admIds.indexOf(r.id) < 0; });
@@ -229,6 +250,57 @@
         }, function () { return list; });
       })
       .catch(function () { return []; });
+  };
+
+  /* Certifications : chaque certification exige un justificatif (attestation PDF ou image).
+     Elle reste « en attente » jusqu'à la vérification par l'équipe Dealr, puis devient « vérifiée » (visible par tous)
+     ou « refusée » (avec un motif). Le justificatif n'est jamais public. */
+  A.CERT_MAX = 1.5 * 1024 * 1024;
+  A.CERT_TYPES = /^data:(application\/pdf|image\/(png|jpe?g|webp));base64,[A-Za-z0-9+\/=]+$/;
+  A.myCerts = function () {
+    return A.user().then(function (u) {
+      if (!u) return [];
+      return client().then(function (c) { return c.from("certifications").select("*").eq("owner", u.id).order("created_at", { ascending: true }); }).then(check);
+    });
+  };
+  A.publicCerts = function (ownerId) {
+    return client()
+      .then(function (c) { return c.from("certifications_public").select("*").eq("owner", ownerId).order("created_at", { ascending: true }); })
+      .then(check).catch(function () { return []; });
+  };
+  A.addCert = function (f) {
+    var title = String(f.title || "").trim().slice(0, 90), url = String(f.url || "").trim();
+    if (title.length < 2) return Promise.reject(new Error("cert_title"));
+    if (!f.proof || !A.CERT_TYPES.test(f.proof)) return Promise.reject(new Error("cert_proof"));
+    if (f.proof.length > A.CERT_MAX * 1.37) return Promise.reject(new Error("cert_size"));
+    if (url && !/^https:\/\/[^\s]+$/i.test(url)) return Promise.reject(new Error("cert_url"));
+    return Promise.all([A.user(), A.isAdmin()]).then(function (r) {
+      var u = r[0];
+      if (!u) throw new Error("not_logged");
+      if (r[1]) throw new Error("admin_member");
+      var row = { id: newId(), owner: u.id, title: title, issuer: String(f.issuer || "").trim().slice(0, 90), year: String(f.year || "").trim().slice(0, 20),
+        num: String(f.num || "").trim().slice(0, 80), url: url, proof: f.proof, proof_name: String(f.proofName || "justificatif").slice(0, 120),
+        status: "pending", reason: null, created_at: new Date().toISOString() };
+      return client().then(function (c) { return c.from("certifications").insert(row); }).then(check).then(function () { return row; });
+    });
+  };
+  A.removeCert = function (id) {
+    return client().then(function (c) { return c.from("certifications").delete().eq("id", id); }).then(check);
+  };
+  A.adminCerts = function () {
+    return needAdmin().then(client)
+      .then(function (c) { return c.from("certifications").select("*").order("created_at", { ascending: false }).limit(500); })
+      .then(check);
+  };
+  A.reviewCert = function (id, status, reason) {
+    if (!/^(verified|rejected)$/.test(status)) return Promise.reject(new Error("forbidden"));
+    reason = String(reason || "").trim().slice(0, 300);
+    if (status === "rejected" && reason.length < 5) return Promise.reject(new Error("cert_reason"));
+    return needAdmin().then(function () { return A.user(); }).then(function (u) {
+      return client().then(function (c) {
+        return c.from("certifications").update({ status: status, reason: status === "rejected" ? reason : null, reviewed_at: new Date().toISOString(), reviewed_by: u.id }).eq("id", id);
+      }).then(check);
+    });
   };
 
   /* Avis : laissés uniquement à la fin d'un deal (payé ou remboursé), par chacun des deux participants,
@@ -661,9 +733,10 @@
   function adminAlerts() {
     A.isAdmin().then(function (ok) {
       if (!ok) return;
-      return A.adminDeals().then(function (all) {
+      return Promise.all([A.adminDeals(), A.adminCerts().catch(function () { return []; })]).then(function (rr) {
+        var all = rr[0], pc = rr[1].filter(function (x) { return x.status === "pending"; }).length;
         var open = all.filter(function (d) { return d.status === "disputed"; });
-        setBadge("dnAdmin", open.length, "red", " litige" + (open.length > 1 ? "s" : "") + " ouvert" + (open.length > 1 ? "s" : ""));
+        setBadge("dnAdmin", open.length + pc, "red", " élément" + (open.length + pc > 1 ? "s" : "") + " à traiter (litiges et certifications)");
         var key = "dealr_admin_seen", seen = "";
         try { seen = localStorage.getItem(key) || ""; } catch (e) {}
         var fresh = open.filter(function (d) { return String(d.disputed_at || d.updated_at) > seen; });
@@ -800,6 +873,11 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/cert_title/.test(m)) return "Indiquez le nom de la certification.";
+    if (/cert_proof/.test(m)) return "Le justificatif est obligatoire : ajoutez votre attestation (PDF, JPG ou PNG).";
+    if (/cert_size/.test(m)) return "Le justificatif est trop lourd : 1,5 Mo maximum.";
+    if (/cert_url/.test(m)) return "Le lien de vérification doit commencer par https://";
+    if (/cert_reason/.test(m)) return "Indiquez le motif du refus (au moins 5 caractères).";
     if (/already_reviewed|duplicate key.*reviews|reviews_pkey/.test(m)) return "Vous avez déjà laissé un avis pour ce deal.";
     if (/review_not_allowed|row-level security.*reviews/.test(m)) return "Un avis ne peut être laissé qu’à la fin d’un deal, par l’un des deux participants.";
     if (/review_rating/.test(m)) return "Choisissez une note de 1 à 5 étoiles.";

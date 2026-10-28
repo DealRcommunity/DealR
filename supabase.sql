@@ -357,3 +357,69 @@ end $$;
 drop trigger if exists reviews_fill on public.reviews;
 create trigger reviews_fill before insert on public.reviews
   for each row execute function public.reviews_fill();
+
+-- 9. Certifications : un justificatif obligatoire (attestation PDF ou image), vérifié par l'équipe Dealr.
+--    Le justificatif reste privé (le membre et les admins). Seules les certifications vérifiées sont publiques,
+--    via la vue certifications_public (sans le justificatif).
+create table if not exists public.certifications (
+  id text primary key,
+  owner uuid not null references auth.users(id) on delete cascade,
+  title text not null check (char_length(title) between 2 and 90),
+  issuer text,
+  year text,
+  num text,
+  url text check (url is null or url = '' or url ~* '^https://'),
+  proof text not null check (proof ~ '^data:(application/pdf|image/(png|jpe?g|webp));base64,' and char_length(proof) < 2200000),
+  proof_name text,
+  status text not null default 'pending' check (status in ('pending', 'verified', 'rejected')),
+  reason text,
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid references auth.users(id)
+);
+create index if not exists certifications_owner_idx on public.certifications (owner, created_at);
+alter table public.certifications enable row level security;
+
+drop policy if exists "Voir ses certifications" on public.certifications;
+create policy "Voir ses certifications"
+  on public.certifications for select to authenticated using (owner = auth.uid() or public.is_admin());
+
+drop policy if exists "Ajouter une certification" on public.certifications;
+create policy "Ajouter une certification"
+  on public.certifications for insert to authenticated
+  with check (owner = auth.uid() and status = 'pending' and not public.is_admin());
+
+drop policy if exists "Retirer sa certification" on public.certifications;
+create policy "Retirer sa certification"
+  on public.certifications for delete to authenticated using (owner = auth.uid());
+
+drop policy if exists "Admins : vérifier les certifications" on public.certifications;
+create policy "Admins : vérifier les certifications"
+  on public.certifications for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- À l'ajout : toujours « en attente ». À la vérification : seuls le statut et le motif changent.
+create or replace function public.certifications_guard() returns trigger
+language plpgsql as $$
+begin
+  if tg_op = 'INSERT' then
+    new.status := 'pending'; new.reason := null; new.reviewed_at := null; new.reviewed_by := null; new.created_at := now();
+    return new;
+  end if;
+  if not public.is_admin() then raise exception 'forbidden'; end if;
+  if new.status not in ('verified', 'rejected') then raise exception 'forbidden'; end if;
+  new.id := old.id; new.owner := old.owner; new.title := old.title; new.issuer := old.issuer; new.year := old.year;
+  new.num := old.num; new.url := old.url; new.proof := old.proof; new.proof_name := old.proof_name; new.created_at := old.created_at;
+  new.reason := case when new.status = 'rejected' then new.reason else null end;
+  new.reviewed_at := now(); new.reviewed_by := auth.uid();
+  return new;
+end $$;
+
+drop trigger if exists certifications_guard on public.certifications;
+create trigger certifications_guard before insert or update on public.certifications
+  for each row execute function public.certifications_guard();
+
+create or replace view public.certifications_public as
+  select id, owner, title, issuer, year, url, status, created_at, reviewed_at
+  from public.certifications where status = 'verified';
+grant select on public.certifications_public to anon, authenticated;
+

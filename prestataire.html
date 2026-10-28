@@ -53,7 +53,10 @@ h1{font-size:clamp(1.7rem,4vw,2.4rem)}
 .empt p{margin:0 0 6px;max-width:30em}
 .certs{display:grid;gap:10px}
 .cert{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:12px}
-.vl{font-size:.85rem;font-weight:600;color:#3448f0}
+.vl{font-size:.85rem;font-weight:600;color:#3448f0;display:inline-block;margin-top:4px}
+.cst{display:inline-block;margin-left:8px;font-size:.72rem;font-weight:700;border-radius:99px;padding:2px 8px;vertical-align:2px}
+.cst.pending{background:#fff1cc;color:#6b4a00}.cst.verified{background:#e3f4ea;color:#17613a}.cst.rejected{background:#fde8e6;color:#a1230f}
+.cert.off{background:#fafafb}.rj{color:#a1230f}
 .badges{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .b{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;background:#e6edff;color:#173ba3}
 .b.e{background:#fff1cc;color:#6b4a00}.b.d{background:#e3f4ea;color:#17613a}.b.c{background:var(--ink);color:#fff}
@@ -149,9 +152,11 @@ function load(){
 load().then(function(res){
   /* Vrais avis (laissés à la fin des deals) : ils remplacent la note par défaut du profil */
   if(!res.p||res.p.demo)return res;
+  /* Certifications : le membre voit toutes les siennes (avec leur statut), les autres seulement les vérifiées */
+  return (res.own?A.myCerts():A.publicCerts(res.p.id)).catch(function(){return[]}).then(function(cl){res.certs=cl||[];return res}).then(function(res){
   return A.listReviews(res.p.id).then(function(rv){var st=A.summarize(rv);
     res.p.reviews=rv.map(function(r){var s=r.author_snap||{};return{note:r.rating,txt:r.text,by:s.n||"Membre",photo:s.photo,role:s.role,title:r.deal_title,date:r.created_at,author:r.author}});
-    res.p.r=st.avg;res.p.a=st.n;return res},function(){res.p.reviews=[];res.p.a=0;return res});
+    res.p.r=st.avg;res.p.a=st.n;return res},function(){res.p.reviews=[];res.p.a=0;return res})});
 }).then(function(res){
 var p=res.p,own=res.own,u=res.u;
 
@@ -192,13 +197,13 @@ if(sl.length){var srow=h("div","socrow");sl.forEach(function(x){var a=document.c
 hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
 
 /* Checklist (visible uniquement par le membre) : ce qui reste à faire pour un profil complet */
-var edus=p.edus||[],certs=p.certs||[];
+var edus=p.edus||[],certs=res.certs||[];
 if(own){
   var CK=[
     {k:"photo",t:p.t==="Entreprise"?"Logo de l’entreprise":"Photo de profil",d:"Montrez aux clients qui se cache derrière votre profil.",ok:!!A.safeImg(p.photo),go:1},
     {k:"exp",t:"Expériences",d:"Ajoutez au moins 2 expériences pour rassurer les clients.",ok:exps.length>=2,go:4},
     {k:"edu",t:"Formation",d:"Vos diplômes et formations prouvent vos connaissances.",ok:edus.length>0,go:5},
-    {k:"cert",t:"Certification",d:"Une certification reconnue vous démarque.",ok:certs.length>0,go:5},
+    {k:"cert",t:"Certification",d:certs.some(function(x){return x.status==="pending"})?"En cours de vérification par l’équipe Dealr.":"Une certification vérifiée vous démarque.",ok:certs.some(function(x){return x.status==="verified"}),go:5},
     {k:"net",t:"Réseaux",d:"Liez Instagram, TikTok ou LinkedIn pour montrer vos projets.",ok:sl.length>0,go:5},
     {k:"port",t:"Portfolio",d:"Ajoutez des photos ou des liens vers vos réalisations.",ok:(p.port||[]).length>0||(p.links||[]).length>0,go:6}];
   var dn=CK.filter(function(x){return x.ok}).length,pc=Math.round(dn/CK.length*100);
@@ -234,10 +239,14 @@ if(edus.length||own){c=sec("Formations");
   if(edus.length){var tl2=h("div","tl");edus.forEach(function(x){var d=h("div");d.appendChild(h("b","",x.t));d.appendChild(h("div","sub",[x.s,x.y].filter(Boolean).join(" · ")));tl2.appendChild(d)});c.appendChild(tl2)}
   else empty(c,"edu","Où vous êtes-vous formé ?","Vos diplômes et formations donnent confiance aux clients.","Ajouter une formation")}
 if(certs.length||own){c=sec("Certifications");
-  if(certs.length){var cg=h("div","certs");certs.forEach(function(x){var d=h("div","cert");d.appendChild(ico("cert","cic"));var t=h("div");t.appendChild(h("b","",x.t));
-      t.appendChild(h("div","sub",[x.o,x.y].filter(Boolean).join(" · ")));
-      if(/^https?:\/\/[^\s]+$/i.test(x.u||"")){var a=link("Vérifier ↗",x.u,"vl");a.target="_blank";a.rel="noopener noreferrer nofollow";t.appendChild(a)}
-      d.appendChild(t);cg.appendChild(d)});c.appendChild(cg)}
+  if(certs.length){var cg=h("div","certs"),CST={pending:"En attente de vérification",verified:"✓ Vérifiée par Dealr",rejected:"Refusée"};
+    certs.forEach(function(x){var d=h("div","cert"+(x.status!=="verified"?" off":""));d.appendChild(ico("cert","cic"));var t=h("div");var tt=h("b","",x.title);t.appendChild(tt);
+      t.appendChild(h("span","cst "+x.status,CST[x.status]||""));
+      t.appendChild(h("div","sub",[x.issuer,x.year].filter(Boolean).join(" · ")));
+      if(x.status==="rejected"&&x.reason)t.appendChild(h("div","sub rj","Motif : "+x.reason));
+      if(/^https:\/\/[^\s]+$/i.test(x.url||"")){var a=link("Voir le certificat ↗",x.url,"vl");a.target="_blank";a.rel="noopener noreferrer nofollow";t.appendChild(a)}
+      d.appendChild(t);cg.appendChild(d)});c.appendChild(cg);
+    if(own&&certs.some(function(x){return x.status!=="verified"}))c.appendChild(h("p","sub","Seules les certifications vérifiées sont visibles par les autres membres."))}
   else empty(c,"cert","Démarquez-vous avec vos certifications","Une certification officielle prouve votre maîtrise.","Ajouter une certification")}
 c=sec("Portfolio");var port=(p.port||[]).map(A.safeImg).filter(Boolean),links=(p.links||[]).filter(function(x){return /^https?:\/\//.test(x)});
 if(port.length){var g=h("div","port");port.forEach(function(s){var d=h("div");d.style.backgroundImage="url('"+s+"')";g.appendChild(d)});c.appendChild(g)}

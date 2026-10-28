@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealr – Vérification des certifications</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--g:#22a863;--red:#c0270f;--ind:#3b4a9e}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--ink);background:#f7f7f9;font:16px/1.5 Figtree,system-ui,sans-serif}
+body.wait main{visibility:hidden}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.035em;font-weight:800;line-height:1.05}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:1.12em;color:var(--o)}
+a{color:inherit}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--o);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header{background:#fff;border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:66px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{font-size:1.45rem;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
+.pill{background:var(--ink);color:#fff;border-radius:99px;padding:3px 10px;font-size:.74rem;font-weight:700}
+nav{display:flex;gap:20px;font-weight:500;align-items:center}
+nav a{text-decoration:none;color:var(--mute)}
+nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:99px;padding:10px 18px;font:600 .92rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
+.btn:hover{background:#2a2a2e}
+.btn.out{background:#fff;color:var(--ink)}.btn.out:hover{background:#f3f3f6}
+.btn.ok{background:var(--g);border-color:var(--g)}.btn.ok:hover{background:#1b9155}
+.btn.no{background:#fff;color:var(--red);border-color:#f0b8b0}.btn.no:hover{background:#fff4f2}
+.btn[disabled]{opacity:.55;cursor:wait}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:30px 0 18px}
+h1{font-size:clamp(2rem,4vw,2.8rem)}
+.sub{color:var(--mute);font-size:.9rem}
+.back{font-weight:600;text-decoration:none;color:var(--mute);font-size:.92rem}.back:hover{color:var(--ink)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 16px;font-weight:600;cursor:pointer;color:var(--mute)}
+.tabs button[aria-selected=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tabs .n{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:99px;background:var(--red);color:#fff;font-size:.7rem;margin-left:6px;padding:0 5px}
+.list{display:grid;gap:14px;padding-bottom:50px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;background:linear-gradient(135deg,#3448f0,#f55a1f) center/cover}
+.who a{font-weight:700;text-decoration:none}.who a:hover{text-decoration:underline}
+.ct{font-size:1.35rem}
+.meta{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:12px 0 0;font-size:.92rem}
+.meta dt{color:var(--mute)}.meta dd{margin:0;overflow-wrap:anywhere}
+.meta a{color:#3448f0;font-weight:600}
+.st{display:inline-block;font-size:.75rem;font-weight:700;border-radius:99px;padding:3px 10px;margin-left:8px;vertical-align:3px}
+.st.pending{background:#fff1cc;color:#6b4a00}.st.verified{background:#e3f4ea;color:#17613a}.st.rejected{background:#fde8e6;color:#a1230f}
+.pv{border:1px solid var(--line);border-radius:14px;background:#fafafb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px;min-height:180px;text-align:center}
+.pv img{max-width:100%;max-height:220px;border-radius:8px;cursor:zoom-in}
+.pv .pdf{width:56px;height:68px;border-radius:8px;background:#e2461a;color:#fff;font-weight:800;display:grid;place-items:center;font-size:.85rem}
+.acts{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:14px}
+.rf{grid-column:1/-1;display:grid;gap:8px}
+.rf textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fafafb;resize:vertical}
+.err{color:var(--red);font-size:.88rem;margin:0}
+.empty{background:#fff;border:1px dashed #d6d6de;border-radius:20px;padding:40px;text-align:center;color:var(--mute)}
+.tip{background:#eef0ff;border-radius:16px;padding:14px 16px;font-size:.92rem;margin-bottom:16px}
+.tip b{display:block;margin-bottom:4px}
+.denied{text-align:center;padding:80px 0}
+dialog{border:0;border-radius:20px;padding:12px;max-width:min(900px,94vw);box-shadow:0 30px 80px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(17,17,17,.6)}
+dialog img{max-width:100%;max-height:80vh;display:block;border-radius:10px}
+@media(max-width:760px){.card{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body class="wait">
+<header><div class="wrap">
+  <div class="brand"><a class="logo" href="index.html"><i></i>Dealr</a><span class="pill">Admin</span></div>
+  <nav data-nav="admin"></nav>
+</div></header>
+
+<main class="wrap" id="main">
+  <div class="top">
+    <div><a class="back" href="admin.html">← Centre des litiges</a><h1 style="margin-top:8px">Vérification des <em>certifications.</em></h1>
+      <p class="sub" style="margin:8px 0 0">Contrôlez chaque justificatif avant qu’une certification n’apparaisse sur un profil.</p></div>
+  </div>
+  <div class="tip"><b>Comment vérifier ?</b>
+    1. Le nom sur le justificatif correspond au membre. 2. L’organisme, l’intitulé et la date correspondent. 3. S’il y a un lien ou un numéro de certificat, vérifiez-le sur le site de l’organisme (Credly, Google Skillshop, Microsoft Learn, Coursera…). En cas de doute, refusez avec un motif clair : le membre pourra renvoyer un justificatif.</div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="pending" aria-selected="true">À vérifier<span class="n" id="nP" hidden></span></button>
+    <button type="button" role="tab" data-tab="verified" aria-selected="false">Vérifiées</button>
+    <button type="button" role="tab" data-tab="rejected" aria-selected="false">Refusées</button>
+  </div>
+  <div class="list" id="list"></div>
+</main>
+
+<dialog id="dImg" aria-label="Justificatif"><img id="dImgI" alt="Justificatif"><div style="text-align:right;margin-top:8px"><button type="button" class="btn out" id="dImgX">Fermer</button></div></dialog>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+var A=window.DealrAuth,$=function(i){return document.getElementById(i)},all=[],tab="pending",people={};
+function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function when(s){if(!s)return"";var d=new Date(s);return d.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+" à "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
+var ST={pending:"À vérifier",verified:"Vérifiée",rejected:"Refusée"};
+/* Ouvre un PDF (data URL) dans un nouvel onglet via une adresse locale */
+function openData(data){try{var b64=data.split(",")[1],mime=data.slice(5,data.indexOf(";")),bin=atob(b64),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  var url=URL.createObjectURL(new Blob([u],{type:mime}));window.open(url,"_blank","noopener");setTimeout(function(){URL.revokeObjectURL(url)},60000)}catch(e){alert("Impossible d’ouvrir ce fichier.")}}
+function load(){
+  return A.adminCerts().then(function(l){all=l||[];
+    var ids=all.map(function(c){return c.owner}).filter(function(id,i,a){return a.indexOf(id)===i&&!people[id]});
+    return Promise.all(ids.map(function(id){return A.getProfile(id).then(function(p){people[id]=p||{n:"Membre"}}).catch(function(){people[id]={n:"Membre"}})}));
+  }).then(render)}
+function render(){
+  var n=all.filter(function(c){return c.status==="pending"}).length;$("nP").textContent=n;$("nP").hidden=!n;
+  var box=$("list");box.textContent="";
+  var l=all.filter(function(c){return c.status===tab});
+  if(tab==="pending")l.sort(function(a,b){return String(a.created_at).localeCompare(String(b.created_at))});
+  if(!l.length){box.appendChild(h("div","empty",tab==="pending"?"Aucune certification à vérifier. Tout est à jour.":"Rien ici pour le moment."));return}
+  l.forEach(function(c){
+    var p=people[c.owner]||{n:"Membre"},card=h("article","card"),left=h("div");
+    var who=h("div","who"),av=h("span","av"),img=A.safeImg(p.photo);if(img)av.style.backgroundImage="url('"+img+"')";else av.textContent=String(p.n||"?").split(" ").map(function(w){return w[0]||""}).slice(0,2).join("").toUpperCase();
+    who.appendChild(av);var wt=h("div"),a=h("a","",p.n||"Membre");a.href="prestataire.html?id="+encodeURIComponent(c.owner);a.target="_blank";wt.appendChild(a);wt.appendChild(h("div","sub",p.job||""));who.appendChild(wt);left.appendChild(who);
+    var t=h("h2","ct",c.title);t.appendChild(h("span","st "+c.status,ST[c.status]));left.appendChild(t);
+    var dl=h("dl","meta");
+    function row(k,v,isLink){if(!v)return;dl.appendChild(h("dt","",k));var dd=h("dd");if(isLink){var x=h("a","",v);x.href=v;x.target="_blank";x.rel="noopener noreferrer nofollow";dd.appendChild(x)}else dd.textContent=v;dl.appendChild(dd)}
+    row("Organisme",c.issuer);row("Année",c.year);row("N° de certificat",c.num);row("Lien officiel",/^https:\/\//i.test(c.url||"")?c.url:"",true);
+    row("Envoyée le",when(c.created_at));if(c.reviewed_at)row("Traitée le",when(c.reviewed_at));if(c.reason)row("Motif du refus",c.reason);
+    left.appendChild(dl);card.appendChild(left);
+    var pv=h("div","pv"),isPdf=/^data:application\/pdf/.test(c.proof||"");
+    if(!c.proof)pv.appendChild(h("span","sub","Justificatif indisponible"));
+    else if(isPdf){pv.appendChild(h("span","pdf","PDF"));pv.appendChild(h("span","sub",c.proof_name||"justificatif.pdf"));var ob=h("button","btn out","Ouvrir le PDF");ob.type="button";ob.onclick=function(){openData(c.proof)};pv.appendChild(ob)}
+    else if(/^data:image\/(png|jpe?g|webp);base64,/.test(c.proof)){var im=h("img");im.src=c.proof;im.alt="Justificatif de "+(p.n||"ce membre");im.onclick=function(){$("dImgI").src=c.proof;$("dImg").showModal()};pv.appendChild(im);pv.appendChild(h("span","sub",c.proof_name||""))}
+    card.appendChild(pv);
+    if(c.status==="pending"){
+      var ac=h("div","acts"),err=h("p","err");err.setAttribute("role","alert");
+      var ok=h("button","btn ok","✓ Valider la certification");ok.type="button";
+      var no=h("button","btn no","Refuser");no.type="button";
+      var rf=h("div","rf");rf.hidden=true;var ta=h("textarea");ta.placeholder="Motif du refus, visible par le membre (ex. le nom sur l’attestation ne correspond pas).";ta.maxLength=300;ta.setAttribute("aria-label","Motif du refus");
+      var rfa=h("div","acts");rfa.style.cssText="border:0;padding:0";var rok=h("button","btn","Confirmer le refus");rok.type="button";var rx=h("button","btn out","Annuler");rx.type="button";rfa.appendChild(rok);rfa.appendChild(rx);
+      rf.appendChild(ta);rf.appendChild(rfa);
+      function go(status,reason,b){b.disabled=true;err.textContent="";A.reviewCert(c.id,status,reason).then(load).then(function(){A.refreshNav()}).catch(function(e){err.textContent=A.message(e);b.disabled=false})}
+      ok.onclick=function(){go("verified","",ok)};
+      no.onclick=function(){rf.hidden=false;ac.hidden=true;ta.focus()};
+      rx.onclick=function(){rf.hidden=true;ac.hidden=false};
+      rok.onclick=function(){go("rejected",ta.value,rok)};
+      ac.appendChild(ok);ac.appendChild(no);card.appendChild(ac);card.appendChild(rf);card.appendChild(err)}
+    box.appendChild(card)})}
+document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
+  document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});render()}});
+$("dImgX").onclick=function(){$("dImg").close()};
+A.requireUser("admin-certifs.html").then(function(){return A.isAdmin()}).then(function(ok){
+  if(!ok){var m=$("main");m.textContent="";var dn=h("div","denied");dn.appendChild(h("h1","","Accès réservé."));dn.appendChild(h("p","sub","Cette page est réservée à l’équipe Dealr."));m.appendChild(dn);document.body.classList.remove("wait");return}
+  return load().then(function(){document.body.classList.remove("wait");setInterval(function(){if(!document.hidden)load()},15000)});
+});
+})();
+</script>
+</body>
+</html>

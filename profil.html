@@ -64,6 +64,14 @@ textarea{min-height:120px;resize:vertical}
 .err{color:#c0270f;font-size:.88rem;min-height:1.3em;margin:8px 0 0}
 .exp{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
 .exp b{display:block}.exp small{color:var(--mute)}
+.proof{position:relative;display:flex;align-items:center;gap:12px;margin:0;border:1.5px dashed #c9cbe0;border-radius:14px;padding:14px;cursor:pointer;background:#fafbff;font-weight:500}
+.proof:hover,.proof:focus-within{border-color:#3448f0}
+.proof input{position:absolute;opacity:0;width:1px;height:1px}
+.proof.ok{border-style:solid;border-color:#22a863;background:#f3fbf6}
+.pi{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;color:#3448f0;background:#eef0ff}.proof.ok .pi{color:#17613a;background:#e3f4ea}
+.pt{display:flex;flex-direction:column;min-width:0}.pt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt small{color:var(--mute);font-size:.82rem}
+.cst{display:inline-block;margin-left:6px;font-size:.72rem;font-weight:700;border-radius:99px;padding:2px 8px;vertical-align:1px}
+.cst.pending{background:#fff1cc;color:#6b4a00}.cst.verified{background:#e3f4ea;color:#17613a}.cst.rejected{background:#fde8e6;color:#a1230f}
 .socs{display:grid;gap:8px}
 .soc{display:flex;align-items:center;gap:10px;margin:0;border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 8px;background:#fff;font-weight:600}
 .soc input{border:0;flex:1;min-width:0;padding:8px;background:transparent}.soc input:focus{outline:0}
@@ -212,10 +220,16 @@ body.wait main{visibility:hidden}
       <div class="err" id="eErr" role="alert"></div>
 
       <div class="l" style="margin-top:26px">Certifications</div>
+      <p class="sub" style="margin:0 0 4px">Chaque certification doit être justifiée. L’équipe Dealr vérifie le justificatif avant de l’afficher sur votre profil avec le badge « Vérifiée ».</p>
       <div id="certList"></div>
       <div class="two"><div><label for="cn">Certification</label><input id="cn" maxlength="90" placeholder="Google Ads Search"></div><div><label for="co2">Délivrée par</label><input id="co2" maxlength="90" placeholder="Google"></div></div>
-      <div class="two"><div><label for="cy">Année</label><input id="cy" maxlength="20" placeholder="2025"></div><div><label for="cu">Lien de vérification <span class="sub" style="font-weight:400">(facultatif)</span></label><input id="cu" type="url" placeholder="https://"></div></div>
-      <button type="button" class="btn out sm" id="cAdd" style="margin-top:12px">Ajouter cette certification</button>
+      <div class="two"><div><label for="cy">Année d’obtention</label><input id="cy" maxlength="20" placeholder="2025"></div><div><label for="cnum">N° de certificat <span class="sub" style="font-weight:400">(si indiqué)</span></label><input id="cnum" maxlength="80" placeholder="Ex. 12345-ABC"></div></div>
+      <label for="cu">Lien de vérification officiel <span class="sub" style="font-weight:400">(facultatif, accélère la vérification)</span></label><input id="cu" type="url" placeholder="https://www.credly.com/badges/…">
+      <div class="l">Justificatif <span style="color:#c0270f">*</span></div>
+      <label class="proof" id="cpBox"><input id="cpf" type="file" accept="application/pdf,image/png,image/jpeg,image/webp">
+        <span class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 14.5l3-3 3 3"/></svg></span>
+        <span class="pt"><b id="cpName">Ajouter l’attestation ou le certificat</b><small id="cpHint">PDF, JPG ou PNG · 1,5 Mo maximum · obligatoire</small></span></label>
+      <button type="button" class="btn out sm" id="cAdd" style="margin-top:12px">Envoyer pour vérification</button>
       <div class="err" id="cErr" role="alert"></div>
 
       <div class="l" style="margin-top:26px">Réseaux</div>
@@ -397,15 +411,31 @@ function listBox(id,arr,line,edit){var box=$(id);box.textContent="";
     var ac=mk("div","","acts");ac.appendChild(m);ac.appendChild(b);d.appendChild(w);d.appendChild(ac);box.appendChild(d)})}
 function renderEdu(){
   listBox("eduList",st.edus,function(x){return[x.t,[x.s,x.y].filter(Boolean).join(" · ")]},function(x){$("ed").value=x.t;$("es").value=x.s||"";$("ey").value=x.y||"";$("ed").focus()});
-  listBox("certList",st.certs,function(x){return[x.t,[x.o,x.y].filter(Boolean).join(" · ")]},function(x){$("cn").value=x.t;$("co2").value=x.o||"";$("cy").value=x.y||"";$("cu").value=x.u||"";$("cn").focus()});
-  draw()}
+  renderCerts();draw()}
+var CST={pending:"En attente de vérification",verified:"Vérifiée",rejected:"Refusée"};
+function renderCerts(){var box=$("certList");box.textContent="";
+  st.certs.forEach(function(x){var d=mk("div","","exp"),w=document.createElement("div"),t=mk("b",x.title);t.appendChild(mk("span",CST[x.status]||"","cst "+x.status));w.appendChild(t);
+    w.appendChild(mk("small",[x.issuer,x.year,x.proof_name?"Justificatif : "+x.proof_name:""].filter(Boolean).join(" · ")));
+    if(x.status==="rejected"&&x.reason){var r=mk("small","Motif : "+x.reason);r.style.cssText="display:block;color:#a1230f";w.appendChild(r)}
+    var b=mk("button","Retirer");b.type="button";b.onclick=function(){b.disabled=true;A.removeCert(x.id).then(loadCerts).catch(function(e){$("cErr").textContent=A.message(e);b.disabled=false})};
+    var ac=mk("div","","acts");ac.appendChild(b);d.appendChild(w);d.appendChild(ac);box.appendChild(d)})}
+function loadCerts(){return A.myCerts().then(function(l){st.certs=l||[];renderCerts();draw()}).catch(function(){})}
+var proof=null;
+function resetProof(){proof=null;$("cpf").value="";$("cpBox").classList.remove("ok");$("cpName").textContent="Ajouter l’attestation ou le certificat";$("cpHint").textContent="PDF, JPG ou PNG · 1,5 Mo maximum · obligatoire"}
 function addEdu(){var t=v("ed");if(!t){$("eErr").textContent="Indiquez le nom du diplôme ou de la formation.";return false}
   if(st.edus.length>=6){$("eErr").textContent="6 formations au maximum.";return false}
   st.edus.push({t:t,s:v("es"),y:v("ey")});["ed","es","ey"].forEach(function(i){$(i).value=""});$("eErr").textContent="";renderEdu();return true}
-function addCert(){var t=v("cn"),u=v("cu");if(!t){$("cErr").textContent="Indiquez le nom de la certification.";return false}
-  if(u&&!/^https?:\/\/[^\s]+$/i.test(u)){$("cErr").textContent="Le lien doit commencer par https://";return false}
-  if(st.certs.length>=8){$("cErr").textContent="8 certifications au maximum.";return false}
-  st.certs.push({t:t,o:v("co2"),y:v("cy"),u:u});["cn","co2","cy","cu"].forEach(function(i){$(i).value=""});$("cErr").textContent="";renderEdu();return true}
+function addCert(){$("cErr").textContent="";
+  if(st.certs.length>=8){$("cErr").textContent="8 certifications au maximum.";return}
+  if(!proof){$("cErr").textContent="Le justificatif est obligatoire : ajoutez votre attestation (PDF, JPG ou PNG).";$("cpf").focus();return}
+  var b=$("cAdd");b.disabled=true;b.textContent="Envoi…";
+  A.addCert({title:v("cn"),issuer:v("co2"),year:v("cy"),num:v("cnum"),url:v("cu"),proof:proof.data,proofName:proof.name}).then(function(){
+    ["cn","co2","cy","cnum","cu"].forEach(function(i){$(i).value=""});resetProof();return loadCerts()})
+   .catch(function(e){$("cErr").textContent=A.message(e)}).then(function(){b.disabled=false;b.textContent="Envoyer pour vérification"})}
+$("cpf").addEventListener("change",function(){var f=this.files[0];$("cErr").textContent="";if(!f)return;
+  if(!/^(application\/pdf|image\/(png|jpe?g|webp))$/.test(f.type)){$("cErr").textContent="Format accepté : PDF, JPG, PNG ou WebP.";resetProof();return}
+  if(f.size>A.CERT_MAX){$("cErr").textContent="Fichier trop lourd : 1,5 Mo maximum.";resetProof();return}
+  var r=new FileReader();r.onload=function(){proof={data:r.result,name:f.name};$("cpBox").classList.add("ok");$("cpName").textContent=f.name;$("cpHint").textContent=Math.max(1,Math.round(f.size/1024))+" Ko · prêt à être envoyé"};r.readAsDataURL(f)});
 function valid(){
   if(st.step===0&&v("city")&&villesOk&&!villes.picked()){$("cityH").textContent="Choisissez votre ville dans la liste proposée.";$("cityH").style.color="#c0270f";$("city").focus();return false}
   var sec=document.querySelectorAll(".step")[st.step],els=sec.querySelectorAll("input,select,textarea");
@@ -414,7 +444,7 @@ function valid(){
   if(st.step===3&&(v("xr")||v("xc"))){if(!addExp())return false}
   if(st.step===4){
     if((v("ed")||v("es"))&&!addEdu())return false;
-    if((v("cn")||v("co2"))&&!addCert())return false;
+    if(v("cn")||v("co2")||proof){$("cErr").textContent="Cliquez sur « Envoyer pour vérification » pour ajouter cette certification, ou videz les champs.";$("cAdd").focus();return false}
     var bad=Object.keys(SOC).filter(function(k){return v(SOC[k][0])&&!socUrl(SOC[k][1],v(SOC[k][0]))})[0];
     if(bad){$("sErr").textContent=bad==="ot"?"Pour « Autre », collez le lien complet (https://…).":"Ce pseudo ou ce lien n’est pas valide.";$(SOC[bad][0]).focus();return false}
     $("sErr").textContent=""}
@@ -437,7 +467,7 @@ function publish(){
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
     tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
     lvl:co?radio("size"):radio("lvl"),langs:langs(),links:links(),port:st.port,
-    edus:st.edus,certs:st.certs,socials:socials()};
+    edus:st.edus,socials:socials()};
   var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
   A.saveProfile(p).then(function(){location.href="prestataire.html?id=moi"})
    .catch(function(e){b.disabled=false;b.textContent=label;$("pubErr").textContent=A.message(e)})}
@@ -458,7 +488,7 @@ function fillFrom(p){
   document.querySelectorAll('input[name="lang"]').forEach(function(c){c.checked=L.indexOf(c.value)>=0});
   st.extra=L.filter(function(l){return base.indexOf(l)<0});
   if(st.extra.length){$("otherLang").checked=true;$("langPanel").hidden=false}
-  st.edus=(p.edus||[]).slice(0,6);st.certs=(p.certs||[]).slice(0,8);
+  st.edus=(p.edus||[]).slice(0,6);
   var so=p.socials||{};Object.keys(SOC).forEach(function(k){$(SOC[k][0]).value=so[SOC[k][1]]||""});
   renderThumbs();renderLangs()}
 
@@ -572,7 +602,7 @@ A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(
   if(!A.profileComplete(p))$("must").hidden=false;
   /* Lien direct vers une étape (depuis la checklist du profil) : profil.html#etape-5 */
   var m=location.hash.match(/^#etape-([1-7])$/);if(m&&A.profileComplete(p))st.step=parseInt(m[1],10)-1;
-  renderSkills();renderExps();renderEdu();show();document.body.classList.remove("wait")});
+  renderSkills();renderExps();renderEdu();loadCerts();show();document.body.classList.remove("wait")});
 })();
 </script>
 </body>
