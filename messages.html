@@ -98,6 +98,22 @@ main{flex:1;min-height:0;padding-bottom:22px}
 /* Bouton Deal */
 .dealbtn{flex:none;height:48px;border-radius:24px;border:1.5px solid var(--ink);background:#fff;font-weight:700;padding:0 16px;display:flex;align-items:center;gap:7px;cursor:pointer}
 .dealbtn:hover{background:var(--ink);color:#fff}
+.attbtn{flex:none;width:48px;height:48px;border-radius:50%;border:1.5px solid #e3e3e8;background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.attbtn:hover{border-color:var(--ink)}.attbtn:disabled{opacity:.5;cursor:wait}
+.attopt{display:block;width:100%;text-align:left;margin-top:16px;border:1.5px solid #e3e3e8;border-radius:16px;background:#fff;padding:14px 16px;cursor:pointer;font:inherit}
+.attopt:hover{border-color:var(--ink)}.attopt b{display:block}.attopt small{color:var(--mute)}
+.attdocs{margin-top:16px}.attdocs .l{font-weight:700;font-size:.86rem;margin-bottom:6px}
+#daDocs{max-height:240px;overflow-y:auto;display:grid;gap:6px}
+.docpick{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid #e3e3e8;border-radius:12px;background:#fafafb;padding:10px 12px;cursor:pointer;font:inherit}
+.docpick:hover{border-color:var(--ink);background:#fff}.docpick small{color:var(--mute);display:block}
+.file{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e3e3e8;border-radius:18px;padding:10px 12px;max-width:400px;min-width:0}
+.row.me .file{border-color:var(--ink)}
+.file .fi{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font:800 .72rem Figtree,sans-serif;color:#fff;background:#c2410c}
+.file .fi.img{background-color:#3448f0;background-size:cover;background-position:center}
+.file .ft{min-width:0;flex:1}.file .ft b{display:block;overflow-wrap:anywhere;font-size:.92rem;line-height:1.25}
+.file .ft small{color:var(--mute);font-size:.8rem}
+.file .fa{display:flex;gap:6px;flex:none}.file .fa button{border:0;background:#f1f1f4;border-radius:99px;padding:7px 11px;font:600 .8rem Figtree,sans-serif;cursor:pointer;color:var(--ink)}
+.file .fa button:hover{background:var(--ink);color:#fff}
 .dealbtn i,.tag:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--o);flex:none}
 .tag{display:inline-flex;align-items:center;gap:5px;background:var(--ink);color:#fff;border-radius:99px;padding:3px 10px;font-size:.7rem;font-weight:800;letter-spacing:.06em;flex:none}
 
@@ -247,6 +263,7 @@ dialog textarea{min-height:80px;resize:vertical}
  .comp{padding:10px 12px 12px;gap:8px}
  .msgs{padding:16px 14px 8px}
  .dealbtn{padding:0 13px}
+ .attbtn{width:44px;height:44px}.file{max-width:100%}
  .pin{padding:9px 14px}
 }
 @media(max-width:420px){.two{grid-template-columns:1fr}.pin small{display:none}}
@@ -294,12 +311,23 @@ dialog textarea{min-height:80px;resize:vertical}
       <p class="err" id="err" role="alert"></p>
       <form class="comp" id="comp" hidden>
         <button class="dealbtn member-only" id="dealBtn" type="button" aria-label="Proposer un deal"><i></i>Deal</button>
+        <button class="attbtn" id="attBtn" type="button" aria-label="Joindre un fichier" title="Joindre un devis, une facture ou un fichier"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg></button>
+        <input type="file" id="attFile" accept="application/pdf,image/png,image/jpeg,image/webp" hidden>
         <textarea id="txt" rows="1" placeholder="Écrire un message…" aria-label="Votre message" maxlength="2000"></textarea>
         <button class="send" id="send" type="submit" aria-label="Envoyer" disabled><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
     </section>
   </div>
 </main>
+
+<dialog id="dAtt" aria-labelledby="daT">
+  <h2 id="daT">Joindre un <em>fichier.</em></h2>
+  <p class="sub">PDF, JPG, PNG ou WebP, <span id="daMax">5 Mo</span> maximum. Seuls vous, votre interlocuteur et l’équipe Dealr (en cas de litige) peuvent l’ouvrir.</p>
+  <button type="button" class="attopt" id="daDevice"><b>Depuis mon appareil</b><small>Un devis, une facture, une photo…</small></button>
+  <div class="attdocs"><div class="l">Mes devis et factures Dealr</div><div id="daDocs"><span class="sub">Chargement…</span></div></div>
+  <p class="derr" id="daErr" role="alert"></p>
+  <div class="dacts"><button type="button" class="btn out" data-close>Fermer</button></div>
+</dialog>
 
 <dialog id="dDeal" aria-labelledby="ddT">
   <form id="fDeal" novalidate>
@@ -377,6 +405,8 @@ dialog textarea{min-height:80px;resize:vertical}
 </div>
 
 <script src="config.js"></script>
+<script src="dealr-pdf.js"></script>
+<script src="dealr-docpdf.js"></script>
 <script src="auth.js"></script>
 <script>
 (function(){
@@ -456,6 +486,9 @@ function loadThread(scroll){
       if(m.kind==="deal"){var dd=byId[m.deal];if(dd){var w=h("div","drow");w.appendChild(dealCard(dd));box.appendChild(w)}return}
       if(m.kind==="admin"){var ad=h("div","adm"),ah=h("div","adh");ah.appendChild(h("i"));ah.appendChild(h("b","","Équipe Dealr"));ah.appendChild(h("time","",hm(d)));
         ad.appendChild(ah);ad.appendChild(h("p","",m.text));box.appendChild(ad);return}
+      if(m.kind==="file"&&m.file){var lastF=!next||next.sender!==m.sender||new Date(next.created_at).toDateString()!==dk;
+        var rf=h("div","row"+(mine?" me":"")+(lastF?" last":""));if(!mine)rf.appendChild(avatar(cur.other,"s"));rf.appendChild(fileCard(m.file));box.appendChild(rf);
+        if(lastF)box.appendChild(h("div","stamp"+(mine?" me":""),hm(d)));return}
       if(m.kind==="event"){var ev=h("div","ev");ev.appendChild(h("b","",who(m.sender)));ev.appendChild(document.createTextNode(" · "+m.text+" · "+hm(d)));box.appendChild(ev);return}
       var last=!next||!isText(next)||next.sender!==m.sender||new Date(next.created_at).toDateString()!==dk;
       var row=h("div","row"+(mine?" me":"")+(last?" last":""));
@@ -463,7 +496,7 @@ function loadThread(scroll){
       row.appendChild(h("div","bub",m.text));box.appendChild(row);
       if(last)box.appendChild(h("div","stamp"+(mine?" me":""),hm(d)))});
     if(scroll||atEnd)box.scrollTop=box.scrollHeight;
-    var q=$("quick");q.textContent="";q.hidden=ms.some(function(m){return !m.kind||m.kind==="text"});
+    var q=$("quick");q.textContent="";q.hidden=ms.some(function(m){return !m.kind||m.kind==="text"||m.kind==="file"});
     QUICK.forEach(function(t){var b=h("button","",t);b.type="button";b.onclick=function(){$("txt").value=t;sync();$("txt").focus()};q.appendChild(b)});
     renderPin();
     replayForPayee();
@@ -621,6 +654,40 @@ function closeVault(){var ov=$("vov");ov.hidden=true;ov.className="vov";$("txt")
 $("vOk").onclick=closeVault;
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("vov").hidden)closeVault()});
 document.querySelectorAll("[data-close]").forEach(function(b){b.onclick=function(){b.closest("dialog").close()}});
+
+/* ---------- Pièces jointes ---------- */
+function kb(n){return n>=1048576?(Math.round(n/104857.6)/10+" Mo").replace(".",","):Math.max(1,Math.round(n/1024))+" Ko"}
+function openFile(f,dl){var w=dl?null:window.open("","_blank");
+  A.fileUrl(f,dl).then(function(u){
+    if(dl){var a=document.createElement("a");a.href=u;a.download=f.name;a.rel="noopener";document.body.appendChild(a);a.click();a.remove()}
+    else if(w){w.opener=null;w.location.href=u}else location.href=u})
+   .catch(function(e){if(w)w.close();$("err").textContent="Fichier indisponible : "+A.message(e)})}
+function fileCard(f){var c=h("div","file"),img=/^image\//.test(f.type),ic=h("span","fi"+(img?" img":""),img?"":(A.FILE_TYPES[f.type]||"FICHIER"));
+  c.appendChild(ic);var t=h("div","ft");
+  var title=f.doc?(f.doc.type==="facture"?"Facture ":"Devis ")+f.doc.num:f.name;t.appendChild(h("b","",title));t.title=f.name;
+  t.appendChild(h("small","",(f.doc&&+f.doc.ttc?eur(f.doc.ttc)+" TTC · ":"")+(A.FILE_TYPES[f.type]||"")+" · "+kb(+f.size||0)));c.appendChild(t);
+  var a=h("div","fa"),o=h("button","","Ouvrir"),g=h("button","","↓");o.type=g.type="button";g.setAttribute("aria-label","Télécharger "+f.name);g.title="Télécharger";
+  o.onclick=function(){openFile(f,false)};g.onclick=function(){openFile(f,true)};a.appendChild(o);a.appendChild(g);c.appendChild(a);
+  if(img)A.fileUrl(f).then(function(u){ic.style.backgroundImage="url(\""+String(u).replace(/["\\\n\r]/g,"")+"\")"}).catch(function(){ic.textContent=A.FILE_TYPES[f.type]||""});
+  return c}
+function attSend(blob,name,extra){if(!cur)return;var b=$("attBtn");b.disabled=true;$("err").textContent="";$("daErr").textContent="";
+  return A.sendFile(cur.id,blob,name,extra).then(function(){if($("dAtt").open)$("dAtt").close();return loadThread(true)}).then(loadList)
+   .catch(function(e){var m="Fichier non envoyé : "+A.message(e);if($("dAtt").open)$("daErr").textContent=m;else $("err").textContent=m})
+   .then(function(){b.disabled=false})}
+$("daMax").textContent=kb(A.FILE_MAX);
+$("attBtn").onclick=function(){if(!cur)return;$("daErr").textContent="";$("dAtt").showModal();var box=$("daDocs");box.textContent="";box.appendChild(h("span","sub","Chargement…"));
+  A.listDocs().then(function(l){box.textContent="";l=l||[];
+    if(!l.length){var e=h("span","sub","Aucun devis ni facture pour l’instant. ");var ln=document.createElement("a");ln.href="documents.html";ln.textContent="Créer un devis";e.appendChild(ln);box.appendChild(e);return}
+    l.slice(0,30).forEach(function(d){var b=h("button","docpick");b.type="button";var x=h("span");x.appendChild(h("b","",d.num));x.appendChild(h("small","",(d.type==="facture"?"Facture":"Devis")+" · "+(d.client||"Client")));
+      b.appendChild(x);b.appendChild(h("b","",eur(d.ttc)));
+      b.onclick=function(){var blob;try{blob=DealrDocPDF(d.data).blob()}catch(e){$("daErr").textContent="Le PDF n’a pas pu être créé.";return}
+        attSend(blob,d.num+".pdf",{doc:{num:d.num,type:d.type,ttc:d.ttc}})};box.appendChild(b)})})
+   .catch(function(){box.textContent="";box.appendChild(h("span","sub","Impossible de charger vos documents."))})};
+$("daDevice").onclick=function(){$("attFile").click()};
+$("attFile").onchange=function(){var f=this.files[0];this.value="";if(!f)return;
+  if(!A.FILE_TYPES[f.type]){$("daErr").textContent="Format non accepté : PDF, JPG, PNG ou WebP uniquement.";return}
+  if(f.size>A.FILE_MAX){$("daErr").textContent="Fichier trop lourd : "+kb(A.FILE_MAX)+" maximum.";return}
+  attSend(f,f.name)};
 
 /* ---------- Envoi de messages ---------- */
 function sync(){var t=$("txt");$("send").disabled=!t.value.trim();t.style.height="auto";t.style.height=Math.min(t.scrollHeight,140)+"px"}

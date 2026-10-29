@@ -536,3 +536,42 @@ create trigger profiles_guard before insert or update on public.profiles
 -- e) « Suis-je administrateur ? » : réservé aux membres connectés
 revoke execute on function public.is_admin() from public, anon;
 grant execute on function public.is_admin() to authenticated;
+
+-- =====================================================================
+-- 13. Pièces jointes dans la messagerie (devis, factures, photos…)
+-- Fichiers rangés dans un espace privé de Supabase Storage (« pieces-jointes »),
+-- un dossier par conversation. Lisibles seulement par les deux participants
+-- et par l'équipe Dealr (litiges). PDF ou images, 5 Mo maximum.
+-- =====================================================================
+alter table public.messages add column if not exists file jsonb;
+alter table public.messages drop constraint if exists messages_kind_check;
+alter table public.messages add constraint messages_kind_check check (kind in ('text', 'deal', 'event', 'admin', 'file'));
+alter table public.messages drop constraint if exists messages_file_check;
+alter table public.messages add constraint messages_file_check check (
+  kind <> 'file' or (
+    file is not null
+    and left(file->>'path', char_length(conv) + 1) = conv || '/'
+    and char_length(coalesce(file->>'name', '')) between 1 and 120
+    and coalesce(file->>'type', '') in ('application/pdf', 'image/png', 'image/jpeg', 'image/webp')
+  ));
+
+-- Espace de fichiers privé et ses règles d'accès (schéma storage de Supabase)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('pieces-jointes', 'pieces-jointes', false, 5242880,
+        array['application/pdf', 'image/png', 'image/jpeg', 'image/webp'])
+on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Pièces jointes : lire" on storage.objects;
+create policy "Pièces jointes : lire" on storage.objects for select to authenticated
+  using (bucket_id = 'pieces-jointes' and (
+    public.is_admin()
+    or exists (select 1 from public.conversations c
+               where c.id = (storage.foldername(name))[1] and auth.uid() in (c.user_a, c.user_b))));
+
+drop policy if exists "Pièces jointes : envoyer" on storage.objects;
+create policy "Pièces jointes : envoyer" on storage.objects for insert to authenticated
+  with check (bucket_id = 'pieces-jointes' and (
+    public.is_admin()
+    or exists (select 1 from public.conversations c
+               where c.id = (storage.foldername(name))[1] and auth.uid() in (c.user_a, c.user_b))));

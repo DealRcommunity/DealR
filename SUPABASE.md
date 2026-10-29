@@ -37,6 +37,7 @@ Dernière mise à jour : 29 octobre 2026 (branchement fait le jour même).
 
 En démonstration, les fichiers étaient enregistrés en texte (base64) dans les données. Avec Supabase, il vaudra mieux utiliser **Storage** :
 
+- [x] **Pièces jointes de la messagerie** : déjà dans Storage (espace privé « pieces-jointes », 5 Mo par fichier), depuis le 29/10/2026.
 - [ ] **Justificatifs de certification** (aujourd'hui dans la table `certifications`, 1,5 Mo max) → bucket **privé**, lisible seulement par le membre et les admins.
 - [ ] **Photos de profil, logos et portfolio** (aujourd'hui dans `profiles.data`) → bucket public, avec une taille maximale.
 - [ ] **PDF des devis et factures** : aujourd'hui recréés à la demande. Envisager de conserver l'original de chaque facture (obligation de conservation).

@@ -559,6 +559,65 @@
     });
   };
 
+  /* Pièces jointes (devis, factures, photos…) : PDF ou image, 5 Mo maximum.
+     Supabase : espace de fichiers privé « pieces-jointes », un dossier par conversation,
+     lisible seulement par les deux participants et l'équipe Dealr (supabase.sql, section 13).
+     Démo : le fichier est gardé dans ce navigateur (1,5 Mo maximum). */
+  A.FILE_TYPES = { "application/pdf": "PDF", "image/png": "PNG", "image/jpeg": "JPG", "image/webp": "WebP" };
+  A.FILE_MAX = demo ? 1.5 * 1024 * 1024 : 5 * 1024 * 1024;
+  var FILE_BUCKET = "pieces-jointes";
+  function safeName(n) {
+    n = String(n || "fichier").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+    return (n || "fichier").slice(-80);
+  }
+  A.sendFile = function (convId, blob, name, extra) {
+    var type = blob && blob.type;
+    if (!blob || !A.FILE_TYPES[type]) return Promise.reject(new Error("file_type"));
+    if (blob.size > A.FILE_MAX) return Promise.reject(new Error("file_size"));
+    name = String(name || "fichier").trim().slice(0, 120) || "fichier";
+    return A.user().then(function (u) {
+      if (!u) throw new Error("not_logged");
+      return client().then(function (c) {
+        return getConv(c, convId).then(function (conv) {
+          if (!conv) throw new Error("not_found");
+          var path = conv.id + "/" + newId() + "-" + safeName(name);
+          var meta = { path: path, name: name, type: type, size: blob.size };
+          if (extra && extra.doc) meta.doc = { num: String(extra.doc.num || "").slice(0, 40), type: extra.doc.type === "facture" ? "facture" : "devis", ttc: +extra.doc.ttc || 0 };
+          var up;
+          if (demo) {
+            up = new Promise(function (ok, ko) {
+              var r = new FileReader();
+              r.onload = function () {
+                try { var all = JSON.parse(localStorage.getItem("dealr_demo_files")) || {}; all[path] = r.result; localStorage.setItem("dealr_demo_files", JSON.stringify(all)); ok(); }
+                catch (e) { ko(new Error("quota")); }
+              };
+              r.onerror = function () { ko(new Error("file_read")); };
+              r.readAsDataURL(blob);
+            });
+          } else {
+            up = c.storage.from(FILE_BUCKET).upload(path, blob, { contentType: type, upsert: false }).then(check);
+          }
+          var label = meta.doc ? (meta.doc.type === "facture" ? "Facture " : "Devis ") + meta.doc.num : name;
+          return up.then(function () { return post(c, conv, u, { kind: "file", text: "Pièce jointe : " + label, file: meta }, "📎 " + label); });
+        });
+      });
+    });
+  };
+  /* Adresse temporaire (2 minutes) pour ouvrir ou télécharger une pièce jointe */
+  A.fileUrl = function (f, download) {
+    if (!f || !f.path) return Promise.reject(new Error("not_found"));
+    if (demo) {
+      try {
+        var d = (JSON.parse(localStorage.getItem("dealr_demo_files")) || {})[f.path];
+        if (!d) throw 0;
+        return fetch(d).then(function (r) { return r.blob(); }).then(function (b) { return URL.createObjectURL(b); });
+      } catch (e) { return Promise.reject(new Error("not_found")); }
+    }
+    return client().then(function (c) {
+      return c.storage.from(FILE_BUCKET).createSignedUrl(f.path, 120, download ? { download: f.name } : undefined);
+    }).then(check).then(function (d) { return d.signedUrl; });
+  };
+
   /* ---------- Deals ----------
      Un participant propose (prestation, montant, date) ; l'autre accepte, refuse ou contre-propose.
      Une fois accepté des deux côtés, le client sécurise le paiement : l'argent est bloqué au coffre Dealr.
@@ -917,6 +976,10 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/file_type/.test(m)) return "Format non accepté : PDF, JPG, PNG ou WebP uniquement.";
+    if (/file_size/.test(m)) return "Fichier trop lourd : " + (A.FILE_MAX / 1048576) + " Mo maximum.";
+    if (/mime type|not supported/i.test(m)) return "Format non accepté : PDF, JPG, PNG ou WebP uniquement.";
+    if (/exceeded the maximum allowed size|Payload too large/i.test(m)) return "Fichier trop lourd : 5 Mo maximum.";
     if (/name_reserved/.test(m)) return "Ce nom est réservé à l’équipe Dealr. Choisissez un autre nom.";
     if (/profile_too_big/.test(m)) return "Votre profil est trop lourd (photos). Retirez quelques photos du portfolio et réessayez.";
     if (/legal_locked/.test(m)) return "Votre raison sociale, votre SIREN et votre numéro de TVA ont été vérifiés : ils ne peuvent plus être modifiés. Contactez le support pour toute correction.";

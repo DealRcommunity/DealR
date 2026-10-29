@@ -325,6 +325,9 @@ function loadThread(){
       if(m.kind==="deal"){var x=ds[m.deal],e=h("div","ev deal");e.appendChild(h("b","",nm));
         e.appendChild(document.createTextNode(" · "+m.text+(x?" · "+(ST[x.status]||x.status):"")+" · "+hm));box.appendChild(e);lastWho="";return}
       if(m.kind==="event"){var ev=h("div","ev");ev.appendChild(h("b","",nm));ev.appendChild(document.createTextNode(" · "+m.text+" · "+hm));box.appendChild(ev);lastWho="";return}
+      if(m.kind==="file"&&m.file){var fe=h("div","ev");fe.appendChild(h("b","",nm));fe.appendChild(document.createTextNode(" · 📎 "+(m.file.name||"fichier")+" · "+hm+" · "));
+        var fo=h("button","btn out sm","Ouvrir");fo.type="button";fo.onclick=function(){var w=window.open("","_blank");A.fileUrl(m.file).then(function(u){if(w){w.opener=null;w.location.href=u}}).catch(function(){if(w)w.close()})};
+        fe.appendChild(fo);box.appendChild(fe);lastWho="";return}
       if(/^Problème signalé/.test(m.text))reason={text:m.text.replace(/^Problème signalé\s*:\s*/,""),at:m.created_at,by:nm};
       var w=h("div","m"+(m.sender===d.payee?" r":""));
       if(lastWho!==m.sender)w.appendChild(h("small","",nm+" · "+hm));lastWho=m.sender;

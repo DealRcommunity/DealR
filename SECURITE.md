@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site).
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -35,6 +35,8 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 - [ ] **Fichiers en base64 dans la base.** Justificatifs de certification, photos et portfolio sont stockés dans les tables. Ça alourdit la base (limite 500 Mo en gratuit).
   - Correction : Supabase Storage, avec un dossier privé pour les justificatifs.
+- [ ] **Pièces jointes non analysées par un antivirus.** Un membre peut envoyer un PDF piégé. Les fichiers sont limités aux PDF et images (5 Mo), privés et ouverts depuis le domaine de Supabase, pas celui de Dealr, ce qui limite les risques pour le site, mais pas pour l'ordinateur de la personne qui les ouvre.
+  - Correction : analyse antivirus à l'envoi (Edge Function + service d'analyse), et un message de prudence pour les fichiers venant de membres inconnus.
 - [ ] **Librairie Supabase chargée depuis un site externe sans contrôle d'intégrité.** Si ce site était piraté, il pourrait injecter du code dans Dealr.
   - Correction : héberger le fichier dans le site, ou ajouter un contrôle d'intégrité (SRI).
 - [ ] **Pas de politique de sécurité du contenu (CSP).** Elle limiterait les dégâts en cas d'injection de code.
@@ -52,6 +54,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 - [x] **29/10/2026 – En-têtes de sécurité Netlify** (fichier `_headers`) : le site ne peut plus être affiché dans un cadre d'un autre site (protection contre le « clickjacking »), HTTPS imposé.
 - [x] **29/10/2026 – Liens du portfolio** marqués `nofollow` (pas de bonus de référencement pour les spammeurs).
 - [x] Avant l'audit : règles d'accès (RLS) sur toutes les tables, messages et deals visibles des seuls participants, deals ne pouvant avancer que dans l'ordre prévu, avis seulement à la fin d'un deal et une seule fois, justificatifs de certification privés, informations juridiques verrouillées après vérification, administrateurs définis uniquement dans la base.
+- [x] **29/10/2026 – Pièces jointes de la messagerie conçues de façon sécurisée** : espace de fichiers privé (aucun lien public), dossier par conversation, lecture et envoi réservés aux deux participants et à l'équipe Dealr, liens temporaires de 2 minutes, formats limités (PDF, JPG, PNG, WebP : pas de SVG ni de HTML, qui pourraient contenir du code), 5 Mo maximum contrôlés par Supabase, nom de fichier nettoyé (section 13).
 
 ## Choix assumés (signalés par Supabase, mais voulus)
 
