@@ -20,8 +20,6 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ### Élevé
 
-- [ ] **Règles de mot de passe appliquées seulement par le site.** Le site exige 8 caractères avec lettres et chiffres, mais quelqu'un qui passe directement par l'API Supabase peut créer un compte avec un mot de passe de 6 caractères.
-  - Correction (2 minutes, à faire par Alexis) : Supabase → Authentication → Sign In / Providers → Email → longueur minimale **8**, et exiger lettres et chiffres.
 - [ ] **Faux messages « système » possibles dans la messagerie.** Un participant peut envoyer un message qui ressemble à un événement de deal (par exemple « paiement reçu »). Son nom reste affiché, mais ça peut tromper.
   - Correction : les messages d'événement de deal doivent être créés par la base (déclencheur sur la table `deals`), et les membres ne doivent pouvoir écrire que des messages texte.
 - [ ] **Aucune limite d'envoi.** Un compte peut envoyer des centaines de messages, ouvrir des conversations avec tous les membres, créer des comptes en série.
@@ -46,6 +44,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ## Corrigé
 
+- [x] **29/10/2026 – Mot de passe de 8 caractères minimum exigé aussi par Supabase** (réglé par Alexis), plus seulement par le site.
 - [x] **29/10/2026 – Usurpation du support dans la messagerie.** La fiche d'un participant (nom, photo, mention « support ») était écrite par le navigateur : un membre pouvait apparaître comme « Équipe Dealr ». Elle est maintenant construite par la base à partir des profils (supabase.sql, section 12 c). Le site ne reconnaît plus le support par son nom.
 - [x] **29/10/2026 – Noms réservés.** Un membre ne peut plus prendre un nom contenant « Dealr » (section 12 d).
 - [x] **29/10/2026 – Taille des profils limitée à 2 Mo**, pour éviter qu'un compte remplisse la base (section 12 d).
