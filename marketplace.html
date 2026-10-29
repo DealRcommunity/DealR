@@ -62,6 +62,7 @@ h1{font-size:clamp(2.3rem,5.6vw,4.2rem);max-width:12em}
 .top{display:flex;gap:14px;align-items:center}
 .av{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o)) center/cover}
 .card h3{font-size:1.18rem;line-height:1.2;letter-spacing:-.025em}
+.card h3 .vbw{display:inline-flex;vertical-align:-2px;margin-left:6px}
 .sub{color:var(--mute);font-size:.9rem}
 .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .b{font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px;background:#eef0ff;color:#2d3a8c}
@@ -205,7 +206,7 @@ function render(){
 }
 const proCard=x=>{const img=DealrAuth.safeImg(x.photo),nm=x.n||"?",mine=me&&x.id===me;return `<article class="card">
   <div class="top">${img?`<div class="av" style="background-image:url('${img}')"></div>`:`<div class="av">${esc(init(nm))}</div>`}
-  <div><h3>${esc(nm)}</h3><div class="sub">${esc(x.job||"")}</div></div></div>
+  <div><h3>${esc(nm)}${DealrAuth.validated(x)?`<span class="vbw" title="Profil validé : plus de 3 deals conclus sur Dealr">${DealrAuth.badgeSvg(18)}</span>`:""}</h3><div class="sub">${esc(x.job||"")}</div></div></div>
   <div class="meta"><span class="b ${cls(x.t)}">${esc(x.t||"Freelance")}</span>${x.dispo&&/maintenant/.test(x.dispo)?'<span class="b d">Disponible</span>':""}${x.demo?'<span class="b x">Exemple</span>':""}<span class="sub">${esc(x.city||"")}</span></div>
   <div class="tags">${(x.tags||[]).slice(0,4).map(t=>`<span>${esc(t)}</span>`).join("")}</div>
   <div class="foot"><div><div class="price">${esc(x.p||"Sur devis")}</div><div class="rating">${+x.a?`<b>★</b> ${String(+x.r).replace(".",",")} · ${+x.a} avis`:"Nouveau profil"}</div></div>

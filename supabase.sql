@@ -449,3 +449,23 @@ end $$;
 drop trigger if exists profiles_legal_guard on public.profiles;
 create trigger profiles_legal_guard before update on public.profiles
   for each row execute function public.profiles_legal_guard();
+
+-- =====================================================================
+-- 11. Profil validé : nombre de deals conclus par membre
+-- Les deals sont privés (visibles des deux participants seulement) : cette fonction
+-- ne renvoie que le nombre de deals conclus (statut « released ») par membre,
+-- sans aucun détail, pour afficher le badge « profil validé » (plus de 3 deals).
+-- =====================================================================
+create or replace function public.deals_done()
+returns table (uid uuid, n integer)
+language sql stable security definer set search_path = public as $$
+  select x.uid, count(*)::integer as n
+  from (
+    select payer as uid from public.deals where status = 'released'
+    union all
+    select payee as uid from public.deals where status = 'released'
+  ) x
+  group by x.uid;
+$$;
+revoke all on function public.deals_done() from public;
+grant execute on function public.deals_done() to anon, authenticated;

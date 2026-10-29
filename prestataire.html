@@ -31,6 +31,11 @@ nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
 h1{font-size:clamp(1.7rem,4vw,2.4rem)}
 .sub{color:var(--mute);font-size:.92rem}
 .socrow{display:flex;gap:8px;margin-top:12px}
+h1 .vbw{display:inline-flex;vertical-align:-3px;margin-left:8px}.vbadge{display:block;flex:none}
+.rzone{margin-top:16px;padding:14px 16px;border:1px solid var(--line,#e7e7ec);border-radius:14px}
+.rzh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline}.rzh small{color:var(--mute,#6b6b73);font-size:.8rem}
+.rbar{height:10px;border-radius:99px;background:#ececf0;margin:12px 0 6px;overflow:hidden}.rbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f55a1f,#965ac8 60%,#3448f0)}
+.rsc{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute,#6b6b73);font-variant-numeric:tabular-nums}
 .sb{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;transition:transform .2s}.sb:hover{transform:translateY(-2px)}
 .sb.ig{background:linear-gradient(135deg,#f9ce34,#ee2a7b 50%,#6228d7)}.sb.tt{background:#111}.sb.li{background:#0a66c2}.sb.ot{background:linear-gradient(135deg,#3448f0,#f55a1f)}
 .sb .i{display:grid}
@@ -158,7 +163,8 @@ load().then(function(res){
   return (res.own?A.myCerts():A.publicCerts(res.p.id)).catch(function(){return[]}).then(function(cl){res.certs=cl||[];return res}).then(function(res){
   return A.listReviews(res.p.id).then(function(rv){var st=A.summarize(rv);
     res.p.reviews=rv.map(function(r){var s=r.author_snap||{};return{note:r.rating,txt:r.text,by:s.n||"Membre",photo:s.photo,role:s.role,title:r.deal_title,date:r.created_at,author:r.author}});
-    res.p.r=st.avg;res.p.a=st.n;return res},function(){res.p.reviews=[];res.p.a=0;return res})});
+    res.p.r=st.avg;res.p.a=st.n;return res},function(){res.p.reviews=[];res.p.a=0;return res})}).then(function(res){
+  return A.dealsDone().then(function(dn){res.p.deals=dn[res.p.id]||0;return res},function(){res.p.deals=0;return res})});
 }).then(function(res){
 var p=res.p,own=res.own,u=res.u;
 
@@ -184,9 +190,11 @@ function sec(title){var c=h("section","card");c.appendChild(h("h2","",title));ma
 var hero=h("section","card"),hr=h("div","hero"),img=A.safeImg(p.photo);
 var av=h("div","av",((p.n||"?").split(" ").map(function(w){return w[0]}).slice(0,2).join("")).toUpperCase());
 if(img){av.textContent="";av.style.backgroundImage="url('"+img+"')"}
-var tx=h("div");tx.style.flex="1";tx.appendChild(h("h1","",p.n||""));tx.appendChild(h("div","sub",p.job||""));
+var tx=h("div");tx.style.flex="1";var h1=h("h1","",p.n||"");
+if(A.validated(p)){var vb=h("span","vbw");vb.innerHTML=A.badgeSvg(26);vb.title="Profil validé : plus de 3 deals conclus sur Dealr";h1.appendChild(vb)}
+tx.appendChild(h1);tx.appendChild(h("div","sub",p.job||""));
 var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""),p.t||"Freelance"));bd.appendChild(h("span","b",p.c||""));
-if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(+p.a>=5)bd.appendChild(h("span","b c","✓ Certifié"));if(p.t==="Entreprise"&&p.legal&&p.legal.verified)bd.appendChild(h("span","b d","✓ Entreprise vérifiée"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
+if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(p.t==="Entreprise"&&p.legal&&p.legal.verified)bd.appendChild(h("span","b d","✓ Entreprise vérifiée"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
 tx.appendChild(bd);
 tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
 if(own){var oa=h("div","acts");oa.appendChild(link("Modifier mon profil","profil.html","btn out"));tx.appendChild(oa)}
@@ -228,7 +236,7 @@ if(own){
 /* Sections */
 var c=sec("À propos");c.appendChild(h("p","bio",p.bio||"Pas encore de présentation."));
 c=sec("Informations clés");var inf=h("div","info");
-[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Taille":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
+(p.demo?[]:[["Deals conclus sur Dealr",A.dealsCount(p)+" deal"+(A.dealsCount(p)>1?"s":"")+(A.validated(p)?" · profil validé":"")]]).concat([["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Taille":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]]).forEach(function(r){
   var d=h("div");d.appendChild(h("small","",r[0]));d.appendChild(h("span","",r[1]));inf.appendChild(d)});
 if(p.t==="Entreprise"){
   if(p.sector){var d1=h("div");d1.appendChild(h("small","","Secteur d’activité"));d1.appendChild(h("span","",p.sector));inf.appendChild(d1)}
@@ -236,6 +244,10 @@ if(p.t==="Entreprise"){
   if(/^https:\/\/[^\s"<>]+$/.test(p.web||"")){var d3=h("div"),a=document.createElement("a");a.href=p.web;a.target="_blank";a.rel="noopener noreferrer nofollow";a.textContent=p.web.replace(/^https:\/\//,"").replace(/\/$/,"");
     d3.appendChild(h("small","","Site web"));d3.appendChild(a);inf.appendChild(d3)}}
 c.appendChild(inf);
+if(p.mob&&p.mob!=="À distance"&&p.radius!=null){var rz=h("div","rzone"),rv=Math.max(0,Math.min(100,+p.radius||0));
+  var rh=h("div","rzh");rh.appendChild(h("small","","Zone de déplacement"));rh.appendChild(h("b","",rv?"jusqu’à "+rv+" km autour de "+(p.city||"sa ville"):"dans sa ville uniquement"));rz.appendChild(rh);
+  var bar=h("div","rbar");bar.setAttribute("role","img");bar.setAttribute("aria-label","Se déplace jusqu’à "+rv+" km sur une échelle de 0 à 100 km");var fi=h("i");fi.style.width=rv+"%";bar.appendChild(fi);rz.appendChild(bar);
+  var sc=h("div","rsc");["0","25","50","75","100 km"].forEach(function(t){sc.appendChild(h("span","",t))});sc.setAttribute("aria-hidden","true");rz.appendChild(sc);c.appendChild(rz)}
 c=sec("Compétences");var ch=h("div","chips");skills.forEach(function(s){ch.appendChild(h("span","",s))});c.appendChild(ch);
 if(services.length){c=sec("Services et tarifs");services.forEach(function(s){var r=h("div","row"),l=h("div");l.appendChild(h("b","",s.t));l.appendChild(h("span","sub",s.d||""));
   r.appendChild(l);r.appendChild(h("span","pr",eur(s.price)+" / "+s.unit));c.appendChild(r)})}

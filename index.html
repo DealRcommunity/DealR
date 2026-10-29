@@ -209,6 +209,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
  nav a.hide{display:none}
 }
 @media(prefers-reduced-motion:reduce){.hub,.tile,.track{animation:none}.band-v{overflow-x:auto}html{scroll-behavior:auto}}
+.mtop .vbw{display:inline-flex;vertical-align:-2px;margin-left:5px}
 </style>
 </head>
 <body>
@@ -292,14 +293,14 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
     <div class="txt">
       <span class="side">Côté freelance</span>
       <h2>Votre profil <em>parle pour vous.</em></h2>
-      <ul><li>Un portfolio qui montre votre travail</li><li>Des avis laissés après chaque mission</li><li>Un badge certifié après 5 missions réussies</li></ul>
+      <ul><li>Un portfolio qui montre votre travail</li><li>Des avis laissés après chaque mission</li><li>Un badge « profil validé » après plus de 3 deals conclus</li></ul>
     </div>
     <div class="stage">
       <div class="card">
         <div class="who"><span class="av" style="width:52px;height:52px">IM</span><div><b style="font-size:1.1rem">Inès M.</b><small>Monteuse vidéo · Paris</small></div></div>
         <div class="port"><div style="background:linear-gradient(135deg,#ff9a4d,var(--o))"></div><div style="background:linear-gradient(135deg,#6f86ff,#2f45d6)"></div><div style="background:linear-gradient(135deg,#3a3a40,#0f0f12)"></div></div>
         <div><span class="stars">★★★★★</span> <b>4,9</b> <small style="color:var(--mute)">38 avis</small></div>
-        <span class="pill">Freelance certifiée · 5 missions réussies</span>
+        <span class="pill">Profil validé · plus de 3 deals conclus</span>
       </div>
     </div>
   </section>
@@ -416,7 +417,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
     if(!list.length)return;
     var one=list.map(function(p,i){var co=p.t==="Entreprise";
       return '<a class="mcard" href="prestataire.html?id='+encodeURIComponent(p.id)+'">'+av(p,i,"mav")+
-        '<span class="mtx"><span class="mtop"><b>'+esc(p.n)+'</b><span class="mt'+(co?" co":"")+'">'+(co?"Entreprise":"Freelance")+'</span></span>'+
+        '<span class="mtx"><span class="mtop"><b>'+esc(p.n)+(DealrAuth.validated(p)?'<span class="vbw">'+DealrAuth.badgeSvg(15)+'</span>':'')+'</b><span class="mt'+(co?" co":"")+'">'+(co?"Entreprise":"Freelance")+'</span></span>'+
         '<small>'+esc([p.job,p.city].filter(Boolean).join(" · "))+'</small></span></a>'}).join("");
     track.innerHTML=one+one.replace(/<a class="mcard"/g,'<a class="mcard" tabindex="-1" aria-hidden="true"');
     track.style.animationDuration=Math.max(30,list.length*5)+"s";

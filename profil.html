@@ -121,6 +121,11 @@ textarea{min-height:120px;resize:vertical}
 .cv{display:flex;gap:16px;align-items:center;justify-content:space-between;background:#fff6ef;border:1px solid #ffd9bf;border-radius:14px;padding:14px 16px;margin:16px 0 6px}
 .cv .sub{margin-top:2px}
 .err.ok{color:#17613a}
+.rad{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fafafb}.rad[hidden]{display:none}
+.radh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.radh label{margin:0}
+.radh output{font:800 1.15rem "Bricolage Grotesque",sans-serif;color:var(--ink);white-space:nowrap}
+.rad input[type=range]{width:100%;margin:12px 0 4px;accent-color:#f55a1f;height:28px;cursor:pointer}
+.radsc{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums;margin-bottom:8px}
 .lgl{margin-top:22px}.lgl[hidden]{display:none}.lgh{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
 .lgi{background:#eef4ff;border-left:4px solid #3448f0;border-radius:10px;padding:12px 14px;margin:14px 0 4px;font-size:.9rem;line-height:1.5}
 .lgb{font-size:.8rem;font-weight:700;border-radius:99px;padding:5px 11px;background:#fff4e5;color:#8a4b00}.lgb.ok{background:#e7f7ee;color:#17613a}
@@ -173,6 +178,12 @@ body.wait main{visibility:hidden}
         <label class="opt"><input type="radio" name="mob" value="À distance" checked><span>À distance</span></label>
         <label class="opt"><input type="radio" name="mob" value="Sur site"><span>Sur site</span></label>
         <label class="opt"><input type="radio" name="mob" value="À distance ou sur site"><span>Les deux</span></label>
+      </div>
+      <div class="rad" id="radBox" hidden>
+        <div class="radh"><label for="rad">Distance maximale de déplacement</label><output id="radV" for="rad">20 km</output></div>
+        <input type="range" id="rad" min="0" max="100" step="5" value="20" aria-describedby="radH">
+        <div class="radsc" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100 km</span></div>
+        <div class="sub" id="radH">Autour de votre ville. À 0 km, vous ne vous déplacez que dans votre ville.</div>
       </div>
     </section>
 
@@ -314,7 +325,7 @@ body.wait main{visibility:hidden}
   <div class="card done" id="done" hidden role="status">
     <div class="ck">✓</div>
     <h2>Votre profil est <em>en ligne.</em></h2>
-    <p>Il apparaît maintenant dans la liste des prestataires. Après 5 missions réussies, vous obtiendrez le badge certifié.</p>
+    <p>Il apparaît maintenant dans la liste des prestataires. Après plus de 3 deals conclus, votre profil obtiendra le badge « profil validé ».</p>
     <div class="row"><a class="btn" href="prestataire.html?id=moi">Voir mon profil</a><a class="btn out" href="marketplace.html">Voir les missions</a><a class="btn out" href="index.html">Retour à l’accueil</a></div>
   </div>
 </div>
@@ -370,8 +381,10 @@ function syncKind(){var co=isCo();$("coBox").hidden=!co;$("company").required=co
   $("job").placeholder=co?"Ex. Agence de design d’interface":"Ex. Monteuse vidéo spécialisée en Reels";
   $("phB").textContent=co?"Ajouter un logo":"Ajouter une photo";$("phH").textContent=co?"Logo de l’entreprise, de préférence carré.":"JPG ou PNG, visage bien visible.";
   $("pKind").textContent=co?"Entreprise":"Freelance";$("pKind").className="badge"+(co?" e":"")}
+document.querySelectorAll('input[name="mob"]').forEach(function(r){r.addEventListener("change",function(){syncRad();draw()})});
+$("rad").addEventListener("input",function(){syncRad();draw()});
 document.querySelectorAll('input[name="kind"]').forEach(function(r){r.addEventListener("change",function(){syncKind();draw()})});
-syncKind();
+syncKind();syncRad();
 $("coWeb").addEventListener("input",function(){$("coErr").textContent=""});
 function mk(tag,txt,cls){var e=document.createElement(tag);if(txt)e.textContent=txt;if(cls)e.className=cls;return e}
 function setAv(el){var t=(isCo()?v("company").split(/\s+/).map(function(w){return w.charAt(0)}).slice(0,2).join(""):v("first").charAt(0)+v("last").charAt(0)).toUpperCase()||"?";
@@ -381,13 +394,16 @@ function score(){var s=0,b=v("bio").length;
   s+=Math.min(st.skills.length,5)*3;s+=Math.min(st.exps.length,3)*5;if(st.edus.length)s+=4;if(st.certs.length)s+=4;if(Object.keys(socials()).length)s+=4;
   if(b>=150)s+=15;else if(b>=40)s+=8;if(links().length||st.port.length)s+=10;if(v("rate"))s+=5;if(radio("dispo"))s+=5;
   return Math.min(s,100)}
+/* Rayon de déplacement (0 à 100 km), seulement si l'on travaille sur site */
+function syncRad(){var on=radio("mob")!=="À distance";$("radBox").hidden=!on;var n=+$("rad").value;$("radV").textContent=n?n+" km":"Ma ville uniquement";
+  $("rad").setAttribute("aria-valuetext",n?n+" kilomètres":"Ma ville uniquement")}
 function draw(){
   setAv($("pAv"));setAv($("stAv"));
   $("pName").textContent=fullName()||"Votre nom";
   $("pJob").textContent=v("job")||"Votre titre";
   $("pCat").textContent=$("cat").value;
   $("pDispo").textContent=radio("dispo");
-  var pc=villes.picked();$("pCity").textContent=pc?pc.nom+" ("+pc.dep+")":v("city")||"Ville";
+  var pc=villes.picked();$("pCity").textContent=(pc?pc.nom+" ("+pc.dep+")":v("city")||"Ville")+(radio("mob")!=="À distance"?" · "+(+$("rad").value?$("rad").value+" km":"ville"):"");
   $("pBio").textContent=v("bio")||"Votre présentation apparaîtra ici.";
   $("bn").textContent=$("bio").value.length;
   $("pPrice").textContent=v("rate")?v("rate")+" "+$("unit").value:"Tarif à renseigner";
@@ -500,7 +516,7 @@ function publish(){
     cp:vc?vc.cp:"",dep:vc?vc.dep:"",depNom:vc?vc.depNom:"",
     p:v("rate")+" "+unitSel,rate:parseFloat(v("rate"))||0,unit:unitSel.replace("€/",""),unitSel:unitSel,
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
-    tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
+    tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),radius:radio("mob")!=="À distance"?+$("rad").value:0,
     lvl:co?$("coSize").value:radio("lvl"),coTeam:co?$("coTeam").value:"",sector:co?$("coSect").value:"",web:co?webUrl(v("coWeb"))||"":"",langs:langs(),links:links(),port:st.port,
     edus:st.edus,socials:socials(),legal:prev.legal||null};
   var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
@@ -514,7 +530,7 @@ function fillFrom(p){
   $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";
   villes.set(p.cp?{nom:p.city,cp:p.cp,dep:p.dep,depNom:p.depNom}:(p.city||""));if(p.cp)$("cityH").textContent=p.city+" · "+p.cp+(p.depNom?" · "+p.depNom:"");
   setRadio("kind",p.t==="Entreprise"?"Entreprise":"Freelance");$("company").value=p.company||(p.t==="Entreprise"?p.n||"":"");
-  setRadio("mob",p.mob);$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise"){selVal("coSize",p.lvl);selVal("coTeam",p.coTeam);selVal("coSect",p.sector);$("coWeb").value=(p.web||"").replace(/^https:\/\//,"").replace(/\/$/,"")}else setRadio("lvl",p.lvl);syncKind();
+  setRadio("mob",p.mob);if(p.radius!=null)$("rad").value=Math.max(0,Math.min(100,+p.radius||0));syncRad();$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise"){selVal("coSize",p.lvl);selVal("coTeam",p.coTeam);selVal("coSect",p.sector);$("coWeb").value=(p.web||"").replace(/^https:\/\//,"").replace(/\/$/,"")}else setRadio("lvl",p.lvl);syncKind();
   st.skills=(p.skills||p.tags||[]).slice(0,15);st.exps=(p.exps||[]).slice(0,8);
   $("bio").value=p.bio||"";(p.links||[]).slice(0,3).forEach(function(u,i){$("l"+(i+1)).value=u});
   st.photo=A.safeImg(p.photo);st.port=(p.port||[]).map(A.safeImg).filter(Boolean).slice(0,6);

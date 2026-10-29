@@ -254,6 +254,13 @@
           return list;
         }, function () { return list; });
       })
+      .then(function (list) {
+        /* Nombre de deals conclus (payés au prestataire) : badge « profil validé » */
+        return A.dealsDone().then(function (dn) {
+          list.forEach(function (p) { p.deals = dn[p.id] || 0; });
+          return list;
+        }, function () { return list; });
+      })
       .catch(function () { return []; });
   };
 
@@ -331,6 +338,37 @@
         Object.keys(m).forEach(function (k) { m[k].avg = Math.round(m[k].sum / m[k].n * 10) / 10; });
         return m;
       });
+  };
+  /* Profil validé : plus de 3 deals conclus (statut « released » : l'argent a été versé au prestataire).
+     Les deux participants du deal le comptent. */
+  A.DEALS_BADGE = 4;
+  var doneP = null;
+  A.dealsDone = function (refresh) {
+    if (refresh) doneP = null;
+    if (doneP) return doneP;
+    if (demo) {
+      var m = {};
+      try { (JSON.parse(localStorage.getItem("dealr_demo_deals")) || []).forEach(function (d) {
+        if (d.status === "released") { m[d.payer] = (m[d.payer] || 0) + 1; m[d.payee] = (m[d.payee] || 0) + 1; }
+      }); } catch (e) {}
+      doneP = Promise.resolve(m);
+      return doneP;
+    }
+    doneP = client().then(function (c) { return c.rpc("deals_done"); }).then(check).then(function (rows) {
+      var m = {};
+      (rows || []).forEach(function (r) { m[r.uid] = +r.n || 0; });
+      return m;
+    }).catch(function (e) { doneP = null; throw e; });
+    return doneP;
+  };
+  /* Profils d'exemple : pas de vrais deals, on se fie à leur nombre d'avis */
+  A.dealsCount = function (p) { return p ? (p.deals != null ? +p.deals || 0 : +p.a || 0) : 0; };
+  A.validated = function (p) { return A.dealsCount(p) >= A.DEALS_BADGE; };
+  A.badgeSvg = function (size) {
+    size = size || 20;
+    return '<svg class="vbadge" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" role="img" aria-label="Profil validé"><title>Profil validé : plus de 3 deals conclus sur Dealr</title>' +
+      '<path fill="#3448f0" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/>' +
+      '<path d="M7.8 12.3l2.8 2.8 5.6-5.8" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   };
   A.summarize = function (reviews) {
     var n = reviews.length, sum = 0;
