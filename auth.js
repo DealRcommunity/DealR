@@ -433,7 +433,8 @@
     return o;
   }
   /* Conversation avec l'équipe Dealr (support) : pas de deal, pas de profil public */
-  A.isSupport = function (o) { return !!o && (o.support === true || o.n === "Équipe Dealr"); };
+  /* Seule la base (ou la démo) pose « support » : un membre ne peut pas s'appeler « Équipe Dealr » (supabase.sql, section 12) */
+  A.isSupport = function (o) { return !!o && o.support === true; };
   function getConv(c, id) { return c.from("conversations").select("*").eq("id", id).maybeSingle().then(check); }
 
   /* Ouvre (ou crée) la conversation avec un autre membre ; renvoie son identifiant */
@@ -448,7 +449,7 @@
           if (row) return id;
           return Promise.all([A.myProfile().catch(function () { return null; }), A.isAdmin()]).then(function (r) {
             var me = r[0];
-            var mine = r[1] ? { id: u.id, n: "Équipe Dealr", job: "Support Dealr", photo: "" }
+            var mine = r[1] ? { id: u.id, n: "Équipe Dealr", job: "Support Dealr", photo: "", support: true }
               : snap(Object.assign({ id: u.id }, me || {}), (me && me.n) || (u.email || "").split("@")[0]);
             var theirs = snap(other);
             var first = u.id < other.id;
@@ -916,6 +917,8 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/name_reserved/.test(m)) return "Ce nom est réservé à l’équipe Dealr. Choisissez un autre nom.";
+    if (/profile_too_big/.test(m)) return "Votre profil est trop lourd (photos). Retirez quelques photos du portfolio et réessayez.";
     if (/legal_locked/.test(m)) return "Votre raison sociale, votre SIREN et votre numéro de TVA ont été vérifiés : ils ne peuvent plus être modifiés. Contactez le support pour toute correction.";
     if (/cert_title/.test(m)) return "Indiquez le nom de la certification.";
     if (/cert_proof/.test(m)) return "Le justificatif est obligatoire : ajoutez votre attestation (PDF, JPG ou PNG).";

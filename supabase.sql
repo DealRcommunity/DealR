@@ -469,3 +469,70 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.deals_done() from public;
 grant execute on function public.deals_done() to anon, authenticated;
+
+-- =====================================================================
+-- 12. Sécurité (audit du 29/10/2026)
+-- =====================================================================
+-- a) Fonctions de contrôle : chemin de recherche fixe (évite qu'une autre fonction soit appelée à leur place)
+alter function public.conversations_guard() set search_path = public;
+alter function public.deals_guard() set search_path = public;
+alter function public.certifications_guard() set search_path = public;
+alter function public.profiles_legal_guard() set search_path = public;
+
+-- b) Fonction interne des avis : appelable seulement par la base (déclencheur), pas depuis l'extérieur
+revoke all on function public.reviews_fill() from public, anon, authenticated;
+
+-- c) Fiches des participants d'une conversation (nom, métier, photo) : construites par la base
+--    à partir des profils, jamais par le navigateur. Empêche un membre de se faire passer
+--    pour « Équipe Dealr » (le support) ou de modifier la fiche de l'autre participant.
+create or replace function public.conv_snap(uid uuid) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare d jsonb; ph text;
+begin
+  if public.is_admin_id(uid) then
+    return jsonb_build_object('id', uid, 'n', 'Équipe Dealr', 'job', 'Support Dealr', 'photo', '', 'support', true);
+  end if;
+  select data into d from public.profiles where id = uid;
+  ph := coalesce(d->>'photo', '');
+  if ph !~ '^data:image/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$' then ph := ''; end if;
+  return jsonb_build_object('id', uid, 'n', left(coalesce(nullif(d->>'n', ''), 'Membre'), 80),
+                            'job', left(coalesce(d->>'job', ''), 80), 'photo', ph);
+end $$;
+revoke all on function public.conv_snap(uuid) from public, anon, authenticated;
+
+create or replace function public.conversations_snaps() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.a_snap := public.conv_snap(new.user_a);
+  new.b_snap := public.conv_snap(new.user_b);
+  return new;
+end $$;
+revoke all on function public.conversations_snaps() from public, anon, authenticated;
+
+drop trigger if exists conversations_snaps on public.conversations;
+create trigger conversations_snaps before insert or update on public.conversations
+  for each row execute function public.conversations_snaps();
+
+-- Fiches déjà enregistrées : on les reconstruit
+update public.conversations set a_snap = a_snap;
+
+-- d) Profils : taille limitée (photos comprises) et nom réservé
+--    Un membre ne peut pas s'appeler « Dealr », « Équipe Dealr », « Support Dealr »…
+create or replace function public.profiles_guard() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  if octet_length(new.data::text) > 2000000 then raise exception 'profile_too_big'; end if;
+  if not public.is_admin()
+     and (lower(coalesce(new.data->>'n', '')) ~ 'dealr' or lower(coalesce(new.data->>'company', '')) ~ 'dealr') then
+    raise exception 'name_reserved';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists profiles_guard on public.profiles;
+create trigger profiles_guard before insert or update on public.profiles
+  for each row execute function public.profiles_guard();
+
+-- e) « Suis-je administrateur ? » : réservé aux membres connectés
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;

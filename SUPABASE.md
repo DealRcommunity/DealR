@@ -53,8 +53,12 @@ En démonstration, les fichiers étaient enregistrés en texte (base64) dans les
 
 ## 7. Après chaque mise à jour du code
 
-- [ ] Relancer `supabase.sql` si le fichier a changé. **À faire maintenant : section 11 ajoutée le 29/10/2026** (fonction `deals_done`, nombre de deals conclus pour le badge « profil validé »). Sans elle, le badge n'apparaît sur aucun vrai profil.
+- [ ] Relancer `supabase.sql` si le fichier a changé. Depuis le 29/10/2026, Claude applique lui-même les changements de la base via le connecteur Supabase (sections 11 et 12 déjà appliquées).
 - [ ] Sur Netlify : déployer puis publier (la publication automatique est verrouillée).
+
+## Sécurité
+
+Voir `SECURITE.md` : registre des failles, mis à jour à chaque audit.
 
 ## Rappels utiles
 

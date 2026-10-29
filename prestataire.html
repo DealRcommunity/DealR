@@ -271,7 +271,7 @@ if(certs.length||own){c=sec("Certifications");
   else empty(c,"cert","Démarquez-vous avec vos certifications","Une certification officielle prouve votre maîtrise.","Ajouter une certification")}
 c=sec("Portfolio");var port=(p.port||[]).map(A.safeImg).filter(Boolean),links=(p.links||[]).filter(function(x){return /^https?:\/\//.test(x)});
 if(port.length){var g=h("div","port");port.forEach(function(s){var d=h("div");d.style.backgroundImage="url('"+s+"')";g.appendChild(d)});c.appendChild(g)}
-links.forEach(function(x){var a=link(x,x);a.target="_blank";a.rel="noopener noreferrer";a.style.cssText="display:block;margin-top:8px;overflow-wrap:anywhere";c.appendChild(a)});
+links.forEach(function(x){var a=link(x,x);a.target="_blank";a.rel="noopener noreferrer nofollow ugc";a.style.cssText="display:block;margin-top:8px;overflow-wrap:anywhere";c.appendChild(a)});
 if(!port.length&&!links.length)c.appendChild(h("p","sub","Portfolio à venir."));
 c=sec("Avis");var rv=p.reviews||[];
 if(rv.length){
