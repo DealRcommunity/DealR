@@ -121,6 +121,12 @@ textarea{min-height:120px;resize:vertical}
 .cv{display:flex;gap:16px;align-items:center;justify-content:space-between;background:#fff6ef;border:1px solid #ffd9bf;border-radius:14px;padding:14px 16px;margin:16px 0 6px}
 .cv .sub{margin-top:2px}
 .err.ok{color:#17613a}
+.lgl{margin-top:22px}.lgl[hidden]{display:none}.lgh{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.lgi{background:#eef4ff;border-left:4px solid #3448f0;border-radius:10px;padding:12px 14px;margin:14px 0 4px;font-size:.9rem;line-height:1.5}
+.lgb{font-size:.8rem;font-weight:700;border-radius:99px;padding:5px 11px;background:#fff4e5;color:#8a4b00}.lgb.ok{background:#e7f7ee;color:#17613a}
+.lnk{display:block;margin:8px 0 0 auto;background:none;border:0;padding:0;color:#3448f0;font:600 .86rem Figtree,sans-serif;cursor:pointer;text-decoration:underline}
+#juridique input[readonly]{background:#f1f1f4;color:#55555c;cursor:not-allowed}
+#lgSave{margin-top:6px}
 .acts{display:flex;gap:12px}
 .lp{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fafafb}
 .lp .add{margin-top:8px}
@@ -290,6 +296,21 @@ body.wait main{visibility:hidden}
     <p class="err" id="pubErr" role="alert"></p>
   </form>
 
+  <section class="card lgl" id="juridique" hidden aria-labelledby="lgT">
+    <div class="lgh"><h2 id="lgT" style="font-size:1.5rem">Informations <em>juridiques</em></h2><span class="lgb" id="lgBadge" hidden></span></div>
+    <p class="help">Nous utilisons ces informations pour générer vos factures. Tant qu’elles ne sont pas complètes, vous ne pouvez pas créer de facture.</p>
+    <div class="lgi">Dans la mesure du possible, sélectionnez votre entreprise via l’outil de recherche pour procéder à la vérification instantanée. Avant d’enregistrer, assurez-vous que toutes les informations sont exactes : une fois vérifiés, votre numéro d’immatriculation et votre numéro de TVA ne pourront plus être modifiés.</div>
+    <label for="lgName">Raison sociale</label><input id="lgName" maxlength="120" placeholder="Rechercher par nom d’entreprise">
+    <label for="lgSiren">Numéro d’immatriculation de l’entreprise (SIREN ou SIRET)</label><input id="lgSiren" maxlength="17" inputmode="numeric" placeholder="Ex. 794598813">
+    <label for="lgAddr">Siège social</label><input id="lgAddr" maxlength="160" placeholder="Commencez à saisir votre adresse">
+    <textarea id="lgAddrM" rows="3" maxlength="200" placeholder="N°, rue&#10;Code postal Ville" hidden aria-label="Adresse du siège social"></textarea>
+    <button type="button" class="lnk" id="lgAddrT">Je ne trouve pas mon adresse parmi les suggestions</button>
+    <label for="lgTva">Numéro de TVA intracommunautaire</label><input id="lgTva" maxlength="20" placeholder="Ex. FR14794598813">
+    <div class="sub" id="lgTvaH" style="margin-top:6px">Laissez vide si votre entreprise n’est pas assujettie à la TVA (franchise en base).</div>
+    <p class="err" id="lgErr" role="alert"></p>
+    <button type="button" class="btn" id="lgSave">Enregistrer les informations juridiques</button>
+  </section>
+
   <div class="card done" id="done" hidden role="status">
     <div class="ck">✓</div>
     <h2>Votre profil est <em>en ligne.</em></h2>
@@ -316,6 +337,7 @@ body.wait main{visibility:hidden}
 <script src="config.js"></script>
 <script src="auth.js"></script>
 <script src="villes.js"></script>
+<script src="legal.js"></script>
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)},A=window.DealrAuth,editing=false,prev={};
@@ -480,7 +502,7 @@ function publish(){
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
     tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
     lvl:co?$("coSize").value:radio("lvl"),coTeam:co?$("coTeam").value:"",sector:co?$("coSect").value:"",web:co?webUrl(v("coWeb"))||"":"",langs:langs(),links:links(),port:st.port,
-    edus:st.edus,socials:socials()};
+    edus:st.edus,socials:socials(),legal:prev.legal||null};
   var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
   A.saveProfile(p).then(function(){location.href="prestataire.html?id=moi"})
    .catch(function(e){b.disabled=false;b.textContent=label;$("pubErr").textContent=A.message(e)})}
@@ -608,6 +630,54 @@ $("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.v
     else if(!t.trim())msg.textContent="Aucun texte lisible dans ce fichier (PDF scanné ?). Ajoutez vos expériences à la main.";
     else msg.textContent="Aucune expérience détectée automatiquement. Ajoutez-les à la main."
   }).catch(function(){msg.textContent="Impossible de lire ce fichier. Ajoutez vos expériences à la main."})});
+/* Informations juridiques (entreprises, après la création du profil) : nécessaires aux factures */
+function initLegal(p){
+  var Lg=window.DealrLegal,box=$("juridique"),lg=Object.assign({name:"",siren:"",siret:"",addr:"",tva:"",verified:false},p.legal||{}),locked=!!lg.verified,manual=false;
+  box.hidden=false;
+  function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function badge(){var b=$("lgBadge");b.hidden=false;
+    if(lg.verified){b.className="lgb ok";b.textContent="✓ Vérifiée via le registre officiel"}
+    else if(Lg.complete(p.legal)){b.className="lgb";b.textContent="Saisie manuelle · non vérifiée"}
+    else{b.className="lgb";b.textContent="À compléter pour facturer"}}
+  function lock(){["lgName","lgSiren","lgTva"].forEach(function(i){$(i).readOnly=locked});
+    if(locked)$("lgTvaH").textContent="Numéro d’immatriculation et TVA vérifiés : pour les corriger, contactez le support."}
+  function setAddrManual(on){manual=on;$("lgAddr").hidden=on;$("lgAddrM").hidden=!on;$("lgAddrT").textContent=on?"Rechercher mon adresse":"Je ne trouve pas mon adresse parmi les suggestions";
+    if(on){$("lgAddrM").value=$("lgAddrM").value||$("lgAddr").value;$("lgAddrM").focus()}else{$("lgAddr").value=$("lgAddrM").value.replace(/\s*\n\s*/g,", ");$("lgAddr").focus()}}
+  function fill(){ $("lgName").value=lg.name;$("lgSiren").value=lg.siret||lg.siren;$("lgTva").value=lg.tva;
+    $("lgAddr").value=lg.addr;$("lgAddrM").value=lg.addr;badge();lock()}
+  function fromRegistry(c){
+    if(!c.open){$("lgErr").textContent="Cette entreprise est fermée selon le registre officiel : elle ne peut pas facturer.";return}
+    lg.name=c.name;lg.siren=c.siren;lg.siret=c.siret;lg.addr=c.addr;lg.verified=true;lg.source="registre";
+    if(!$("lgTva").value.trim()||!Lg.validTva($("lgTva").value,c.siren))$("lgTva").value=Lg.tvaFor(c.siren);
+    $("lgName").value=c.name;$("lgSiren").value=c.siret||c.siren;$("lgAddr").value=c.addr;$("lgAddrM").value=c.addr;if(manual)setAddrManual(false);
+    $("lgErr").className="err ok";$("lgErr").textContent="Entreprise trouvée dans le registre officiel. Vérifiez puis enregistrez.";}
+  function compItem(c){return{v:c,cls:c.open?"":"lg-off",off:false,html:"<small>"+esc(c.siren)+(c.open?"":" · fermée")+"</small>"+esc(c.name)+(c.cp||c.ville?" – "+esc([c.cp,c.ville].filter(Boolean).join(" ")):"")+", France"}}
+  function addItem(q){return{v:{manual:q},add:true,cls:"lg-add",html:"<b>+ "+esc(q)+"</b><small>Cette entreprise ne figure pas dans le registre. Cliquez pour la saisir à la main.</small>"}}
+  function onManual(v){if(v.manual){lg.verified=false;lg.source="manuel";$("lgErr").className="err";$("lgErr").textContent="Saisie manuelle : complétez les autres champs. Elle sera indiquée comme non vérifiée.";return true}return false}
+  function unverify(){if(!locked&&lg.verified){lg.verified=false;lg.source="manuel"}}
+  Lg.attach($("lgName"),{min:2,search:Lg.searchCompanies,item:compItem,first:function(q){return addItem(q)},onType:unverify,
+    onPick:function(v){if(!onManual(v))fromRegistry(v)},down:"Registre indisponible : vous pouvez saisir vos informations à la main."});
+  Lg.attach($("lgSiren"),{min:3,search:function(q){var d=q.replace(/\D/g,"");return d.length<3?Promise.resolve([]):Lg.searchCompanies(d.length>9?d.slice(0,9):d)},item:compItem,
+    first:function(q){var d=q.replace(/\D/g,"");return d.length>=9?addItem(d):null},onType:unverify,
+    onPick:function(v){if(!onManual(v))fromRegistry(v)},down:"Registre indisponible : vous pouvez saisir vos informations à la main."});
+  Lg.attach($("lgAddr"),{min:4,search:Lg.searchAddress,item:function(a){return{v:a,html:esc(a.label)}},
+    onPick:function(a){$("lgAddr").value=a.label;$("lgAddrM").value=a.label},empty:"Aucune adresse trouvée.",down:"Recherche d’adresse indisponible : utilisez la saisie manuelle."});
+  $("lgAddrT").onclick=function(){setAddrManual(!manual)};
+  $("lgSave").onclick=function(){
+    var err=$("lgErr"),b=this;err.className="err";err.textContent="";
+    var name=v("lgName"),id=$("lgSiren").value.replace(/\D/g,""),addr=(manual?$("lgAddrM").value:$("lgAddr").value).trim().replace(/\s*\n\s*/g,", "),tva=Lg.cleanTva($("lgTva").value);
+    if(name.length<2){err.textContent="Indiquez la raison sociale.";$("lgName").focus();return}
+    if(!(id.length===9||id.length===14)||!Lg.validSiren(id.slice(0,9))){err.textContent="Numéro d’immatriculation invalide : 9 chiffres (SIREN) ou 14 chiffres (SIRET).";$("lgSiren").focus();return}
+    if(addr.length<8){err.textContent="Indiquez l’adresse du siège social.";(manual?$("lgAddrM"):$("lgAddr")).focus();return}
+    if(!Lg.validTva(tva,id.slice(0,9))){err.textContent="Numéro de TVA invalide : il doit correspondre à votre SIREN (ex. "+Lg.tvaFor(id.slice(0,9))+").";$("lgTva").focus();return}
+    if(lg.verified&&!locked&&(name!==lg.name||id.slice(0,9)!==lg.siren))lg.verified=false;
+    var legal={name:name,siren:id.slice(0,9),siret:id.length===14?id:(lg.siren===id.slice(0,9)?lg.siret||"":""),addr:addr,tva:tva,verified:!!lg.verified,source:lg.verified?"registre":"manuel",at:new Date().toISOString()};
+    b.disabled=true;
+    A.myProfile().then(function(cur){if(!cur)throw new Error("not_logged");cur=Object.assign({},cur);delete cur.id;cur.legal=legal;return A.saveProfile(cur).then(function(){return cur})})
+     .then(function(cur){p.legal=legal;prev.legal=legal;lg=Object.assign({},legal);locked=!!legal.verified;fill();err.className="err ok";
+       err.textContent=legal.verified?"Informations enregistrées et vérifiées. Vous pouvez maintenant créer vos factures.":"Informations enregistrées (saisie manuelle). Vous pouvez maintenant créer vos factures."})
+     .catch(function(e){err.textContent=A.message(e)}).then(function(){b.disabled=false})};
+  fill()}
 /* Accès réservé aux membres connectés */
 A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(adm){if(adm){location.replace("admin.html");return new Promise(function(){})}
   return A.myProfile().catch(function(){return null})}).then(function(p){
@@ -615,7 +685,9 @@ A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(
   if(!A.profileComplete(p))$("must").hidden=false;
   /* Lien direct vers une étape (depuis la checklist du profil) : profil.html#etape-5 */
   var m=location.hash.match(/^#etape-([1-7])$/);if(m&&A.profileComplete(p))st.step=parseInt(m[1],10)-1;
-  renderSkills();renderExps();renderEdu();loadCerts();show();document.body.classList.remove("wait")});
+  renderSkills();renderExps();renderEdu();loadCerts();show();
+  if(p&&p.t==="Entreprise"&&A.profileComplete(p)){initLegal(p);if(location.hash==="#juridique")setTimeout(function(){$("juridique").scrollIntoView({behavior:"smooth"})},150)}
+  document.body.classList.remove("wait")});
 })();
 </script>
 </body>

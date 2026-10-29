@@ -43,6 +43,8 @@ textarea{min-height:64px;resize:vertical}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
 .msg{color:#c0270f;font-size:.86rem;min-height:1.2em;margin-top:8px}
 .msg.ok{color:#17613a}
+.lock{background:#fff4e5;border-left:4px solid #f55a1f;border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:.9rem;line-height:1.5}.lock a{color:#3448f0;font-weight:600}
+input[readonly],textarea[readonly]{background:#f1f1f4;color:#55555c}
 .hist{margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
 .hist div{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;font-size:.88rem}
 .a4{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.08);padding:44px 48px;max-width:794px;font-size:.88rem;line-height:1.45;min-height:600px}
@@ -83,10 +85,13 @@ body.wait main{visibility:hidden}
   <div class="two"><div><label for="date">Date d’émission</label><input id="date" type="date" data-k="date"></div>
     <div id="validRow"><label for="valid">Validité du devis (jours)</label><input id="valid" type="number" min="1" data-k="valid"></div></div>
 
+  <div class="lock" id="legalLock" hidden role="status"><b>Facture impossible pour le moment.</b> Renseignez d’abord les informations juridiques de votre entreprise (raison sociale, SIREN, siège social, TVA) : elles figurent obligatoirement sur vos factures. <a href="profil.html#juridique">Compléter mes informations juridiques</a></div>
   <fieldset><legend>Émetteur (le prestataire)</legend>
+    <p class="sub" id="legalNote" hidden style="margin:0 0 6px">Repris de vos informations juridiques. Pour les modifier : <a href="profil.html#juridique">mon profil</a>.</p>
     <label for="in">Nom ou société</label><input id="in" data-k="issuer.name" autocomplete="organization">
     <label for="ia">Adresse</label><textarea id="ia" data-k="issuer.addr"></textarea>
-    <div class="two"><div><label for="is">SIRET</label><input id="is" data-k="issuer.siret" inputmode="numeric"></div><div><label for="ie">Email</label><input id="ie" type="email" data-k="issuer.email"></div></div>
+    <div class="two"><div><label for="is">SIRET ou SIREN</label><input id="is" data-k="issuer.siret" inputmode="numeric"></div><div><label for="ie">Email</label><input id="ie" type="email" data-k="issuer.email"></div></div>
+    <label for="it">N° TVA intracommunautaire (facultatif)</label><input id="it" data-k="issuer.tva">
     <label for="ib">IBAN (facultatif)</label><input id="ib" data-k="issuer.iban"></fieldset>
 
   <fieldset><legend>Client</legend>
@@ -118,6 +123,7 @@ body.wait main{visibility:hidden}
 <script src="config.js"></script>
 <script src="dealr-pdf.js"></script>
 <script src="auth.js"></script>
+<script src="legal.js"></script>
 <script>
 (function(){
 var A=window.DealrAuth,$=function(i){return document.getElementById(i)};
@@ -130,7 +136,12 @@ function getp(o,p){return p.split(".").reduce(function(a,k){return a[k]},o)}
 function setp(o,p,v){var a=p.split("."),l=a.pop();a.reduce(function(x,k){return x[k]},o)[l]=v}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 
-var me={name:"",addr:"",siret:"",email:"",iban:""},docs=[],nextN={};
+var me={name:"",addr:"",siret:"",tva:"",email:"",iban:""},docs=[],nextN={},isCo=false,legal=null,legalOk=true;
+/* Entreprise : les factures reprennent ses informations juridiques ; sans elles, pas de facture */
+function legalId(id){id=String(id||"").replace(/\D/g,"");return id.length===14?"SIRET : "+id:(id?"SIREN : "+id:"")}
+function applyLegal(d){if(isCo&&legalOk&&!d.finalized){d.issuer.name=legal.name;d.issuer.addr=legal.addr;d.issuer.siret=legal.siret||legal.siren;d.issuer.tva=legal.tva||""}}
+function syncLock(){var f=doc.type==="facture";$("legalLock").hidden=!(isCo&&!legalOk&&f);$("print").disabled=isCo&&!legalOk&&f;
+  var ro=isCo&&legalOk&&!doc.finalized;["in","ia","is","it"].forEach(function(i){$(i).readOnly=ro});$("legalNote").hidden=!ro}
 function blank(type){return{type:type||"devis",date:iso(new Date()),valid:30,issuer:clone(me),
   client:{name:"",addr:"",email:""},lines:[{d:"",q:1,u:"forfait",pu:0}],tva:20,rem:0,acc:0,pay:30,notes:"",num:"",finalized:false}}
 var doc=blank();
@@ -159,7 +170,7 @@ function draw(){
   if(!+doc.tva)mentions+=" TVA non applicable, art. 293 B du CGI.";
   $("docv").innerHTML=
    "<div class='dh'><div><h2>"+(dev?"DEVIS":"FACTURE")+"</h2><div>N° "+esc(num)+"</div></div><div class='r'>Date : "+fr(doc.date)+(dev?"<br>Valable jusqu’au "+fr(doc.date,+doc.valid||30):"<br>Échéance : "+due)+"</div></div>"+
-   "<div class='pt'><div><small>Émetteur</small><b>"+esc(iss.name||"Votre nom ou société")+"</b><div class='pre'>"+esc(iss.addr)+"</div>"+(iss.siret?"SIRET : "+esc(iss.siret)+"<br>":"")+esc(iss.email)+"</div>"+
+   "<div class='pt'><div><small>Émetteur</small><b>"+esc(iss.name||"Votre nom ou société")+"</b><div class='pre'>"+esc(iss.addr)+"</div>"+(iss.siret?esc(legalId(iss.siret))+"<br>":"")+(iss.tva?"N° TVA : "+esc(iss.tva)+"<br>":"")+esc(iss.email)+"</div>"+
    "<div><small>Client</small><b>"+esc(cl.name||"Nom du client")+"</b><div class='pre'>"+esc(cl.addr)+"</div>"+esc(cl.email)+"</div></div>"+
    "<table><thead><tr><th>Désignation</th><th class='n'>Quantité</th><th class='n'>PU HT</th><th class='n'>Total HT</th></tr></thead><tbody>"+rows+"</tbody></table>"+
    "<div class='tt'><div><span>Sous-total HT</span><span>"+eur(t.sub)+"</span></div>"+(t.rem?"<div><span>Remise ("+esc(doc.rem)+" %)</span><span>−"+eur(t.rem)+"</span></div>":"")+
@@ -182,7 +193,7 @@ function buildLines(){
       inp.addEventListener("input",function(){l[f[0]]=f[1]==="number"?parseFloat(inp.value)||0:inp.value;draw()});row.appendChild(inp)});
     var b=document.createElement("button");b.type="button";b.textContent="×";b.setAttribute("aria-label","Supprimer la ligne "+(i+1));
     b.onclick=function(){if(doc.lines.length>1){doc.lines.splice(i,1);buildLines();draw()}};row.appendChild(b);box.appendChild(row)})}
-function fill(){document.querySelectorAll("[data-k]").forEach(function(el){el.value=getp(doc,el.dataset.k)});buildLines();draw()}
+function fill(){applyLegal(doc);document.querySelectorAll("[data-k]").forEach(function(el){var x=getp(doc,el.dataset.k);el.value=x==null?"":x});buildLines();syncLock();draw()}
 document.querySelectorAll("[data-k]").forEach(function(el){el.addEventListener("input",function(){
   var v=el.value;if(el.type==="number"||el.dataset.n)v=parseFloat(v)||0;setp(doc,el.dataset.k,v);
   if(el.dataset.k==="date"&&!doc.finalized)refreshNext();draw()})});
@@ -206,6 +217,8 @@ function reload(){return A.listDocs().then(function(r){docs=r||[];renderHist()})
 /* Enregistrer dans le compte puis télécharger en PDF */
 $("print").onclick=function(){
   var err=$("err"),btn=this;err.textContent="";err.className="msg";
+  if(isCo&&!legalOk&&doc.type==="facture"){err.textContent="Complétez vos informations juridiques pour créer une facture.";return}
+  applyLegal(doc);
   if(!doc.issuer.name.trim()){err.textContent="Indiquez le nom de l’émetteur.";$("in").focus();return}
   if(!doc.client.name.trim()){err.textContent="Indiquez le nom du client.";$("cn").focus();return}
   if(!doc.lines.some(function(l){return String(l.d).trim()&&(+l.pu)>0})){err.textContent="Ajoutez au moins une prestation avec un prix.";return}
@@ -239,7 +252,7 @@ function buildPdf(){
     P.wrap(p.name||"—",half,11,true).forEach(function(l){P.text(x,yy,l,{size:11,bold:true});yy+=14});
     P.wrap(p.addr||"",half,10,false).forEach(function(l){if(l){P.text(x,yy,l,{size:10});yy+=13}});
     extra.forEach(function(e){if(e){P.wrap(e,half,10,false).forEach(function(l){P.text(x,yy,l,{size:10});yy+=13})}});return yy}
-  y=Math.max(party(L,"ÉMETTEUR",iss,[iss.siret?"SIRET : "+iss.siret:"",iss.email]),party(L+CW/2+12,"CLIENT",cl,[cl.email]))+18;
+  y=Math.max(party(L,"ÉMETTEUR",iss,[legalId(iss.siret),iss.tva?"N° TVA : "+iss.tva:"",iss.email]),party(L+CW/2+12,"CLIENT",cl,[cl.email]))+18;
   /* Tableau des prestations */
   var cQ=L+305,cP=L+395;
   function head(){P.text(L,y,"DÉSIGNATION",{size:8,bold:true,color:MUTE});P.text(cQ,y,"QUANTITÉ",{size:8,bold:true,color:MUTE,align:"right"});
@@ -280,7 +293,8 @@ A.requireUser("documents.html").then(function(u){return A.isAdmin().then(functio
   return Promise.all([A.myProfile().catch(function(){return null}),A.listDocs().catch(function(){return[]})]).then(function(r){
     var p=r[0];docs=r[1]||[];
     var last=docs[0]&&docs[0].data&&docs[0].data.issuer;
-    me=last?clone(last):{name:p?((p.first||p.n||"")+(p.last?" "+p.last:"")).trim():"",addr:"",siret:"",email:u.email||"",iban:""};
+    me=last?clone(last):{name:p?((p.first||p.n||"")+(p.last?" "+p.last:"")).trim():"",addr:"",siret:"",tva:"",email:u.email||"",iban:""};
+    isCo=!!(p&&p.t==="Entreprise");legal=p&&p.legal;legalOk=!isCo||!!(window.DealrLegal&&DealrLegal.complete(legal));
     doc=blank();fill();renderHist();refreshNext();document.body.classList.remove("wait")})});
 })();
 </script>

@@ -423,3 +423,29 @@ create or replace view public.certifications_public as
   from public.certifications where status = 'verified';
 grant select on public.certifications_public to anon, authenticated;
 
+
+-- =====================================================================
+-- 10. Informations juridiques des entreprises (factures)
+-- Stockées dans profiles.data->'legal' : raison sociale, SIREN/SIRET, siège, TVA.
+-- Une fois vérifiées via le registre officiel, raison sociale, SIREN et TVA
+-- ne peuvent plus être modifiés par le membre (seul un admin le peut).
+-- =====================================================================
+create or replace function public.profiles_legal_guard() returns trigger
+language plpgsql as $$
+declare o jsonb := old.data->'legal'; n jsonb := new.data->'legal';
+begin
+  if coalesce(o->>'verified', 'false') = 'true' and not public.is_admin() then
+    if n is null
+       or (n->>'name') is distinct from (o->>'name')
+       or (n->>'siren') is distinct from (o->>'siren')
+       or coalesce(n->>'tva', '') <> coalesce(o->>'tva', '')
+       or coalesce(n->>'verified', 'false') <> 'true' then
+      raise exception 'legal_locked';
+    end if;
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists profiles_legal_guard on public.profiles;
+create trigger profiles_legal_guard before update on public.profiles
+  for each row execute function public.profiles_legal_guard();

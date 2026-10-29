@@ -226,7 +226,12 @@
       var u = r[0];
       if (!u) throw new Error("not_logged");
       if (r[1]) throw new Error("admin_member");
-      return client()
+      /* Informations juridiques vérifiées : raison sociale, SIREN et TVA ne changent plus (même règle côté base, supabase.sql section 10) */
+      return A.myProfile().catch(function () { return null; }).then(function (old) {
+        var o = old && old.legal, n = data && data.legal;
+        if (o && o.verified && (!n || n.name !== o.name || n.siren !== o.siren || (n.tva || "") !== (o.tva || ""))) throw new Error("legal_locked");
+        return client();
+      })
         .then(function (c) { return c.from("profiles").upsert({ id: u.id, data: data, updated_at: new Date().toISOString() }); })
         .then(check);
     });
@@ -873,6 +878,7 @@
   /* Messages d'erreur en français */
   A.message = function (e) {
     var m = String((e && (e.message || e.error_description)) || e || "");
+    if (/legal_locked/.test(m)) return "Votre raison sociale, votre SIREN et votre numéro de TVA ont été vérifiés : ils ne peuvent plus être modifiés. Contactez le support pour toute correction.";
     if (/cert_title/.test(m)) return "Indiquez le nom de la certification.";
     if (/cert_proof/.test(m)) return "Le justificatif est obligatoire : ajoutez votre attestation (PDF, JPG ou PNG).";
     if (/cert_size/.test(m)) return "Le justificatif est trop lourd : 1,5 Mo maximum.";
