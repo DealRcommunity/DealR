@@ -151,7 +151,11 @@ body.wait main{visibility:hidden}
         <label class="opt"><input type="radio" name="kind" value="Freelance" checked><span><b>Freelance</b><small>Indépendant, vous travaillez seul</small></span></label>
         <label class="opt"><input type="radio" name="kind" value="Entreprise"><span><b>Entreprise</b><small>Agence, studio, société avec une équipe</small></span></label>
       </div>
-      <div id="coBox" hidden><label for="company">Nom de l’entreprise</label><input id="company" maxlength="80" autocomplete="organization" placeholder="Ex. Studio Nord"></div>
+      <div id="coBox" hidden><label for="company">Nom légal de l’entreprise</label><input id="company" maxlength="80" autocomplete="organization" placeholder="Ex. Studio Nord SAS">
+        <div class="two"><div><label for="coSize">Taille de l’entreprise</label><select id="coSize"><option value="">Choisir…</option><option>Entre 1 et 9</option><option>Entre 10 et 49</option><option>Entre 50 et 249</option><option>Entre 250 et 999</option><option>1 000 et plus</option></select></div><div><label for="coTeam">Votre équipe au sein de l’entreprise</label><select id="coTeam"><option value="">Choisir…</option><option>IT / DSI</option><option>Marketing / Communication</option><option>Administration</option><option>Achats</option><option>Finance / Comptabilité</option><option>Ressources humaines</option><option>Opérations</option><option>Ventes</option><option>Management</option><option>Produit</option><option>Communication</option></select></div></div>
+        <label for="coSect">Secteur d’activité <span class="facu">(facultatif)</span></label><select id="coSect"><option value="">–</option><option>Services professionnels</option><option>Énergie (gaz, électricité, eau)</option><option>Immobilier et construction</option><option>Aviation, aérospatial et défense</option><option>Fabrication industrielle et produits chimiques</option><option>Automobile et assemblage</option><option>Transport et vente en gros</option><option>Biens de consommation</option><option>Vente</option><option>Alimentaire, boissons et tabac</option><option>Santé</option><option>Secteur public</option><option>Services financiers</option><option>Hardware & software</option><option>Télécoms, médias, communication</option><option>Tourisme, voyage et loisirs</option><option>Enseignement</option><option>Hôtellerie, restauration et traiteur</option><option>Autre</option></select>
+        <label for="coWeb">Site web de l’entreprise <span class="facu">(facultatif)</span></label><input id="coWeb" inputmode="url" maxlength="120" autocomplete="url" placeholder="www.website.com">
+        <div class="err" id="coErr" role="alert"></div></div>
       <div class="photo" style="margin-top:18px"><span class="av" id="stAv">?</span>
         <div><label class="fileup"><input id="photo" type="file" accept="image/*"><span class="btn out sm" id="phB">Ajouter une photo</span></label><div class="sub" style="margin-top:6px" id="phH">JPG ou PNG, visage bien visible.</div></div></div>
       <div class="two"><div><label for="first" id="firstL">Prénom</label><input id="first" autocomplete="given-name" required></div>
@@ -178,11 +182,6 @@ body.wait main{visibility:hidden}
         <label class="opt"><input type="radio" name="lvl" value="Débutant"><span>Débutant · moins de 2 ans</span></label>
         <label class="opt"><input type="radio" name="lvl" value="Confirmé" checked><span>Confirmé · 2 à 5 ans</span></label>
         <label class="opt"><input type="radio" name="lvl" value="Senior"><span>Senior · plus de 5 ans</span></label>
-      </div>
-      <div class="opts" id="lvlCo" hidden>
-        <label class="opt"><input type="radio" name="size" value="2 à 5 personnes" checked><span>2 à 5 personnes</span></label>
-        <label class="opt"><input type="radio" name="size" value="6 à 20 personnes"><span>6 à 20 personnes</span></label>
-        <label class="opt"><input type="radio" name="size" value="Plus de 20 personnes"><span>Plus de 20 personnes</span></label>
       </div>
     </section>
 
@@ -337,16 +336,21 @@ function socials(){var o={};Object.keys(SOC).forEach(function(k){var u=socUrl(SO
 var villes=DealrVilles.attach($("city"),{onPick:function(c){$("cityH").textContent=c?c.nom+" · "+c.cp+" · "+c.depNom:"Choisissez votre ville dans la liste : France métropolitaine et outre-mer.";$("cityH").style.color="";draw()}}),villesOk=false;
 villes.ready().then(function(ok){villesOk=ok});
 function isCo(){return radio("kind")==="Entreprise"}
+/* Site web : « www.exemple.fr » devient « https://www.exemple.fr » */
+function webUrl(x){x=String(x||"").trim();if(!x)return "";if(!/^https?:\/\//i.test(x))x="https://"+x;
+  try{var u=new URL(x);if(!/^https?:$/.test(u.protocol)||!/\.[a-z]{2,}$/i.test(u.hostname))return null;return u.href.replace(/^http:/,"https:")}catch(e){return null}}
+function selVal(id,val){var s=$(id);if(!val){s.value="";return}if(!Array.prototype.some.call(s.options,function(o){return o.value===val})){var o=document.createElement("option");o.textContent=val;s.appendChild(o)}s.value=val}
 function fullName(){if(isCo())return v("company");var f=v("first"),l=v("last");return (f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim()}
 /* Freelance ou entreprise : le formulaire s'adapte */
-function syncKind(){var co=isCo();$("coBox").hidden=!co;$("company").required=co;
+function syncKind(){var co=isCo();$("coBox").hidden=!co;$("company").required=co;$("coSize").required=co;$("coTeam").required=co;
   $("firstL").textContent=co?"Prénom du contact":"Prénom";$("lastL").textContent=co?"Nom du contact":"Nom";
-  $("lvlL").textContent=co?"Taille de l’équipe":"Votre niveau d’expérience";$("lvlFree").hidden=co;$("lvlCo").hidden=!co;
+  $("lvlL").hidden=co;$("lvlFree").hidden=co;
   $("job").placeholder=co?"Ex. Agence de design d’interface":"Ex. Monteuse vidéo spécialisée en Reels";
   $("phB").textContent=co?"Ajouter un logo":"Ajouter une photo";$("phH").textContent=co?"Logo de l’entreprise, de préférence carré.":"JPG ou PNG, visage bien visible.";
   $("pKind").textContent=co?"Entreprise":"Freelance";$("pKind").className="badge"+(co?" e":"")}
 document.querySelectorAll('input[name="kind"]').forEach(function(r){r.addEventListener("change",function(){syncKind();draw()})});
 syncKind();
+$("coWeb").addEventListener("input",function(){$("coErr").textContent=""});
 function mk(tag,txt,cls){var e=document.createElement(tag);if(txt)e.textContent=txt;if(cls)e.className=cls;return e}
 function setAv(el){var t=(isCo()?v("company").split(/\s+/).map(function(w){return w.charAt(0)}).slice(0,2).join(""):v("first").charAt(0)+v("last").charAt(0)).toUpperCase()||"?";
   if(st.photo){el.style.backgroundImage="url("+st.photo+")";el.textContent=""}else{el.style.backgroundImage="";el.textContent=t}}
@@ -445,6 +449,7 @@ $("cpf").addEventListener("change",function(){var f=this.files[0];$("cErr").text
   if(f.size>A.CERT_MAX){$("cErr").textContent="Fichier trop lourd : 1,5 Mo maximum.";resetProof();return}
   var r=new FileReader();r.onload=function(){proof={data:r.result,name:f.name};$("cpBox").classList.add("ok");$("cpName").textContent=f.name;$("cpHint").textContent=Math.max(1,Math.round(f.size/1024))+" Ko · prêt à être envoyé"};r.readAsDataURL(f)});
 function valid(){
+  if(st.step===0&&isCo()){$("coErr").textContent="";if(webUrl(v("coWeb"))===null){$("coErr").textContent="Adresse du site web invalide (ex. www.monentreprise.fr).";$("coWeb").focus();return false}}
   if(st.step===0&&v("city")&&villesOk&&!villes.picked()){$("cityH").textContent="Choisissez votre ville dans la liste proposée.";$("cityH").style.color="#c0270f";$("city").focus();return false}
   var sec=document.querySelectorAll(".step")[st.step],els=sec.querySelectorAll("input,select,textarea");
   for(var i=0;i<els.length;i++){if(!els[i].checkValidity()){els[i].reportValidity();return false}}
@@ -474,7 +479,7 @@ function publish(){
     p:v("rate")+" "+unitSel,rate:parseFloat(v("rate"))||0,unit:unitSel.replace("€/",""),unitSel:unitSel,
     r:prev.r||5,a:prev.a||0,reviews:prev.reviews||[],services:prev.services||[],
     tags:st.skills.slice(0,5),skills:st.skills,bio:v("bio"),photo:st.photo,exps:st.exps,dispo:radio("dispo"),mob:radio("mob"),
-    lvl:co?radio("size"):radio("lvl"),langs:langs(),links:links(),port:st.port,
+    lvl:co?$("coSize").value:radio("lvl"),coTeam:co?$("coTeam").value:"",sector:co?$("coSect").value:"",web:co?webUrl(v("coWeb"))||"":"",langs:langs(),links:links(),port:st.port,
     edus:st.edus,socials:socials()};
   var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
   A.saveProfile(p).then(function(){location.href="prestataire.html?id=moi"})
@@ -487,7 +492,7 @@ function fillFrom(p){
   $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";
   villes.set(p.cp?{nom:p.city,cp:p.cp,dep:p.dep,depNom:p.depNom}:(p.city||""));if(p.cp)$("cityH").textContent=p.city+" · "+p.cp+(p.depNom?" · "+p.depNom:"");
   setRadio("kind",p.t==="Entreprise"?"Entreprise":"Freelance");$("company").value=p.company||(p.t==="Entreprise"?p.n||"":"");
-  setRadio("mob",p.mob);$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise")setRadio("size",p.lvl);else setRadio("lvl",p.lvl);syncKind();
+  setRadio("mob",p.mob);$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise"){selVal("coSize",p.lvl);selVal("coTeam",p.coTeam);selVal("coSect",p.sector);$("coWeb").value=(p.web||"").replace(/^https:\/\//,"").replace(/\/$/,"")}else setRadio("lvl",p.lvl);syncKind();
   st.skills=(p.skills||p.tags||[]).slice(0,15);st.exps=(p.exps||[]).slice(0,8);
   $("bio").value=p.bio||"";(p.links||[]).slice(0,3).forEach(function(u,i){$("l"+(i+1)).value=u});
   st.photo=A.safeImg(p.photo);st.port=(p.port||[]).map(A.safeImg).filter(Boolean).slice(0,6);

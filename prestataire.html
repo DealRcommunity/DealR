@@ -225,8 +225,14 @@ if(own){
 /* Sections */
 var c=sec("À propos");c.appendChild(h("p","bio",p.bio||"Pas encore de présentation."));
 c=sec("Informations clés");var inf=h("div","info");
-[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Équipe":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
-  var d=h("div");d.appendChild(h("small","",r[0]));d.appendChild(h("span","",r[1]));inf.appendChild(d)});c.appendChild(inf);
+[["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Taille":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]].forEach(function(r){
+  var d=h("div");d.appendChild(h("small","",r[0]));d.appendChild(h("span","",r[1]));inf.appendChild(d)});
+if(p.t==="Entreprise"){
+  if(p.sector){var d1=h("div");d1.appendChild(h("small","","Secteur d’activité"));d1.appendChild(h("span","",p.sector));inf.appendChild(d1)}
+  if(p.coTeam||p.first){var d2=h("div");d2.appendChild(h("small","","Contact"));d2.appendChild(h("span","",[p.first,p.coTeam?"équipe "+p.coTeam:""].filter(Boolean).join(" · ")));inf.appendChild(d2)}
+  if(/^https:\/\/[^\s"<>]+$/.test(p.web||"")){var d3=h("div"),a=document.createElement("a");a.href=p.web;a.target="_blank";a.rel="noopener noreferrer nofollow";a.textContent=p.web.replace(/^https:\/\//,"").replace(/\/$/,"");
+    d3.appendChild(h("small","","Site web"));d3.appendChild(a);inf.appendChild(d3)}}
+c.appendChild(inf);
 c=sec("Compétences");var ch=h("div","chips");skills.forEach(function(s){ch.appendChild(h("span","",s))});c.appendChild(ch);
 if(services.length){c=sec("Services et tarifs");services.forEach(function(s){var r=h("div","row"),l=h("div");l.appendChild(h("b","",s.t));l.appendChild(h("span","sub",s.d||""));
   r.appendChild(l);r.appendChild(h("span","pr",eur(s.price)+" / "+s.unit));c.appendChild(r)})}
