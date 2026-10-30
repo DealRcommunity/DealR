@@ -49,8 +49,21 @@ En démonstration, les fichiers étaient enregistrés en texte (base64) dans les
 
 ## 6. Factures et obligations légales
 
-- [ ] **Freelances** : seules les entreprises doivent remplir leurs informations juridiques avant de facturer. Décider si on applique la même règle aux freelances (SIRET obligatoire).
-- [ ] Faire valider le modèle de facture par un comptable. Prévoir la **facturation électronique** obligatoire en France (réception obligatoire pour toutes les entreprises depuis septembre 2026 ; émission obligatoire en septembre 2026 pour les grandes et moyennes entreprises, en septembre 2027 pour les PME et microentreprises).
+**Décision du 30/10/2026 : facture automatique à la fin du deal** (comme Malt). Quand l'argent est versé au prestataire, Dealr émet la facture « au nom et pour le compte » du prestataire, grâce à un mandat de facturation accepté à l'inscription. L'outil de factures PDF actuel reste disponible en attendant.
+
+Prérequis et points juridiques (à faire valider par un avocat et un comptable) :
+- [ ] **Vrais paiements via un prestataire agréé** (Stripe Connect, Mangopay…) : Dealr ne peut pas encaisser lui-même l'argent pour le compte des membres (activité de paiement réglementée).
+- [ ] **Société Dealr immatriculée** (SIREN, TVA) : pour signer le mandat et facturer sa propre commission.
+- [ ] **Mandat de facturation dans les conditions d'utilisation** : accepté avant la première facture ; chaque facture acceptée par le prestataire (acceptation tacite après un délai de contestation, par ex. 7 jours, et possibilité de facture rectificative) ; copie envoyée au prestataire.
+- [ ] **Mentions sur la facture** : toutes les mentions habituelles, plus « Facture établie par Dealr au nom et pour le compte de [prestataire] ».
+- [ ] **Informations juridiques obligatoires pour tous les prestataires**, freelances compris : SIRET, adresse, **régime de TVA** (assujetti avec taux, ou franchise « TVA non applicable, art. 293 B du CGI »). Un particulier sans SIRET ne pourra pas être payé comme prestataire.
+- [ ] **Numérotation** : une série continue par prestataire pour les factures émises par Dealr (par ex. DLR-2027-0001), à valider avec un comptable.
+- [ ] **Facture de commission de Dealr**, séparée de la facture du prestataire.
+- [ ] **Facturation électronique** : passer par une plateforme agréée (accès délégué au nom du prestataire) dès que le prestataire y est soumis — grandes entreprises et ETI depuis septembre 2026, PME et micro-entreprises en **septembre 2027**. Réception obligatoire pour toutes les entreprises depuis septembre 2026.
+- [ ] **Déclaration DAC7** : chaque année avant fin février, déclarer aux impôts les sommes perçues par les prestataires via Dealr, et leur remettre une attestation.
+- [ ] **Conservation des factures** : 6 ans (fiscal) à 10 ans (commercial), dans un stockage durable.
+- [ ] **Assurance responsabilité civile professionnelle** pour Dealr (erreur sur une facture émise pour un membre).
+- [ ] En attendant : remplacer le texte sous l'outil de factures par un message clair (PDF valable entre entreprises jusqu'au 31/08/2027 pour les micro-entreprises et PME, à faire vérifier par un comptable).
 
 ## 7. Après chaque mise à jour du code
 
