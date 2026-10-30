@@ -251,7 +251,7 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("di
 setup();render();
 
 /* Profils des membres + en-tête selon la connexion */
-DealrAuth.listProfiles().then(list=>{if(!list.length)return;
+DealrAuth.listProfiles().then(list=>{list=list.filter(p=>p.t!=="Particulier");if(!list.length)return;
   const ids=new Set(list.map(p=>p.id));
   for(let i=pros.length-1;i>=0;i--)if(ids.has(pros[i].id))pros.splice(i,1);
   pros.unshift(...list);if(view==="pros")render()});

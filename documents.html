@@ -85,7 +85,7 @@ body.wait main{visibility:hidden}
   <div class="two"><div><label for="date">Date d’émission</label><input id="date" type="date" data-k="date"></div>
     <div id="validRow"><label for="valid">Validité du devis (jours)</label><input id="valid" type="number" min="1" data-k="valid"></div></div>
 
-  <div class="lock" id="legalLock" hidden role="status"><b>Facture impossible pour le moment.</b> Renseignez d’abord les informations juridiques de votre entreprise (raison sociale, SIREN, siège social, TVA) : elles figurent obligatoirement sur vos factures. <a href="profil.html#juridique">Compléter mes informations juridiques</a></div>
+  <div class="lock" id="legalLock" hidden role="status"><b>Facture impossible pour le moment.</b> Renseignez d’abord votre SIRET et vos informations juridiques (nom, adresse, régime de TVA) : ils figurent obligatoirement sur vos factures. <a href="profil.html#juridique">Compléter mes informations juridiques</a> · <a href="aide-statut.html">Pas encore de SIRET ?</a></div>
   <fieldset><legend>Émetteur (le prestataire)</legend>
     <p class="sub" id="legalNote" hidden style="margin:0 0 6px">Repris de vos informations juridiques. Pour les modifier : <a href="profil.html#juridique">mon profil</a>.</p>
     <label for="in">Nom ou société</label><input id="in" data-k="issuer.name" autocomplete="organization">
@@ -140,9 +140,10 @@ function clone(o){return JSON.parse(JSON.stringify(o))}
 var me={name:"",addr:"",siret:"",tva:"",email:"",iban:""},docs=[],nextN={},isCo=false,legal=null,legalOk=true;
 /* Entreprise : les factures reprennent ses informations juridiques ; sans elles, pas de facture */
 function legalId(id){id=String(id||"").replace(/\D/g,"");return id.length===14?"SIRET : "+id:(id?"SIREN : "+id:"")}
-function applyLegal(d){if(isCo&&legalOk&&!d.finalized){d.issuer.name=legal.name;d.issuer.addr=legal.addr;d.issuer.siret=legal.siret||legal.siren;d.issuer.tva=legal.tva||""}}
+function applyLegal(d){if(isCo&&legalOk&&!d.finalized){d.issuer.name=legal.name;d.issuer.addr=legal.addr;d.issuer.siret=legal.siret||legal.siren;d.issuer.tva=legal.tva||"";if(legal.tvaRegime==="franchise")d.tva=0}}
 function syncLock(){var f=doc.type==="facture";$("legalLock").hidden=!(isCo&&!legalOk&&f);$("print").disabled=isCo&&!legalOk&&f;
-  var ro=isCo&&legalOk&&!doc.finalized;["in","ia","is","it"].forEach(function(i){$(i).readOnly=ro});$("legalNote").hidden=!ro}
+  var ro=isCo&&legalOk&&!doc.finalized;["in","ia","is","it"].forEach(function(i){$(i).readOnly=ro});$("legalNote").hidden=!ro;
+  $("tva").disabled=!!(ro&&legal&&legal.tvaRegime==="franchise")}
 function blank(type){return{type:type||"devis",date:iso(new Date()),valid:30,issuer:clone(me),
   client:{name:"",addr:"",email:""},lines:[{d:"",q:1,u:"forfait",pu:0}],tva:20,rem:0,acc:0,pay:30,notes:"",num:"",finalized:false}}
 var doc=blank();
@@ -242,7 +243,8 @@ A.requireUser("documents.html").then(function(u){return A.isAdmin().then(functio
     var p=r[0];docs=r[1]||[];
     var last=docs[0]&&docs[0].data&&docs[0].data.issuer;
     me=last?clone(last):{name:p?((p.first||p.n||"")+(p.last?" "+p.last:"")).trim():"",addr:"",siret:"",tva:"",email:u.email||"",iban:""};
-    isCo=!!(p&&p.t==="Entreprise");legal=p&&p.legal;legalOk=!isCo||!!(window.DealrLegal&&DealrLegal.complete(legal));
+    if(p&&p.t==="Particulier"){var mn=document.querySelector("main");mn.innerHTML='<section class="card" style="max-width:640px;margin:40px auto;padding:28px"><h1 style="font-size:1.8rem">Devis et factures</h1><p class="sub" style="margin-top:10px">Les devis et factures sont établis par les prestataires (freelances et entreprises). Avec un compte particulier, vous recevez les devis et factures de vos prestataires dans la messagerie.</p><p style="margin-top:16px"><a class="btn" href="messages.html">Ouvrir mes messages</a> <a class="btn out" href="aide-statut.html">Proposer mes services ?</a></p></section>';document.body.classList.remove("wait");return}
+    isCo=!!(p&&p.t!=="Particulier");legal=p&&p.legal;legalOk=!isCo||!!(window.DealrLegal&&DealrLegal.complete(legal));
     doc=blank();fill();renderHist();refreshNext();document.body.classList.remove("wait")})});
 })();
 </script>

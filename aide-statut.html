@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rester en règle – Dealr</title>
+<meta name="description" content="Trouver son SIRET, se déclarer en micro-entreprise, déclarer ses revenus : le guide Dealr pour proposer ses services en toute légalité.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.top{text-align:center;padding:64px 0 10px;max-width:780px;margin:0 auto}
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--o)}
+.kick:before{content:"";width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,#3448f0,var(--o))}
+h1{font-size:clamp(2.4rem,6vw,4rem);margin-top:14px}
+.top p{color:#55555c;font-size:1.12rem;margin:16px auto 0;max-width:34em}
+.tabs{position:sticky;top:12px;z-index:5;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px auto 0;max-width:820px}
+.tabs a{border:1px solid #dcdce2;background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:99px;padding:9px 16px;font:600 .93rem Figtree,sans-serif;color:var(--ink);text-decoration:none}
+.tabs a:hover,.tabs a[aria-current=true]{color:#fff;border-color:transparent;background:linear-gradient(100deg,#4056ff,#965ac8 50%,#f55a1f)}
+.guide{max-width:820px;margin:34px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:26px}
+.sec{background:#fff;border-radius:24px;padding:30px;box-shadow:0 14px 40px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05);scroll-margin-top:80px}
+.sec h2{font-size:clamp(1.5rem,3.4vw,2rem);display:flex;align-items:center;gap:12px}
+.sec h2 i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff;font:800 1rem Figtree,sans-serif;font-style:normal}
+.sec h2 i.o{background:linear-gradient(150deg,#ff8248,#f55a1f)}.sec h2 i.b{background:linear-gradient(150deg,#5a6bff,#3448f0)}.sec h2 i.v{background:linear-gradient(150deg,#b07ce0,#7a54d8)}.sec h2 i.g{background:linear-gradient(150deg,#3fc47f,#22a863)}
+.sec h3{font-size:1.12rem;margin:22px 0 8px}
+.sec p,.sec li{color:#45454d;line-height:1.65}
+.sec p{margin:10px 0 0}
+.sec ul,.sec ol{margin:8px 0 0;padding-left:22px}.sec li{margin:5px 0}
+.sec a{color:#3448f0;font-weight:600}
+.lead{font-size:1.05rem}
+.steps{list-style:none;padding:0!important;counter-reset:s;display:grid;gap:12px;margin-top:14px!important}
+.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;border:1px solid #ececf0;border-radius:16px;margin:0!important}
+.steps li:before{content:counter(s);position:absolute;left:14px;top:14px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 .95rem Figtree,sans-serif;color:#fff;background:linear-gradient(135deg,#3448f0,#f55a1f)}
+.steps b{display:block;color:var(--ink)}
+.tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:.95rem}
+.tbl th,.tbl td{text-align:left;padding:10px 8px;border-bottom:1px solid #ececf0;vertical-align:top}
+.tbl th{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.tbl td.n{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.note{background:#eef4ff;border-radius:14px;padding:14px 16px;margin-top:14px;font-size:.93rem;line-height:1.55;color:#2c3570}
+.warn{background:#fff4e5;border-radius:14px;padding:14px 16px;margin-top:14px;font-size:.93rem;line-height:1.55;color:#6b3d00}
+.ex{border:1.5px dashed #c9cdf5;border-radius:16px;padding:14px 16px;margin-top:14px}
+.ex b{color:var(--ink)}
+.find{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.find input{flex:1;min-width:220px;border:1px solid #dcdce2;border-radius:99px;padding:13px 18px;font:500 1rem Figtree,sans-serif;background:#fafafb}
+.find input:focus{outline:0;border-color:var(--ink);background:#fff}
+.res{display:grid;gap:8px;margin-top:12px}
+.res .r{border:1px solid #ececf0;border-radius:14px;padding:12px 14px}
+.res .r b{display:block}.res .r small{color:var(--mute);font-variant-numeric:tabular-nums}
+.res .r code{font:700 .95rem ui-monospace,Menlo,monospace;background:#f3f4fb;border-radius:6px;padding:2px 6px}
+.res .msg{color:var(--mute);font-size:.92rem}
+.cta2{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn2{display:inline-block;border-radius:99px;padding:12px 22px;font:600 .98rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff!important;border:1.5px solid var(--ink)}
+.btn2.out{background:#fff;color:var(--ink)!important}
+.disc{max-width:820px;margin:26px auto 90px;color:var(--mute);font-size:.88rem;line-height:1.6;text-align:center}
+@media(max-width:700px){.top{padding-top:40px}.sec{padding:22px}.tbl{font-size:.86rem}.tabs{position:static}.tbl td.n{white-space:normal}.sec{padding:20px 16px}}
+</style>
+</head>
+<body>
+<header class="gh">
+  <div class="gh-in">
+    <a class="logo" href="index.html"><i></i>Dealr</a>
+    <nav data-nav="aide">
+      <a data-extra href="index.html#entreprise">Entreprises</a>
+      <a data-extra href="index.html#freelance">Freelances</a>
+      <a data-extra href="faq.html">Questions fréquentes</a>
+      <a data-extra="end" data-acc class="gh-mcta" id="ghSignup" href="connexion.html#inscription">Créer un compte</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="top">
+    <span class="kick">Rester en règle</span>
+    <h1>Travailler en freelance, <em>en toute légalité.</em></h1>
+    <p>Pour être payé sur Dealr, il faut un statut et un numéro SIRET. Voici comment le retrouver, le créer, puis déclarer vos revenus, étape par étape.</p>
+  </section>
+
+  <nav class="tabs" aria-label="Sommaire">
+    <a href="#siret">Retrouver mon SIRET</a>
+    <a href="#creer">Me déclarer micro-entrepreneur</a>
+    <a href="#declarer">Déclarer mes revenus</a>
+    <a href="#autres">Sans créer d’entreprise ?</a>
+  </nav>
+
+  <div class="guide">
+
+    <section class="sec" id="siret">
+      <h2><i class="b">1</i>Retrouver mon SIRET</h2>
+      <p class="lead">Le <b>SIRET</b> est le numéro de votre entreprise, à 14 chiffres. Ses 9 premiers chiffres forment le <b>SIREN</b>. Dealr accepte l’un ou l’autre.</p>
+      <h3>Le chercher ici</h3>
+      <p>Tapez le nom de votre entreprise (pour une micro-entreprise : vos prénom et nom) ou votre SIREN. La recherche se fait dans le registre officiel des entreprises.</p>
+      <div class="find"><input id="q" placeholder="Ex. Nina Roy, Studio Nord, 794598813" aria-label="Nom de l’entreprise ou SIREN"></div>
+      <div class="res" id="res" aria-live="polite"></div>
+      <h3>Ou ailleurs</h3>
+      <ul>
+        <li>Sur <a href="https://annuaire-entreprises.data.gouv.fr" target="_blank" rel="noopener">l’Annuaire des entreprises</a> (service public, gratuit).</li>
+        <li>Sur votre <a href="https://avis-situation-sirene.insee.fr" target="_blank" rel="noopener">avis de situation INSEE</a>, ou le courrier reçu de l’INSEE à la création.</li>
+        <li>Dans votre espace sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a>, ou sur vos anciennes factures.</li>
+      </ul>
+      <div class="note">Votre SIRET n’apparaît nulle part ? C’est sans doute que votre entreprise n’est pas encore créée. La partie suivante explique comment faire.</div>
+    </section>
+
+    <section class="sec" id="creer">
+      <h2><i class="o">2</i>Me déclarer micro-entrepreneur</h2>
+      <p class="lead">La <b>micro-entreprise</b> (l’ancien « auto-entrepreneur ») est le statut le plus simple pour se lancer seul : création gratuite en ligne, comptabilité allégée, cotisations calculées sur ce que vous encaissez. On peut l’ouvrir en plus d’un emploi salarié ou de ses études (vérifiez simplement votre contrat de travail).</p>
+      <ol class="steps">
+        <li><b>Choisissez votre type d’activité</b>La plupart des métiers du digital (développement, design, rédaction, conseil, montage vidéo…) sont des <b>activités libérales</b>. Les activités commerciales ou artisanales relèvent d’une autre catégorie. En cas de doute, le guichet unique vous guide.</li>
+        <li><b>Déclarez votre activité sur le guichet unique</b>Sur <a href="https://formalites.entreprises.gouv.fr" target="_blank" rel="noopener">formalites.entreprises.gouv.fr</a>, le site officiel. La démarche est <b>gratuite</b> et prend une vingtaine de minutes. Méfiez-vous des sites qui la font payer.</li>
+        <li><b>Recevez votre SIRET</b>L’INSEE vous l’envoie en général en une à quatre semaines. Vous le retrouvez aussi dans l’Annuaire des entreprises.</li>
+        <li><b>Activez votre espace URSSAF</b>Sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a> : c’est là que vous déclarerez votre chiffre d’affaires. Pensez à demander l’<b>ACRE</b> (cotisations réduites la première année) si vous y avez droit.</li>
+        <li><b>Renseignez votre SIRET sur Dealr</b>Dans <a href="profil.html#juridique">Mon profil → Informations juridiques</a>. Vous pouvez alors faire des deals et être payé.</li>
+      </ol>
+      <h3>Les plafonds à connaître (2026)</h3>
+      <table class="tbl">
+        <thead><tr><th>Activité</th><th>Chiffre d’affaires maximum par an</th><th>Pas de TVA jusqu’à*</th></tr></thead>
+        <tbody>
+          <tr><td>Prestations de services et activités libérales</td><td class="n">83 600 €</td><td class="n">37 500 €</td></tr>
+          <tr><td>Vente de marchandises</td><td class="n">203 100 €</td><td class="n">85 000 €</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:.9rem">* « Franchise en base » : tant que vous restez sous ce seuil, vous ne facturez pas la TVA et vos factures portent la mention « TVA non applicable, art. 293 B du CGI ». Au-delà, vous facturez la TVA.</p>
+      <h3>Vos obligations au quotidien</h3>
+      <ul>
+        <li>Faire une facture pour chaque prestation, avec votre SIRET (sur Dealr, la facture est préparée pour vous).</li>
+        <li>Tenir un livre des recettes : la liste de ce que vous encaissez.</li>
+        <li>Ouvrir un compte bancaire dédié si votre chiffre d’affaires dépasse 10 000 € deux années de suite.</li>
+        <li>Payer la cotisation foncière des entreprises (CFE) à partir de la deuxième année.</li>
+        <li>Selon votre métier, souscrire une assurance responsabilité civile professionnelle.</li>
+      </ul>
+    </section>
+
+    <section class="sec" id="declarer">
+      <h2><i class="v">3</i>Déclarer mes revenus</h2>
+      <p class="lead">Un micro-entrepreneur déclare ses revenus à deux endroits : à l’<b>URSSAF</b> chaque mois ou trimestre (cotisations sociales), et aux <b>impôts</b> une fois par an.</p>
+
+      <h3>Tous les mois ou tous les trimestres : l’URSSAF</h3>
+      <ol class="steps">
+        <li><b>Connectez-vous à autoentrepreneur.urssaf.fr</b>Ou à l’application « AutoEntrepreneur Urssaf ».</li>
+        <li><b>Déclarez votre chiffre d’affaires encaissé</b>Le total des sommes réellement reçues sur la période, même si c’est 0 € (une déclaration à zéro reste obligatoire).</li>
+        <li><b>Payez les cotisations</b>Elles sont calculées automatiquement, en pourcentage de ce que vous avez déclaré.</li>
+      </ol>
+      <table class="tbl">
+        <thead><tr><th>Activité</th><th>Cotisations 2026</th></tr></thead>
+        <tbody>
+          <tr><td>Activités libérales (la plupart des métiers du digital)</td><td class="n">25,6 %</td></tr>
+          <tr><td>Activités libérales relevant de la CIPAV</td><td class="n">23,2 %</td></tr>
+          <tr><td>Prestations de services commerciales ou artisanales</td><td class="n">21,2 %</td></tr>
+          <tr><td>Vente de marchandises</td><td class="n">12,3 %</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:.9rem">Une petite contribution à la formation professionnelle s’ajoute (0,1 % à 0,3 %). Avec l’ACRE, ces taux sont environ divisés par deux la première année.</p>
+      <p><b>Échéances trimestrielles :</b> 30 avril, 31 juillet, 31 octobre et 31 janvier. En mensuel : avant la fin du mois suivant.</p>
+      <div class="ex"><b>Exemple.</b> Nina, monteuse vidéo (activité libérale), encaisse 2 000 € via Dealr en mars. Elle déclare 2 000 € à l’URSSAF et paie environ 516 € de cotisations (25,6 % + 0,2 %).</div>
+
+      <h3>Une fois par an : l’impôt sur le revenu</h3>
+      <ol class="steps">
+        <li><b>Faites votre déclaration de revenus habituelle</b>Sur <a href="https://www.impots.gouv.fr" target="_blank" rel="noopener">impots.gouv.fr</a>, au printemps (en général d’avril à début juin, selon votre département).</li>
+        <li><b>Ajoutez la déclaration complémentaire « 2042-C-PRO »</b>Cochez « revenus des professions non salariées » dans l’étape des annexes.</li>
+        <li><b>Reportez votre chiffre d’affaires de l’année</b>Dans la bonne case : <b>5HQ</b> pour une activité libérale, <b>5KP</b> pour des prestations commerciales ou artisanales, <b>5KO</b> pour de la vente. Indiquez le chiffre d’affaires brut : l’administration retire elle-même un abattement pour frais (34 %, 50 % ou 71 %).</li>
+      </ol>
+      <div class="note">Si vous avez choisi le <b>versement libératoire</b> (l’impôt payé en même temps que les cotisations URSSAF), utilisez les cases 5TE, 5TB ou 5TA : l’impôt est déjà réglé, mais le montant doit quand même être déclaré.</div>
+      <div class="note">Chaque année, Dealr vous enverra un récapitulatif des sommes reçues via la plateforme, comme la loi l’impose aux plateformes : il vous aidera à vérifier vos déclarations.</div>
+    </section>
+
+    <section class="sec" id="autres">
+      <h2><i class="g">4</i>Sans créer d’entreprise ?</h2>
+      <p class="lead">Vendre ses services régulièrement sans statut, c’est du travail non déclaré. Si vous ne voulez pas créer d’entreprise, il existe une alternative : le <b>portage salarial</b>. Une société de portage facture le client à votre place et vous verse un salaire, avec les protections d’un salarié (chômage, retraite…), en échange de frais de gestion.</p>
+      <p>Vous voulez seulement <b>trouver un prestataire</b> pour un projet personnel ? Pas besoin de statut : créez un compte <b>Particulier</b>.</p>
+      <div class="cta2"><a class="btn2" href="profil.html#juridique">Renseigner mon SIRET</a><a class="btn2 out" href="contact.html">Une question ? Écrivez-nous</a></div>
+    </section>
+  </div>
+
+  <p class="disc">Ce guide donne des informations générales, à jour au 30 octobre 2026 (chiffres 2026). Il ne remplace pas l’avis d’un expert-comptable. Les règles peuvent évoluer : vérifiez toujours sur les sites officiels <a href="https://entreprendre.service-public.gouv.fr" target="_blank" rel="noopener">entreprendre.service-public.gouv.fr</a>, <a href="https://www.urssaf.fr" target="_blank" rel="noopener">urssaf.fr</a> et <a href="https://www.impots.gouv.fr" target="_blank" rel="noopener">impots.gouv.fr</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fbot">
+      <span>© 2026 Dealr. Tous droits réservés.</span>
+      <span><a href="apropos.html">À propos</a> · <a href="faq.html">Questions fréquentes</a> · <a href="contact.html">Contact</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script src="legal.js"></script>
+<script>
+(function(){
+  var Lg=window.DealrLegal,q=document.getElementById("q"),res=document.getElementById("res"),t=null,seq=0;
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  function msg(m){res.textContent="";res.appendChild(el("p","msg",m))}
+  function run(){var v=q.value.trim(),my=++seq;if(v.replace(/\s/g,"").length<3){res.textContent="";return}
+    msg("Recherche dans le registre officiel…");
+    Lg.searchCompanies(v.replace(/\s/g,"").match(/^\d{9,14}$/)?v.replace(/\s/g,"").slice(0,9):v).then(function(l){if(my!==seq)return;res.textContent="";
+      if(!l.length){msg("Aucune entreprise trouvée. Vérifiez l’orthographe, ou votre entreprise n’est peut-être pas encore créée (voir partie 2).");return}
+      l.slice(0,6).forEach(function(c){var r=el("div","r");r.appendChild(el("b","",c.name+(c.open?"":" (fermée)")));
+        var s=el("small");s.appendChild(document.createTextNode("SIREN "));s.appendChild(el("code","",c.siren));
+        if(c.siret){s.appendChild(document.createTextNode(" · SIRET du siège "));s.appendChild(el("code","",c.siret))}
+        r.appendChild(s);if(c.addr){var a2=el("small","",c.addr);a2.style.display="block";r.appendChild(a2)}res.appendChild(r)})})
+    .catch(function(){if(my===seq)msg("Le registre ne répond pas pour le moment. Essayez l’Annuaire des entreprises (lien ci-dessous).")})}
+  q.addEventListener("input",function(){clearTimeout(t);t=setTimeout(run,300)});
+  /* Sommaire : onglet actif selon la partie visible */
+  var tabs=document.querySelectorAll(".tabs a");
+  if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)tabs.forEach(function(a){a.setAttribute("aria-current",a.getAttribute("href")==="#"+e.target.id?"true":"false")})})},{rootMargin:"-40% 0px -55% 0px"});
+    document.querySelectorAll(".sec").forEach(function(s){io.observe(s)})}
+  DealrAuth.user().then(function(u){if(!u)return;var g=document.getElementById("ghSignup");if(g)g.hidden=true});
+})();
+</script>
+</body>
+</html>

@@ -98,6 +98,7 @@ main{flex:1;min-height:0;padding-bottom:22px}
 /* Bouton Deal */
 .dealbtn{flex:none;height:48px;border-radius:24px;border:1.5px solid var(--ink);background:#fff;font-weight:700;padding:0 16px;display:flex;align-items:center;gap:7px;cursor:pointer}
 .dealbtn:hover{background:var(--ink);color:#fff}
+.roles label:has(input:disabled){opacity:.45;cursor:not-allowed}
 .attbtn{flex:none;width:48px;height:48px;border-radius:50%;border:1.5px solid #e3e3e8;background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .attbtn:hover{border-color:var(--ink)}.attbtn:disabled{opacity:.5;cursor:wait}
 .attopt{display:block;width:100%;text-align:left;margin-top:16px;border:1.5px solid #e3e3e8;border-radius:16px;background:#fff;padding:14px 16px;cursor:pointer;font:inherit}
@@ -337,7 +338,7 @@ dialog textarea{min-height:80px;resize:vertical}
       <div class="roles">
         <label><input type="radio" name="role" value="payee" checked>Le prestataire<small>Vous serez payé</small></label>
         <label><input type="radio" name="role" value="payer">Le client<small>Vous paierez</small></label>
-      </div></div>
+      </div><p class="sub" id="ddRoleH" style="margin-top:6px;font-size:.85rem"></p></div>
     <label for="ddTitle">Prestation</label><input id="ddTitle" maxlength="140" placeholder="Ex. Montage de 3 Reels" required>
     <div class="two"><div><label for="ddAmt">Montant (€)</label><input id="ddAmt" type="number" min="1" max="100000" step="0.01" inputmode="decimal" placeholder="320" required></div>
       <div><label for="ddDate">Livraison avant le</label><input id="ddDate" type="date"></div></div>
@@ -608,7 +609,7 @@ var countering=null;
 function openDeal(replaces){
   countering=replaces||null;$("fDeal").reset();$("ddErr").textContent="";
   $("ddDate").min=new Date().toISOString().slice(0,10);
-  $("ddRole").hidden=!!replaces;
+  $("ddRole").hidden=!!replaces;if(!replaces)syncRoles();
   $("ddT").innerHTML=replaces?"Faire une <em>contre-proposition.</em>":"Proposer un <em>deal.</em>";
   $("ddS").textContent=replaces?"Modifiez le montant ou les conditions. "+other()+" pourra accepter votre nouvelle proposition.":"Quand vous êtes d’accord, fixez les termes. Le deal est conclu dès que "+other()+" l’accepte.";
   $("ddOk").textContent=replaces?"Envoyer la contre-proposition":"Proposer le deal";
@@ -622,7 +623,23 @@ $("fDeal").onsubmit=function(e){e.preventDefault();
    .catch(function(err){$("ddErr").textContent=A.message(err)}).then(function(){$("ddOk").disabled=false})};
 $("dealBtn").onclick=function(){var a=active();
   if(a){$("err").textContent="Un deal est déjà en cours dans cette conversation.";var c=document.querySelector('[data-deal="'+a.id+'"]');if(c)c.scrollIntoView({behavior:"smooth",block:"center"});return}
-  openDeal()};
+  dealReady().then(function(ok){if(ok)openDeal()})};
+/* Avant un deal : SIRET pour les freelances et entreprises, et un particulier ne peut pas être payé */
+var dealCtx=null;
+function blockMsg(code){var e=$("err");e.textContent=A.message(new Error(code))+" ";
+  if(code==="deal_siret_me"){var a1=document.createElement("a");a1.href="profil.html#juridique";a1.textContent="Renseigner mon SIRET";e.appendChild(a1);
+    e.appendChild(document.createTextNode(" · "));var a2=document.createElement("a");a2.href="aide-statut.html";a2.textContent="Guide pour rester en règle";e.appendChild(a2)}}
+function dealReady(){$("err").textContent="";
+  return Promise.all([A.myProfile().catch(function(){return null}),A.getProfile(cur.other.id).catch(function(){return null})]).then(function(r){
+    var me=r[0],ot=r[1];dealCtx={me:me,other:ot};
+    if(A.isPro(me)&&!A.legalOk(me)){blockMsg("deal_siret_me");return false}
+    if(ot&&A.isPro(ot)&&!A.legalOk(ot)){blockMsg("deal_siret_other");return false}
+    if(me&&!A.isPro(me)&&ot&&!A.isPro(ot)){$("err").textContent="Deux particuliers ne peuvent pas faire de deal : un prestataire (freelance ou entreprise) est nécessaire.";return false}
+    return true})}
+function syncRoles(){var me=dealCtx&&dealCtx.me,ot=dealCtx&&dealCtx.other,ee=document.querySelector('input[name="role"][value="payee"]'),er=document.querySelector('input[name="role"][value="payer"]');
+  var meP=me&&!A.isPro(me),otP=ot&&!A.isPro(ot);ee.disabled=!!meP;er.disabled=!!otP;
+  if(meP)er.checked=true;else if(otP)ee.checked=true;
+  $("ddRoleH").textContent=meP?"Compte particulier : vous êtes le client de ce deal.":otP?(other()+" est un particulier : vous êtes le prestataire de ce deal."):""}
 
 /* Paiement (simulé) puis animation du coffre */
 var paying=null;

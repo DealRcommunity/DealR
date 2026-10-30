@@ -50,6 +50,8 @@ textarea{min-height:120px;resize:vertical}
 .opt input{position:absolute;opacity:0}
 .opt span{display:block;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;background:#fff}
 .kind .opt span b{display:block}
+body.part .side{display:none}body.part .layout{grid-template-columns:minmax(0,1fr);max-width:760px;margin-left:auto;margin-right:auto}
+.partnote{background:#eef4ff;border-radius:12px;padding:12px 14px;margin:14px 0 0;font-size:.9rem;line-height:1.5}.partnote a{color:#3448f0;font-weight:600}.partnote[hidden]{display:none}
 .kind .opt span small{display:block;color:var(--mute);font-weight:400;font-size:.82rem}
 .opt input:checked+span{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:#fafafb}
 .opt input:focus-visible+span{outline:3px solid var(--o);outline-offset:2px}
@@ -127,6 +129,7 @@ textarea{min-height:120px;resize:vertical}
 .rad input[type=range]{width:100%;margin:12px 0 4px;accent-color:#f55a1f;height:28px;cursor:pointer}
 .radsc{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums;margin-bottom:8px}
 .lgl{margin-top:22px}.lgl[hidden]{display:none}.lgh{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.helpbox{display:block;text-decoration:none;color:inherit;border:1.5px solid #3448f0;border-radius:14px;padding:12px 14px;margin:12px 0 0;background:#fff}.helpbox b{display:block;color:#3448f0}.helpbox span{font-size:.88rem;color:var(--mute)}.helpbox:hover{background:#eef4ff}
 .lgi{background:#eef4ff;border-left:4px solid #3448f0;border-radius:10px;padding:12px 14px;margin:14px 0 4px;font-size:.9rem;line-height:1.5}
 .lgb{font-size:.8rem;font-weight:700;border-radius:99px;padding:5px 11px;background:#fff4e5;color:#8a4b00}.lgb.ok{background:#e7f7ee;color:#17613a}
 .lnk{display:block;margin:8px 0 0 auto;background:none;border:0;padding:0;color:#3448f0;font:600 .86rem Figtree,sans-serif;cursor:pointer;text-decoration:underline}
@@ -161,7 +164,9 @@ body.wait main{visibility:hidden}
       <div class="opts h kind">
         <label class="opt"><input type="radio" name="kind" value="Freelance" checked><span><b>Freelance</b><small>Indépendant, vous travaillez seul</small></span></label>
         <label class="opt"><input type="radio" name="kind" value="Entreprise"><span><b>Entreprise</b><small>Agence, studio, société avec une équipe</small></span></label>
+        <label class="opt"><input type="radio" name="kind" value="Particulier"><span><b>Particulier</b><small>Vous cherchez un prestataire pour un projet personnel</small></span></label>
       </div>
+      <p class="partnote" id="partNote" hidden>Un compte particulier sert à trouver un prestataire, lui écrire, payer un deal et laisser un avis. Il n’apparaît pas dans la liste des prestataires. Pour proposer vos services contre rémunération, il faut un statut (micro-entreprise ou société) : choisissez Freelance ou Entreprise. <a href="aide-statut.html">Comment se déclarer ?</a></p>
       <div id="coBox" hidden><label for="company">Nom légal de l’entreprise</label><input id="company" maxlength="80" autocomplete="organization" placeholder="Ex. Studio Nord SAS">
         <div class="two"><div><label for="coSize">Taille de l’entreprise</label><select id="coSize"><option value="">Choisir…</option><option>Entre 1 et 9</option><option>Entre 10 et 49</option><option>Entre 50 et 249</option><option>Entre 250 et 999</option><option>1 000 et plus</option></select></div><div><label for="coTeam">Votre équipe au sein de l’entreprise</label><select id="coTeam"><option value="">Choisir…</option><option>IT / DSI</option><option>Marketing / Communication</option><option>Administration</option><option>Achats</option><option>Finance / Comptabilité</option><option>Ressources humaines</option><option>Opérations</option><option>Ventes</option><option>Management</option><option>Produit</option><option>Communication</option></select></div></div>
         <label for="coSect">Secteur d’activité <span class="facu">(facultatif)</span></label><select id="coSect"><option value="">–</option><option>Services professionnels</option><option>Énergie (gaz, électricité, eau)</option><option>Immobilier et construction</option><option>Aviation, aérospatial et défense</option><option>Fabrication industrielle et produits chimiques</option><option>Automobile et assemblage</option><option>Transport et vente en gros</option><option>Biens de consommation</option><option>Vente</option><option>Alimentaire, boissons et tabac</option><option>Santé</option><option>Secteur public</option><option>Services financiers</option><option>Hardware & software</option><option>Télécoms, médias, communication</option><option>Tourisme, voyage et loisirs</option><option>Enseignement</option><option>Hôtellerie, restauration et traiteur</option><option>Autre</option></select>
@@ -173,6 +178,7 @@ body.wait main{visibility:hidden}
       <div><label for="last" id="lastL">Nom</label><input id="last" autocomplete="family-name" required></div></div>
       <label for="city">Ville</label><input id="city" placeholder="Tapez le nom de votre ville ou son code postal" required>
       <div class="sub" id="cityH" style="margin-top:6px">Choisissez votre ville dans la liste : France métropolitaine et outre-mer.</div>
+      <div id="mobBox">
       <div class="l">Où travaillez-vous ?</div>
       <div class="opts h">
         <label class="opt"><input type="radio" name="mob" value="À distance" checked><span>À distance</span></label>
@@ -184,6 +190,7 @@ body.wait main{visibility:hidden}
         <input type="range" id="rad" min="0" max="100" step="5" value="20" aria-describedby="radH">
         <div class="radsc" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100 km</span></div>
         <div class="sub" id="radH">Autour de votre ville. À 0 km, vous ne vous déplacez que dans votre ville.</div>
+      </div>
       </div>
     </section>
 
@@ -309,15 +316,21 @@ body.wait main{visibility:hidden}
 
   <section class="card lgl" id="juridique" hidden aria-labelledby="lgT">
     <div class="lgh"><h2 id="lgT" style="font-size:1.5rem">Informations <em>juridiques</em></h2><span class="lgb" id="lgBadge" hidden></span></div>
-    <p class="help">Nous utilisons ces informations pour générer vos factures. Tant qu’elles ne sont pas complètes, vous ne pouvez pas créer de facture.</p>
+    <p class="help">Obligatoires pour faire un deal, être payé et facturer : elles figurent sur vos factures. Tant qu’elles ne sont pas complètes, vous ne pouvez ni proposer ni accepter de deal.</p>
+    <a class="helpbox" href="aide-statut.html"><b>Pas encore de SIRET ? Vous ne le retrouvez plus ?</b><span>Trouver son numéro, se déclarer en micro-entreprise, déclarer ses revenus : notre guide pour rester en règle →</span></a>
     <div class="lgi">Dans la mesure du possible, sélectionnez votre entreprise via l’outil de recherche pour procéder à la vérification instantanée. Avant d’enregistrer, assurez-vous que toutes les informations sont exactes : une fois vérifiés, votre numéro d’immatriculation et votre numéro de TVA ne pourront plus être modifiés.</div>
-    <label for="lgName">Raison sociale</label><input id="lgName" maxlength="120" placeholder="Rechercher par nom d’entreprise">
+    <label for="lgName" id="lgNameL">Raison sociale</label><input id="lgName" maxlength="120" placeholder="Rechercher par nom d’entreprise">
     <label for="lgSiren">Numéro d’immatriculation de l’entreprise (SIREN ou SIRET)</label><input id="lgSiren" maxlength="17" inputmode="numeric" placeholder="Ex. 794598813">
     <label for="lgAddr">Siège social</label><input id="lgAddr" maxlength="160" placeholder="Commencez à saisir votre adresse">
     <textarea id="lgAddrM" rows="3" maxlength="200" placeholder="N°, rue&#10;Code postal Ville" hidden aria-label="Adresse du siège social"></textarea>
     <button type="button" class="lnk" id="lgAddrT">Je ne trouve pas mon adresse parmi les suggestions</button>
-    <label for="lgTva">Numéro de TVA intracommunautaire</label><input id="lgTva" maxlength="20" placeholder="Ex. FR14794598813">
-    <div class="sub" id="lgTvaH" style="margin-top:6px">Laissez vide si votre entreprise n’est pas assujettie à la TVA (franchise en base).</div>
+    <div class="l" style="margin-top:16px">Régime de TVA</div>
+    <div class="opts h" role="radiogroup" aria-label="Régime de TVA">
+      <label class="opt"><input type="radio" name="tvar" value="franchise"><span>Franchise en base<small style="display:block;color:var(--mute);font-weight:400;font-size:.8rem">TVA non applicable, art. 293 B du CGI (cas de la plupart des micro-entreprises)</small></span></label>
+      <label class="opt"><input type="radio" name="tvar" value="assujetti"><span>Assujetti à la TVA<small style="display:block;color:var(--mute);font-weight:400;font-size:.8rem">Vous facturez la TVA à vos clients</small></span></label>
+    </div>
+    <div id="lgTvaBox"><label for="lgTva">Numéro de TVA intracommunautaire</label><input id="lgTva" maxlength="20" placeholder="Ex. FR14794598813"></div>
+    <div class="sub" id="lgTvaH" style="margin-top:6px">Vous ne savez pas ? Une micro-entreprise qui ne facture pas la TVA est en « franchise en base ».</div>
     <p class="err" id="lgErr" role="alert"></p>
     <button type="button" class="btn" id="lgSave">Enregistrer les informations juridiques</button>
   </section>
@@ -369,18 +382,21 @@ function socials(){var o={};Object.keys(SOC).forEach(function(k){var u=socUrl(SO
 var villes=DealrVilles.attach($("city"),{onPick:function(c){$("cityH").textContent=c?c.nom+" · "+c.cp+" · "+c.depNom:"Choisissez votre ville dans la liste : France métropolitaine et outre-mer.";$("cityH").style.color="";draw()}}),villesOk=false;
 villes.ready().then(function(ok){villesOk=ok});
 function isCo(){return radio("kind")==="Entreprise"}
+function isPart(){return radio("kind")==="Particulier"}
 /* Site web : « www.exemple.fr » devient « https://www.exemple.fr » */
 function webUrl(x){x=String(x||"").trim();if(!x)return "";if(!/^https?:\/\//i.test(x))x="https://"+x;
   try{var u=new URL(x);if(!/^https?:$/.test(u.protocol)||!/\.[a-z]{2,}$/i.test(u.hostname))return null;return u.href.replace(/^http:/,"https:")}catch(e){return null}}
 function selVal(id,val){var s=$(id);if(!val){s.value="";return}if(!Array.prototype.some.call(s.options,function(o){return o.value===val})){var o=document.createElement("option");o.textContent=val;s.appendChild(o)}s.value=val}
 function fullName(){if(isCo())return v("company");var f=v("first"),l=v("last");return (f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim()}
 /* Freelance ou entreprise : le formulaire s'adapte */
-function syncKind(){var co=isCo();$("coBox").hidden=!co;$("company").required=co;$("coSize").required=co;$("coTeam").required=co;
+function syncKind(){var co=isCo(),pa=isPart();document.body.classList.toggle("part",pa);$("partNote").hidden=!pa;$("mobBox").hidden=pa;if($("juridique")&&editing)$("juridique").hidden=pa||!$("juridique").dataset.ready;
+  $("prog").hidden=pa;show(true);$("coBox").hidden=!co;$("company").required=co;$("coSize").required=co;$("coTeam").required=co;
   $("firstL").textContent=co?"Prénom du contact":"Prénom";$("lastL").textContent=co?"Nom du contact":"Nom";
   $("lvlL").hidden=co;$("lvlFree").hidden=co;
   $("job").placeholder=co?"Ex. Agence de design d’interface":"Ex. Monteuse vidéo spécialisée en Reels";
   $("phB").textContent=co?"Ajouter un logo":"Ajouter une photo";$("phH").textContent=co?"Logo de l’entreprise, de préférence carré.":"JPG ou PNG, visage bien visible.";
-  $("pKind").textContent=co?"Entreprise":"Freelance";$("pKind").className="badge"+(co?" e":"")}
+  $("pKind").textContent=pa?"Particulier":co?"Entreprise":"Freelance";$("pKind").className="badge"+(co?" e":"")+(pa?" p":"");
+  if(pa){$("phH").textContent="Facultatif. Une photo rassure les prestataires.";$("firstL").textContent="Prénom";$("lastL").textContent="Nom"}}
 document.querySelectorAll('input[name="mob"]').forEach(function(r){r.addEventListener("change",function(){syncRad();draw()})});
 $("rad").addEventListener("input",function(){syncRad();draw()});
 document.querySelectorAll('input[name="kind"]').forEach(function(r){r.addEventListener("change",function(){syncKind();draw()})});
@@ -501,13 +517,21 @@ function valid(){
     $("sErr").textContent=""}
   if(st.step===5&&v("bio").length<40){$("bio").focus();$("bio").setCustomValidity("Écrivez au moins 40 caractères.");$("bio").reportValidity();$("bio").setCustomValidity("");return false}
   return true}
-function show(){
+function show(quiet){
+  if(isPart())st.step=0;
   Array.prototype.forEach.call(document.querySelectorAll(".step"),function(s,i){s.hidden=i!==st.step});
   Array.prototype.forEach.call(document.querySelectorAll("#prog i"),function(b,i){b.className=i<=st.step?"on":""});
-  $("stepLbl").textContent="Étape "+(st.step+1)+" sur "+N;
+  $("stepLbl").textContent=isPart()?"Compte particulier":"Étape "+(st.step+1)+" sur "+N;
   $("back").style.visibility=st.step?"visible":"hidden";
-  $("next").textContent=st.step===N-1?(editing?"Enregistrer mes modifications":"Publier mon profil"):"Continuer";
-  window.scrollTo({top:0,behavior:"smooth"})}
+  $("next").textContent=isPart()?(editing?"Enregistrer mes modifications":"Créer mon compte particulier"):st.step===N-1?(editing?"Enregistrer mes modifications":"Publier mon profil"):"Continuer";
+  if(!quiet)window.scrollTo({top:0,behavior:"smooth"})}
+/* Compte particulier : profil léger, jamais listé parmi les prestataires, ne peut pas être payé */
+function publishPart(){
+  var vc=villes.picked(),f=v("first"),l=v("last");
+  var p={first:f,last:l,n:(f+(l?" "+l.charAt(0).toUpperCase()+".":"")).trim(),t:"Particulier",city:vc?vc.nom:v("city"),cp:vc?vc.cp:"",dep:vc?vc.dep:"",depNom:vc?vc.depNom:"",photo:st.photo};
+  var b=$("next"),label=b.textContent;b.disabled=true;b.textContent="Enregistrement…";$("pubErr").textContent="";
+  A.saveProfile(p).then(function(){location.href="marketplace.html"})
+   .catch(function(e){b.disabled=false;b.textContent=label;$("pubErr").textContent=A.message(e)})}
 function publish(){
   var unitSel=$("unit").value;
   var co=isCo();
@@ -529,7 +553,7 @@ function fillFrom(p){
   prev=p;var parts=(p.n||"").split(" ");
   $("first").value=p.first||parts[0]||"";$("last").value=p.last||"";
   villes.set(p.cp?{nom:p.city,cp:p.cp,dep:p.dep,depNom:p.depNom}:(p.city||""));if(p.cp)$("cityH").textContent=p.city+" · "+p.cp+(p.depNom?" · "+p.depNom:"");
-  setRadio("kind",p.t==="Entreprise"?"Entreprise":"Freelance");$("company").value=p.company||(p.t==="Entreprise"?p.n||"":"");
+  setRadio("kind",p.t==="Entreprise"?"Entreprise":p.t==="Particulier"?"Particulier":"Freelance");$("company").value=p.company||(p.t==="Entreprise"?p.n||"":"");
   setRadio("mob",p.mob);if(p.radius!=null)$("rad").value=Math.max(0,Math.min(100,+p.radius||0));syncRad();$("job").value=p.job||"";if(p.c)$("cat").value=p.c;if(p.t==="Entreprise"){selVal("coSize",p.lvl);selVal("coTeam",p.coTeam);selVal("coSect",p.sector);$("coWeb").value=(p.web||"").replace(/^https:\/\//,"").replace(/\/$/,"")}else setRadio("lvl",p.lvl);syncKind();
   st.skills=(p.skills||p.tags||[]).slice(0,15);st.exps=(p.exps||[]).slice(0,8);
   $("bio").value=p.bio||"";(p.links||[]).slice(0,3).forEach(function(u,i){$("l"+(i+1)).value=u});
@@ -547,6 +571,7 @@ $("wiz").addEventListener("submit",function(e){e.preventDefault();
   if(document.activeElement===$("skIn")){addSkill($("skIn").value);return}
   if(document.activeElement===$("ltxt")){addLang($("ltxt").value);$("ltxt").value="";return}
   if(!valid())return;
+  if(isPart()){publishPart();return}
   if(st.step<N-1){st.step++;show()}else publish()});
 $("back").onclick=function(){if(st.step>0){st.step--;show()}};
 $("skAdd").onclick=function(){addSkill($("skIn").value)};
@@ -649,17 +674,22 @@ $("cv").addEventListener("change",function(e){var f=e.target.files[0];e.target.v
 /* Informations juridiques (entreprises, après la création du profil) : nécessaires aux factures */
 function initLegal(p){
   var Lg=window.DealrLegal,box=$("juridique"),lg=Object.assign({name:"",siren:"",siret:"",addr:"",tva:"",verified:false},p.legal||{}),locked=!!lg.verified,manual=false;
-  box.hidden=false;
+  box.hidden=false;box.dataset.ready="1";
+  var fr=p.t!=="Entreprise";
+  if(fr){$("lgNameL").textContent="Nom de votre entreprise";$("lgName").placeholder="Micro-entreprise : vos prénom et nom (ex. Nina Roy)"}
+  function syncTvar(){var r=document.querySelector('input[name="tvar"]:checked'),fra=r&&r.value==="franchise";$("lgTvaBox").hidden=fra;if(fra&&!locked)$("lgTva").value=""}
+  document.querySelectorAll('input[name="tvar"]').forEach(function(r){r.addEventListener("change",syncTvar)});
   function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function badge(){var b=$("lgBadge");b.hidden=false;
     if(lg.verified){b.className="lgb ok";b.textContent="✓ Vérifiée via le registre officiel"}
     else if(Lg.complete(p.legal)){b.className="lgb";b.textContent="Saisie manuelle · non vérifiée"}
-    else{b.className="lgb";b.textContent="À compléter pour facturer"}}
+    else{b.className="lgb";b.textContent="À compléter pour faire un deal"}}
   function lock(){["lgName","lgSiren","lgTva"].forEach(function(i){$(i).readOnly=locked});
     if(locked)$("lgTvaH").textContent="Numéro d’immatriculation et TVA vérifiés : pour les corriger, contactez le support."}
   function setAddrManual(on){manual=on;$("lgAddr").hidden=on;$("lgAddrM").hidden=!on;$("lgAddrT").textContent=on?"Rechercher mon adresse":"Je ne trouve pas mon adresse parmi les suggestions";
     if(on){$("lgAddrM").value=$("lgAddrM").value||$("lgAddr").value;$("lgAddrM").focus()}else{$("lgAddr").value=$("lgAddrM").value.replace(/\s*\n\s*/g,", ");$("lgAddr").focus()}}
-  function fill(){ $("lgName").value=lg.name;$("lgSiren").value=lg.siret||lg.siren;$("lgTva").value=lg.tva;
+  function fill(){ var rg=lg.tvaRegime||(lg.tva?"assujetti":"");document.querySelectorAll('input[name="tvar"]').forEach(function(r){r.checked=r.value===rg});syncTvar();
+    $("lgName").value=lg.name;$("lgSiren").value=lg.siret||lg.siren;$("lgTva").value=lg.tva;
     $("lgAddr").value=lg.addr;$("lgAddrM").value=lg.addr;badge();lock()}
   function fromRegistry(c){
     if(!c.open){$("lgErr").textContent="Cette entreprise est fermée selon le registre officiel : elle ne peut pas facturer.";return}
@@ -685,13 +715,15 @@ function initLegal(p){
     if(name.length<2){err.textContent="Indiquez la raison sociale.";$("lgName").focus();return}
     if(!(id.length===9||id.length===14)||!Lg.validSiren(id.slice(0,9))){err.textContent="Numéro d’immatriculation invalide : 9 chiffres (SIREN) ou 14 chiffres (SIRET).";$("lgSiren").focus();return}
     if(addr.length<8){err.textContent="Indiquez l’adresse du siège social.";(manual?$("lgAddrM"):$("lgAddr")).focus();return}
+    var rgEl=document.querySelector('input[name="tvar"]:checked');if(!rgEl){err.textContent="Indiquez votre régime de TVA.";return}
+    var rg=rgEl.value;if(rg==="franchise")tva="";else if(!tva){err.textContent="Indiquez votre numéro de TVA (ex. "+Lg.tvaFor(id.slice(0,9))+").";$("lgTva").focus();return}
     if(!Lg.validTva(tva,id.slice(0,9))){err.textContent="Numéro de TVA invalide : il doit correspondre à votre SIREN (ex. "+Lg.tvaFor(id.slice(0,9))+").";$("lgTva").focus();return}
     if(lg.verified&&!locked&&(name!==lg.name||id.slice(0,9)!==lg.siren))lg.verified=false;
-    var legal={name:name,siren:id.slice(0,9),siret:id.length===14?id:(lg.siren===id.slice(0,9)?lg.siret||"":""),addr:addr,tva:tva,verified:!!lg.verified,source:lg.verified?"registre":"manuel",at:new Date().toISOString()};
+    var legal={name:name,siren:id.slice(0,9),siret:id.length===14?id:(lg.siren===id.slice(0,9)?lg.siret||"":""),addr:addr,tva:tva,tvaRegime:rg,verified:!!lg.verified,source:lg.verified?"registre":"manuel",at:new Date().toISOString()};
     b.disabled=true;
     A.myProfile().then(function(cur){if(!cur)throw new Error("not_logged");cur=Object.assign({},cur);delete cur.id;cur.legal=legal;return A.saveProfile(cur).then(function(){return cur})})
      .then(function(cur){p.legal=legal;prev.legal=legal;lg=Object.assign({},legal);locked=!!legal.verified;fill();err.className="err ok";
-       err.textContent=legal.verified?"Informations enregistrées et vérifiées. Vous pouvez maintenant créer vos factures.":"Informations enregistrées (saisie manuelle). Vous pouvez maintenant créer vos factures."})
+       err.textContent=legal.verified?"Informations enregistrées et vérifiées. Vous pouvez maintenant faire des deals et créer vos factures.":"Informations enregistrées (saisie manuelle). Vous pouvez maintenant faire des deals et créer vos factures."})
      .catch(function(e){err.textContent=A.message(e)}).then(function(){b.disabled=false})};
   fill()}
 /* Accès réservé aux membres connectés */
@@ -702,7 +734,7 @@ A.requireUser("profil.html").then(function(){return A.isAdmin()}).then(function(
   /* Lien direct vers une étape (depuis la checklist du profil) : profil.html#etape-5 */
   var m=location.hash.match(/^#etape-([1-7])$/);if(m&&A.profileComplete(p))st.step=parseInt(m[1],10)-1;
   renderSkills();renderExps();renderEdu();loadCerts();show();
-  if(p&&p.t==="Entreprise"&&A.profileComplete(p)){initLegal(p);if(location.hash==="#juridique")setTimeout(function(){$("juridique").scrollIntoView({behavior:"smooth"})},150)}
+  if(p&&p.t!=="Particulier"&&A.profileComplete(p)){initLegal(p);if(location.hash==="#juridique")setTimeout(function(){$("juridique").scrollIntoView({behavior:"smooth"})},150)}
   document.body.classList.remove("wait")});
 })();
 </script>

@@ -382,7 +382,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
       </div>
       <div>
         <h4>Dealr</h4>
-        <ul><li><a href="apropos.html">À propos</a></li><li><a href="contact.html">Contact</a></li><li><a href="faq.html">Questions fréquentes</a></li></ul>
+        <ul><li><a href="apropos.html">À propos</a></li><li><a href="contact.html">Contact</a></li><li><a href="faq.html">Questions fréquentes</a></li><li><a href="aide-statut.html">Rester en règle (SIRET, revenus)</a></li></ul>
       </div>
     </div>
     <div class="fbot">
@@ -426,7 +426,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
   var base=(window.DEALR_PROS||[]).slice();
   draw(base);
   DealrAuth.listProfiles().then(function(l){
-    l=(l||[]).filter(function(p){return p&&p.n});if(!l.length)return;
+    l=(l||[]).filter(function(p){return p&&p.n&&p.t!=="Particulier"});if(!l.length)return;
     var ids={};l.forEach(function(p){ids[p.id]=1});
     draw(l.concat(base.filter(function(p){return !ids[p.id]})));
   });

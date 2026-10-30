@@ -229,7 +229,9 @@
       /* Informations juridiques vérifiées : raison sociale, SIREN et TVA ne changent plus (même règle côté base, supabase.sql section 10) */
       return A.myProfile().catch(function () { return null; }).then(function (old) {
         var o = old && old.legal, n = data && data.legal;
-        if (o && o.verified && (!n || n.name !== o.name || n.siren !== o.siren || (n.tva || "") !== (o.tva || ""))) throw new Error("legal_locked");
+        /* Passer de la franchise à la TVA reste possible : le seul numéro accepté est celui calculé à partir du SIREN */
+        var tvaOk = n && ((n.tva || "") === (o && o.tva || "") || (!(o && o.tva) && n.tva === tvaFor(o && o.siren)));
+        if (o && o.verified && (!n || n.name !== o.name || n.siren !== o.siren || !tvaOk)) throw new Error("legal_locked");
         return client();
       })
         .then(function (c) { return c.from("profiles").upsert({ id: u.id, data: data, updated_at: new Date().toISOString() }); })
@@ -668,7 +670,7 @@
           var deal = { id: newId(), conv: convId, proposer: u.id, payer: payer, payee: payee, title: title, amount: amount,
             deadline: f.deadline || null, details: String(f.details || "").trim().slice(0, 1000) || null,
             status: "proposed", created_at: now, updated_at: now };
-          var first = replaces ? A.updateDeal(replaces, "countered", true) : Promise.resolve();
+          var first = dealParties(payer, payee, u.id).then(function () { return replaces ? A.updateDeal(replaces, "countered", true) : null; });
           return first
             .then(function () { return c.from("deals").insert(deal).then(check); })
             .then(function () {
@@ -689,6 +691,7 @@
         return c.from("deals").select("*").eq("id", deal.id).maybeSingle().then(check).then(function (cur) {
           if (!cur) throw new Error("not_found");
           if (!A.dealCan(cur, u.id, to)) throw new Error("deal_state");
+          return (to === "accepted" ? dealParties(cur.payer, cur.payee, u.id) : Promise.resolve()).then(function () {
           var now = new Date().toISOString(), patch = { status: to, updated_at: now };
           if (/^(accepted|funded|delivered|released|disputed|refunded)$/.test(to)) patch[to + "_at"] = now;
           return c.from("deals").update(patch).eq("id", cur.id).then(check).then(function () {
@@ -697,6 +700,7 @@
             return getConv(c, cur.conv).then(function (conv) {
               return post(c, conv, u, { kind: "event", deal: cur.id, text: A.DEAL_EVENT[to] }, A.DEAL_EVENT[to] + " · " + A.eur(cur.amount));
             }).then(function () { return d; });
+          });
           });
         });
       });
@@ -980,6 +984,13 @@
     if (/file_size/.test(m)) return "Fichier trop lourd : " + (A.FILE_MAX / 1048576) + " Mo maximum.";
     if (/mime type|not supported/i.test(m)) return "Format non accepté : PDF, JPG, PNG ou WebP uniquement.";
     if (/exceeded the maximum allowed size|Payload too large/i.test(m)) return "Fichier trop lourd : 5 Mo maximum.";
+    if (/deal_siret_me/.test(m)) return "Pour faire un deal, renseignez d’abord votre SIRET dans « Mon profil → Informations juridiques ». Pas encore de SIRET ? Consultez le guide « Rester en règle ».";
+    if (/deal_siret_other/.test(m)) return "Ce prestataire n’a pas encore renseigné son SIRET : le deal sera possible dès qu’il l’aura fait. Vous pouvez le lui demander par message.";
+    if (/deal_siret/.test(m)) return "Deal impossible : le freelance ou l’entreprise de ce deal n’a pas encore renseigné de SIRET valide (Mon profil → Informations juridiques).";
+    if (/deal_no_profile/.test(m)) return "Deal impossible : un des deux comptes n’a pas encore de profil.";
+    if (/profile_type/.test(m)) return "Type de compte invalide.";
+    if (/deal_part_payee_other/.test(m)) return "Un particulier ne peut pas être payé sur Dealr : dans ce deal, c’est vous le prestataire.";
+    if (/deal_part_payee/.test(m)) return "Un compte particulier peut payer un deal, mais pas être payé. Pour proposer vos services, passez en Freelance ou Entreprise (avec un SIRET).";
     if (/name_reserved/.test(m)) return "Ce nom est réservé à l’équipe Dealr. Choisissez un autre nom.";
     if (/profile_too_big/.test(m)) return "Votre profil est trop lourd (photos). Retirez quelques photos du portfolio et réessayez.";
     if (/legal_locked/.test(m)) return "Votre raison sociale, votre SIREN et votre numéro de TVA ont été vérifiés : ils ne peuvent plus être modifiés. Contactez le support pour toute correction.";
@@ -1051,6 +1062,7 @@
     var m = [];
     if (!p.n) m.push("nom");
     if (!p.city) m.push("ville");
+    if (p.t === "Particulier") return m;   // compte particulier : nom et ville suffisent
     if (!p.job) m.push("métier");
     if (!p.skills || p.skills.length < 3) m.push("compétences");
     if (!p.bio || String(p.bio).length < 40) m.push("présentation");
@@ -1058,9 +1070,47 @@
     return m;
   };
   A.profileComplete = function (p) { return !A.profileMissing(p).length; };
+
+  /* Freelances et entreprises : SIRET, adresse et régime de TVA obligatoires pour faire un deal.
+     Particuliers : peuvent payer un deal, jamais être payés. Même règle dans la base (supabase.sql, section 14). */
+  function tvaFor(siren) {
+    siren = String(siren || "");
+    if (!/^\d{9}$/.test(siren)) return "";
+    var k = (12 + 3 * (Number(siren) % 97)) % 97;
+    return "FR" + (k < 10 ? "0" : "") + k + siren;
+  }
+  A.isPro = function (p) { return !!p && p.t !== "Particulier"; };
+  function sirenOk(s) {
+    s = String(s || "").replace(/\D/g, "");
+    if (!/^\d{9}$/.test(s)) return false;
+    if (s === "356000000") return true;
+    var sum = 0;
+    for (var i = 0; i < 9; i++) { var n = +s[8 - i]; if (i % 2) { n *= 2; if (n > 9) n -= 9; } sum += n; }
+    return sum % 10 === 0;
+  }
+  A.legalOk = function (p) {
+    var l = p && p.legal;
+    return !!(l && String(l.name || "").trim().length >= 2 && sirenOk(l.siren) && String(l.addr || "").trim().length >= 8);
+  };
+  /* Vérifie qu'un deal est possible entre « me » et « other » (profils). payerIsMe : qui paie ? */
+  A.dealBlock = function (me, other, payerIsMe) {
+    var payee = payerIsMe ? other : me;
+    if (payee && payee.t === "Particulier") return payerIsMe ? "deal_part_payee_other" : "deal_part_payee";
+    if (A.isPro(me) && !A.legalOk(me)) return "deal_siret_me";
+    if (other && A.isPro(other) && !A.legalOk(other)) return "deal_siret_other";
+    return null;
+  };
+  function dealParties(payerId, payeeId, meId) {
+    return Promise.all([A.getProfile(payerId).catch(function () { return null; }), A.getProfile(payeeId).catch(function () { return null; })])
+      .then(function (r) {
+        var payer = r[0], payee = r[1], me = meId === payerId ? payer : payee, other = meId === payerId ? payee : payer;
+        var why = A.dealBlock(me, other, meId === payerId);
+        if (why) throw new Error(why);
+      });
+  }
   function profileGate() {
     var page = location.pathname.split("/").pop() || "index.html";
-    if (/^(profil|connexion|contact|faq|apropos)\.html$/.test(page)) return;
+    if (/^(profil|connexion|contact|faq|apropos|aide-statut)\.html$/.test(page)) return;
     /* Sans session enregistrée dans le navigateur, c'est un visiteur : rien à vérifier */
     var likely = false;
     try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k === "dealr_demo_session" || /^sb-.*-auth-token$/.test(k)) { likely = true; break; } } } catch (e) {}

@@ -20,6 +20,8 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ### Élevé
 
+- [ ] **Un membre peut saisir le SIRET de quelqu'un d'autre.** Le SIRET est contrôlé (numéro valide, entreprise existante si choisie dans le registre), mais rien ne prouve que la personne est bien le dirigeant de cette entreprise. Elle pourrait faire des deals et des factures au nom d'une autre entreprise.
+  - Correction : vérification d'identité (KYC) faite par le prestataire de paiement (Stripe, Mangopay le font, entreprise comprise) avant tout versement, et comparaison du nom du dirigeant avec le registre.
 - [ ] **Faux messages « système » possibles dans la messagerie.** Un participant peut envoyer un message qui ressemble à un événement de deal (par exemple « paiement reçu »). Son nom reste affiché, mais ça peut tromper.
   - Correction : les messages d'événement de deal doivent être créés par la base (déclencheur sur la table `deals`), et les membres ne doivent pouvoir écrire que des messages texte.
 - [ ] **Aucune limite d'envoi.** Un compte peut envoyer des centaines de messages, ouvrir des conversations avec tous les membres, créer des comptes en série.
@@ -55,6 +57,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 - [x] **29/10/2026 – Liens du portfolio** marqués `nofollow` (pas de bonus de référencement pour les spammeurs).
 - [x] Avant l'audit : règles d'accès (RLS) sur toutes les tables, messages et deals visibles des seuls participants, deals ne pouvant avancer que dans l'ordre prévu, avis seulement à la fin d'un deal et une seule fois, justificatifs de certification privés, informations juridiques verrouillées après vérification, administrateurs définis uniquement dans la base.
 - [x] **29/10/2026 – Pièces jointes de la messagerie conçues de façon sécurisée** : espace de fichiers privé (aucun lien public), dossier par conversation, lecture et envoi réservés aux deux participants et à l'équipe Dealr, liens temporaires de 2 minutes, formats limités (PDF, JPG, PNG, WebP : pas de SVG ni de HTML, qui pourraient contenir du code), 5 Mo maximum contrôlés par Supabase, nom de fichier nettoyé (section 13).
+- [x] **30/10/2026 – Règles des deals appliquées par la base** : un freelance ou une entreprise sans SIRET valide ne peut ni proposer ni accepter de deal, et un compte particulier ne peut jamais être payé (section 14). Le site applique les mêmes règles, mais ce n'est plus lui qui décide.
 
 ## Choix assumés (signalés par Supabase, mais voulus)
 

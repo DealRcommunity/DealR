@@ -575,3 +575,102 @@ create policy "Pièces jointes : envoyer" on storage.objects for insert to authe
     public.is_admin()
     or exists (select 1 from public.conversations c
                where c.id = (storage.foldername(name))[1] and auth.uid() in (c.user_a, c.user_b))));
+
+-- =====================================================================
+-- 14. Particuliers et SIRET obligatoire pour les deals (30/10/2026)
+-- - Trois types de compte : Freelance, Entreprise, Particulier.
+-- - Un particulier peut payer un deal, jamais être payé.
+-- - Freelances et entreprises : SIRET valide, nom et adresse obligatoires
+--   (profiles.data->'legal') pour proposer ou accepter un deal.
+-- - Informations juridiques vérifiées : passer de la franchise à la TVA reste possible,
+--   avec le seul numéro de TVA calculé à partir du SIREN.
+-- =====================================================================
+create or replace function public.siren_ok(s text) returns boolean
+language plpgsql immutable set search_path = public as $$
+declare i int; n int; total int := 0;
+begin
+  if s is null or s !~ '^\d{9}$' then return false; end if;
+  if s = '356000000' then return true; end if;
+  for i in 0..8 loop
+    n := substr(s, 9 - i, 1)::int;
+    if i % 2 = 1 then n := n * 2; if n > 9 then n := n - 9; end if; end if;
+    total := total + n;
+  end loop;
+  return total % 10 = 0;
+end $$;
+
+create or replace function public.tva_for(siren text) returns text
+language sql immutable set search_path = public as $$
+  select case when siren ~ '^\d{9}$'
+    then 'FR' || lpad(((12 + 3 * (siren::bigint % 97)) % 97)::text, 2, '0') || siren end
+$$;
+
+-- Ce membre peut-il être le client (payeur) ou le prestataire (payé) d'un deal ?
+create or replace function public.deal_party_ok(uid uuid, is_payee boolean) returns text
+language plpgsql stable security definer set search_path = public as $$
+declare d jsonb; l jsonb;
+begin
+  select data into d from public.profiles where id = uid;
+  if d is null then return 'deal_no_profile'; end if;
+  if d->>'t' = 'Particulier' then
+    return case when is_payee then 'deal_part_payee' else null end;
+  end if;
+  l := d->'legal';
+  if l is null or not public.siren_ok(l->>'siren')
+     or char_length(trim(coalesce(l->>'name', ''))) < 2
+     or char_length(trim(coalesce(l->>'addr', ''))) < 8 then
+    return 'deal_siret';
+  end if;
+  return null;
+end $$;
+revoke all on function public.deal_party_ok(uuid, boolean) from public, anon, authenticated;
+
+create or replace function public.deals_parties() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare e text;
+begin
+  if tg_op = 'INSERT' or (new.status = 'accepted' and old.status is distinct from 'accepted') then
+    e := public.deal_party_ok(new.payee, true);
+    if e is null then e := public.deal_party_ok(new.payer, false); end if;
+    if e is not null then raise exception '%', e; end if;
+  end if;
+  return new;
+end $$;
+revoke all on function public.deals_parties() from public, anon, authenticated;
+
+drop trigger if exists deals_parties on public.deals;
+create trigger deals_parties before insert or update on public.deals
+  for each row execute function public.deals_parties();
+
+-- Type de compte : seulement les trois prévus
+create or replace function public.profiles_guard() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  if octet_length(new.data::text) > 2000000 then raise exception 'profile_too_big'; end if;
+  if coalesce(new.data->>'t', 'Freelance') not in ('Freelance', 'Entreprise', 'Particulier') then
+    raise exception 'profile_type';
+  end if;
+  if not public.is_admin()
+     and (lower(coalesce(new.data->>'n', '')) ~ 'dealr' or lower(coalesce(new.data->>'company', '')) ~ 'dealr') then
+    raise exception 'name_reserved';
+  end if;
+  return new;
+end $$;
+
+-- Verrou des informations juridiques vérifiées (remplace la version de la section 10)
+create or replace function public.profiles_legal_guard() returns trigger
+language plpgsql set search_path = public as $$
+declare o jsonb := old.data->'legal'; n jsonb := new.data->'legal';
+begin
+  if coalesce(o->>'verified', 'false') = 'true' and not public.is_admin() then
+    if n is null
+       or (n->>'name') is distinct from (o->>'name')
+       or (n->>'siren') is distinct from (o->>'siren')
+       or coalesce(n->>'verified', 'false') <> 'true'
+       or not (coalesce(n->>'tva', '') = coalesce(o->>'tva', '')
+               or (coalesce(o->>'tva', '') = '' and n->>'tva' = public.tva_for(o->>'siren'))) then
+      raise exception 'legal_locked';
+    end if;
+  end if;
+  return new;
+end $$;

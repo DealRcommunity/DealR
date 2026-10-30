@@ -193,7 +193,7 @@ if(img){av.textContent="";av.style.backgroundImage="url('"+img+"')"}
 var tx=h("div");tx.style.flex="1";var h1=h("h1","",p.n||"");
 if(A.validated(p)){var vb=h("span","vbw");vb.innerHTML=A.badgeSvg(26);vb.title="Profil validé : plus de 3 deals conclus sur Dealr";h1.appendChild(vb)}
 tx.appendChild(h1);tx.appendChild(h("div","sub",p.job||""));
-var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""),p.t||"Freelance"));bd.appendChild(h("span","b",p.c||""));
+var bd=h("div","badges");bd.appendChild(h("span","b"+(p.t==="Entreprise"?" e":""),p.t||"Freelance"));if(p.c&&p.t!=="Particulier")bd.appendChild(h("span","b",p.c));
 if(p.dispo)bd.appendChild(h("span","b d",p.dispo));if(p.t==="Entreprise"&&p.legal&&p.legal.verified)bd.appendChild(h("span","b d","✓ Entreprise vérifiée"));if(p.demo)bd.appendChild(h("span","b x","Profil d’exemple"));
 tx.appendChild(bd);
 tx.appendChild(h("div","sub",(+p.a?"★ "+String(+p.r).replace(".",",")+" · "+(+p.a)+" avis":"Nouveau profil")+" · "+(p.city||"")));
@@ -205,10 +205,11 @@ var sl=SOCS.filter(function(x){return /^https:\/\/[^\s]+$/i.test(so[x[0]]||"")})
 if(sl.length){var srow=h("div","socrow");sl.forEach(function(x){var a=document.createElement("a");a.href=so[x[0]];a.target="_blank";a.rel="noopener noreferrer nofollow";
   a.className="sb "+x[1];a.setAttribute("aria-label",x[2]);a.title=x[2];a.appendChild(ico(x[1],"i"));srow.appendChild(a)});tx.appendChild(srow)}
 hr.appendChild(av);hr.appendChild(tx);hero.appendChild(hr);main.appendChild(hero);
+var isPart=p.t==="Particulier";
 
 /* Checklist (visible uniquement par le membre) : ce qui reste à faire pour un profil complet */
 var edus=p.edus||[],certs=res.certs||[];
-if(own){
+if(own&&!isPart){
   var CK=[
     {k:"photo",t:p.t==="Entreprise"?"Logo de l’entreprise":"Photo de profil",d:"Montrez aux clients qui se cache derrière votre profil.",ok:!!A.safeImg(p.photo),go:1},
     {k:"exp",t:"Expériences",d:"Ajoutez au moins 2 expériences pour rassurer les clients.",ok:exps.length>=2,go:4},
@@ -216,7 +217,7 @@ if(own){
     {k:"cert",t:"Certification",d:certs.some(function(x){return x.status==="pending"})?"En cours de vérification par l’équipe Dealr.":"Une certification vérifiée vous démarque.",ok:certs.some(function(x){return x.status==="verified"}),go:5},
     {k:"net",t:"Réseaux",d:"Liez Instagram, TikTok ou LinkedIn pour montrer vos projets.",ok:sl.length>0,go:5},
     {k:"port",t:"Portfolio",d:"Ajoutez des photos ou des liens vers vos réalisations.",ok:(p.port||[]).length>0||(p.links||[]).length>0,go:6}];
-  if(p.t==="Entreprise")CK.unshift({k:"legal",t:"Informations juridiques",d:"Indispensables pour créer vos factures : SIREN, siège, TVA.",ok:!!(window.DealrLegal&&DealrLegal.complete(p.legal)),href:"profil.html#juridique"});
+  CK.unshift({k:"legal",t:"SIRET et informations juridiques",d:"Obligatoires pour faire un deal et facturer : SIRET, adresse, régime de TVA.",ok:!!(window.DealrLegal&&DealrLegal.complete(p.legal)),href:"profil.html#juridique"});
   var dn=CK.filter(function(x){return x.ok}).length,pc=Math.round(dn/CK.length*100);
   if(dn<CK.length){
     var ck=h("section","card ckl");var hd=h("div","ckh");hd.appendChild(h("h2","","Checklist pour finir votre profil"));
@@ -234,6 +235,11 @@ if(own){
 }
 
 /* Sections */
+if(isPart){var pc0=sec("Compte particulier");
+  pc0.appendChild(h("p","sub",own?"Votre compte vous permet de contacter des prestataires, de leur payer un deal en toute sécurité et de laisser un avis. Il n’apparaît pas dans la liste des prestataires.":p.n+" utilise Dealr pour trouver des prestataires pour ses projets personnels."));
+  if(own){var pr=h("div","acts");pr.appendChild(link("Trouver un prestataire","marketplace.html","btn"));pr.appendChild(link("Proposer mes services ?","aide-statut.html","btn out"));pc0.appendChild(pr);
+    pc0.appendChild(h("p","sub","Pour être payé sur Dealr, il faut un statut (micro-entreprise ou société) et un SIRET. Notre guide explique comment faire."))}}
+if(!isPart){
 var c=sec("À propos");c.appendChild(h("p","bio",p.bio||"Pas encore de présentation."));
 c=sec("Informations clés");var inf=h("div","info");
 (p.demo?[]:[["Deals conclus sur Dealr",A.dealsCount(p)+" deal"+(A.dealsCount(p)>1?"s":"")+(A.validated(p)?" · profil validé":"")]]).concat([["Tarif",p.p||"Sur devis"],["Disponibilité",p.dispo||"Sur demande"],[p.t==="Entreprise"?"Taille":"Expérience",p.lvl||"Non renseigné"],["Lieu de travail",(p.mob||"À distance")+" · "+(p.city||"")+(p.cp?" ("+p.cp+")":"")],["Langues",langs.join(", ")],["Catégorie",p.c||""]]).forEach(function(r){
@@ -273,6 +279,7 @@ c=sec("Portfolio");var port=(p.port||[]).map(A.safeImg).filter(Boolean),links=(p
 if(port.length){var g=h("div","port");port.forEach(function(s){var d=h("div");d.style.backgroundImage="url('"+s+"')";g.appendChild(d)});c.appendChild(g)}
 links.forEach(function(x){var a=link(x,x);a.target="_blank";a.rel="noopener noreferrer nofollow ugc";a.style.cssText="display:block;margin-top:8px;overflow-wrap:anywhere";c.appendChild(a)});
 if(!port.length&&!links.length)c.appendChild(h("p","sub","Portfolio à venir."));
+}
 c=sec("Avis");var rv=p.reviews||[];
 if(rv.length){
   var sum=h("div","rvsum"),sc=h("div","rvscore");sc.appendChild(h("b","",String(+p.r||0).replace(".",",")));sc.appendChild(starRow(Math.round(+p.r||0)));
@@ -304,11 +311,14 @@ if(own){
     else td.appendChild(h("p","sub","Rien à faire pour l’instant."));
   }).catch(function(){kp.appendChild(h("p","sub","Activité indisponible pour le moment."))});
   var me=h("section","card");me.appendChild(h("h2","","Mes outils"));
-  [["Devis et factures","Créez un devis, transformez-le en facture, téléchargez-le en PDF.","documents.html"],
-   ["Modifier mon profil","Photo, compétences, expériences, tarif, disponibilité.","profil.html"]].forEach(function(t){
+  (isPart?[["Modifier mon profil","Nom, ville, photo.","profil.html"],["Rester en règle","Se déclarer en micro-entreprise pour proposer ses services.","aide-statut.html"]]
+   :[["Devis et factures","Créez un devis, transformez-le en facture, téléchargez-le en PDF.","documents.html"],
+   ["Modifier mon profil","Photo, compétences, expériences, tarif, disponibilité.","profil.html"],
+   ["Rester en règle","SIRET, micro-entreprise, déclaration des revenus : le guide.","aide-statut.html"]]).forEach(function(t){
     var r=h("a","tool");r.href=t[2];r.appendChild(h("b","",t[0]));r.appendChild(h("span","sub",t[1]));me.appendChild(r)});
   side.appendChild(me);return}
 
+if(isPart)return;
 var q=h("section","card q member-only");q.id="devis";q.appendChild(h("h2","","Estimer un devis"));q.appendChild(h("p","sub","Choisissez les services pour obtenir une estimation, puis envoyez votre demande."));
 var boxes=[];
 if(!services.length)q.appendChild(h("p","sub","Ce prestataire travaille sur devis personnalisé."));
