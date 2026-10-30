@@ -22,6 +22,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 - [ ] **Un membre peut saisir le SIRET de quelqu'un d'autre.** Le SIRET est contrôlé (numéro valide, entreprise existante si choisie dans le registre), mais rien ne prouve que la personne est bien le dirigeant de cette entreprise. Elle pourrait faire des deals et des factures au nom d'une autre entreprise.
   - Correction : vérification d'identité (KYC) faite par le prestataire de paiement (Stripe, Mangopay le font, entreprise comprise) avant tout versement, et comparaison du nom du dirigeant avec le registre.
+  - Décision d'Alexis (30/10/2026) : à traiter plus tard, en demandant des justificatifs (pièce d'identité + avis de situation INSEE ou Kbis), vérifiés comme les certifications.
 - [ ] **Faux messages « système » possibles dans la messagerie.** Un participant peut envoyer un message qui ressemble à un événement de deal (par exemple « paiement reçu »). Son nom reste affiché, mais ça peut tromper.
   - Correction : les messages d'événement de deal doivent être créés par la base (déclencheur sur la table `deals`), et les membres ne doivent pouvoir écrire que des messages texte.
 - [ ] **Aucune limite d'envoi.** Un compte peut envoyer des centaines de messages, ouvrir des conversations avec tous les membres, créer des comptes en série.
