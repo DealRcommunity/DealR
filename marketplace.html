@@ -6,140 +6,334 @@
 <title>Dealr – Missions et prestataires</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--o-soft:#fff1e8;--ind:#3b4a9e;--g:#22a863;--card:#fff}
+:root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--b:#3448f0;--g:#22a863}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 Figtree,system-ui,sans-serif;
- background-image:radial-gradient(55% 38% at 100% 0,#ffe3cf 0,transparent 70%),radial-gradient(45% 30% at 0 22%,#ecedff 0,transparent 70%);background-repeat:no-repeat}
+body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:hidden}
 h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.035em;font-weight:800;line-height:1.05}
-em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em;font-size:1.12em;color:var(--o)}
+em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em;font-size:1.1em;color:var(--o)}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--o);outline-offset:3px}
-.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+
+/* Voile néon animé : bandes floues aux couleurs Dealr qui ondulent derrière la page */
+.veil{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:#fff}
+.veil i{position:absolute;display:block;border-radius:50%;will-change:transform}
+.veil .bl{filter:blur(80px);opacity:.5;mix-blend-mode:multiply}
+.veil .st{filter:blur(26px);opacity:.75;mix-blend-mode:multiply}
+.veil .v1{width:80vw;height:30vh;left:-14vw;top:4vh;background:#3448f0;animation:w1 11s ease-in-out infinite alternate}
+.veil .v2{width:66vw;height:26vh;right:-16vw;top:20vh;background:#f55a1f;animation:w2 13s ease-in-out infinite alternate}
+.veil .v3{width:60vw;height:24vh;left:16vw;top:50vh;background:#e2365b;opacity:.38;animation:w3 15s ease-in-out infinite alternate}
+.veil .v4{width:70vw;height:30vh;right:-10vw;bottom:-8vh;background:#3448f0;opacity:.32;animation:w1 17s ease-in-out infinite alternate-reverse}
+.veil .v5{width:90vw;height:5vh;left:-6vw;top:30vh;background:#f55a1f;animation:w4 8s ease-in-out infinite alternate}
+.veil .v6{width:80vw;height:4vh;right:-8vw;top:40vh;background:#3448f0;animation:w4 10s ease-in-out infinite alternate-reverse}
+.veil .v7{width:70vw;height:3.5vh;left:10vw;top:68vh;background:#e2365b;opacity:.55;animation:w4 12s ease-in-out infinite alternate}
+.veil .v8{width:60vw;height:22vh;left:22vw;top:24vh;background:#fff;filter:blur(60px);opacity:.9;animation:w3 9s ease-in-out infinite alternate-reverse}
+.veil .wb{position:absolute;left:0;right:0;height:30vh;animation:bob 6s ease-in-out infinite alternate}
+.veil .wv{position:absolute;inset:0;width:200%;filter:blur(28px);opacity:.6;mix-blend-mode:multiply;animation:slide 18s linear infinite}
+.veil .wv svg{display:block;width:100%;height:100%}
+.veil .wa{top:8vh}.veil .wbb{top:34vh;animation-duration:8s;animation-delay:-3s}.veil .wc{top:60vh;animation-duration:7s;animation-delay:-5s}
+.veil .wbb .wv{animation-duration:24s;animation-direction:reverse;opacity:.5}.veil .wc .wv{animation-duration:21s;opacity:.42}
+.veil:after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.28)}
+@keyframes w1{0%{transform:translate(0,0) rotate(-10deg) scale(1,1)}50%{transform:translate(10vw,5vh) rotate(3deg) scale(1.2,.85)}100%{transform:translate(-4vw,11vh) rotate(-16deg) scale(.95,1.15)}}
+@keyframes w2{0%{transform:translate(0,0) rotate(12deg) scale(1,1)}50%{transform:translate(-12vw,6vh) rotate(-2deg) scale(1.15,.9)}100%{transform:translate(-3vw,-5vh) rotate(18deg) scale(.9,1.2)}}
+@keyframes w3{0%{transform:translate(0,0) rotate(-4deg)}100%{transform:translate(8vw,-9vh) rotate(9deg) scale(1.2,.8)}}
+@keyframes w4{0%{transform:translate(-6vw,0) rotate(-9deg) scaleX(.9)}50%{transform:translate(4vw,3vh) rotate(-3deg) scaleX(1.15)}100%{transform:translate(10vw,-2vh) rotate(-13deg) scaleX(1)}}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes bob{from{transform:translateY(-3vh) skewY(-2deg)}to{transform:translateY(4vh) skewY(2deg)}}
 
 /* En-tête commun */
-header{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);background:rgba(255,255,255,.75);border-bottom:1px solid rgba(0,0,0,.04)}
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(255,255,255,.72);border-bottom:1px solid rgba(0,0,0,.04)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:68px}
 .logo{font-size:1.5rem;text-decoration:none;display:flex;align-items:center;gap:8px}
 .logo i{width:.62em;height:.62em;border-radius:50%;background:var(--o)}
 nav{display:flex;align-items:center;gap:22px;font-weight:500}
 nav a{text-decoration:none;color:var(--mute)}
 nav a:hover,nav a[aria-current]{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:99px;padding:11px 20px;font:600 .95rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:99px;padding:11px 20px;font:700 .95rem Figtree,sans-serif;text-decoration:none;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap;min-height:44px}
 .btn:hover{background:#2a2a2e}
-.btn.out{background:#fff;color:var(--ink)}
+.btn.out{background:#fff;color:var(--ink);border-color:#dcdce2}
 .btn.out:hover{background:#f6f6f8}
 .btn.sm{padding:8px 15px;font-size:.88rem}
 
-/* En-tête de page */
-.hero{padding:52px 0 8px}
-h1{font-size:clamp(2.3rem,5.6vw,4.2rem);max-width:12em}
-.lead{color:var(--mute);font-size:1.12rem;max-width:34em;margin:16px 0 30px}
+/* Titre */
+.hero{padding:46px 0 24px}
+h1{font-size:clamp(2.3rem,5vw,3.4rem);letter-spacing:-.04em;line-height:1}
+.lead{color:#45454d;font-size:1.08rem;margin:10px 0 0}
 
-/* Barre de recherche : le sélecteur prestataire / mission fait partie de la barre */
-.finder{display:flex;align-items:center;gap:6px;background:#fff;border-radius:22px;padding:6px;box-shadow:0 18px 50px rgba(60,30,10,.1),0 1px 3px rgba(60,30,10,.06);max-width:860px}
-.seg{display:flex;background:#f3f3f6;border-radius:16px;padding:4px;flex:none}
-.seg button{border:0;background:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;color:var(--mute);font-size:.94rem}
+/* Barre de recherche (reste visible au défilement) */
+.finder{position:sticky;top:80px;z-index:10;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px;box-shadow:0 14px 40px rgba(40,40,80,.10)}
+.seg{display:flex;background:#f3f3f6;border-radius:99px;padding:4px;flex:none}
+.seg button{border:0;background:none;height:44px;padding:0 18px;border-radius:99px;cursor:pointer;font-weight:700;color:var(--mute)}
 .seg button[aria-pressed=true]{background:var(--ink);color:#fff}
-.q{flex:1;display:flex;align-items:center;gap:10px;padding:0 10px;min-width:0}
-.q svg{flex:none;color:var(--mute)}
-.q input{flex:1;border:0;outline:0;background:none;padding:12px 0;min-width:0;font-size:1rem}
-.finder select{border:0;background:#f3f3f6;border-radius:14px;padding:12px 14px;cursor:pointer;font-weight:500;flex:none}
-.cats{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0}
-.chip{border:1px solid #dedee4;background:#fff;border-radius:99px;padding:7px 16px;cursor:pointer;font-weight:500;font-size:.93rem}
+.fq{display:flex;align-items:center;gap:10px;padding:0 16px;height:48px;min-width:0}
+.fq svg{flex:none;color:var(--mute)}
+.fq input{flex:1;border:0;outline:0;background:none;min-width:0;width:100%;font-size:1rem;font-weight:500}
+.fq input::placeholder{color:#8a8a93}
+.fq .vl-wrap{flex:1;min-width:0}
+.fq.q{flex:2 1 220px;border-right:1px solid var(--line)}
+.fq.c{flex:1 1 170px}
+.fbtn{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 22px;border-radius:99px;border:0;background:linear-gradient(100deg,#3448f0,#965ac8 55%,#f55a1f);color:#fff;font-weight:700;cursor:pointer;flex:none}
+.fbtn .n{min-width:22px;height:22px;border-radius:99px;background:#fff;color:var(--ink);display:grid;place-items:center;font-size:.75rem;padding:0 6px}
+
+/* Publier un besoin : bouton en verre miroir */
+.pub{display:flex;justify-content:flex-end;align-items:center;gap:18px;flex-wrap:wrap;padding-top:18px}
+.pub p{margin:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:.95rem;color:#45454d;text-align:right}
+.pub p b{color:var(--ink);font-size:1rem}
+.glass{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:14px;height:64px;padding:0 9px 0 28px;border-radius:99px;font:800 1.12rem Figtree,sans-serif;color:var(--ink);text-decoration:none;white-space:nowrap;cursor:pointer;
+ background:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.2));-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.9);
+ box-shadow:inset 0 1px 0 #fff,inset 0 -12px 26px rgba(255,255,255,.3),0 20px 44px rgba(52,72,240,.2);transition:transform .2s,box-shadow .2s}
+.glass:before{content:"";position:absolute;top:0;left:-50%;width:34%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);transform:skewX(-20deg);animation:shine 5s ease-in-out infinite}
+.glass:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 #fff,inset 0 -12px 26px rgba(255,255,255,.3),0 26px 54px rgba(245,90,31,.25)}
+.glass .gi{position:relative;width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+@keyframes shine{0%,60%{left:-50%}100%{left:130%}}
+
+/* Catégories, raccourcis, tri */
+.cats{display:flex;gap:10px;padding:22px 0 4px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.chip{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:99px;border:1.5px solid #e4e4ea;background:#fff;font-weight:600;cursor:pointer;white-space:nowrap;flex:none}
+.chip small{font-weight:500;color:var(--mute);font-size:.82rem}
 .chip:hover{border-color:var(--ink)}
-.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.chip[aria-pressed=true] small{color:#c9c9cf}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 0 6px}
+.togs{display:flex;gap:8px;flex-wrap:wrap}
+.tog{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:99px;border:1.5px dashed #c9c9d2;background:rgba(255,255,255,.65);font-weight:600;font-size:.9rem;color:#45454d;cursor:pointer}
+.tog i{width:16px;height:16px;border-radius:5px;border:1.5px solid #b9b9c2;display:grid;place-items:center;flex:none}
+.tog i svg{opacity:0}
+.tog[aria-pressed=true]{border-style:solid;border-color:var(--b);background:#f3f5ff;color:#2234c4}.tog[aria-pressed=true] i{background:var(--b);border-color:var(--b)}.tog[aria-pressed=true] i svg{opacity:1}
+.right{display:flex;align-items:center;gap:14px}
+.count{font-size:.95rem;color:#45454d}.count b{color:var(--ink)}
+.sort{display:flex;align-items:center;gap:6px;height:40px;padding:0 6px 0 14px;border-radius:99px;border:1.5px solid #e4e4ea;background:#fff;font-size:.88rem;color:#55555c;margin:0}
+.sort select{border:0;background:transparent;font-weight:700;height:36px;cursor:pointer}
+.applied{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:8px}
+.applied button{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 14px;border-radius:99px;border:0;background:var(--ink);color:#fff;font-weight:600;font-size:.82rem;cursor:pointer}
+.applied .clr{background:none;color:var(--b);text-decoration:underline;font-weight:700;padding:0 8px}
 
-/* Résultats */
-.count{color:var(--mute);margin:34px 0 14px;font-weight:500}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding-bottom:70px}
-.card{background:var(--card);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 14px 40px rgba(60,30,10,.07),0 1px 3px rgba(60,30,10,.05);transition:transform .18s ease,box-shadow .18s ease}
-.card:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06)}
-.top{display:flex;gap:14px;align-items:center}
-.av{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o)) center/cover}
-.card h3{font-size:1.18rem;line-height:1.2;letter-spacing:-.025em}
-.card h3 .vbw{display:inline-flex;vertical-align:-2px;margin-left:6px}
-.sub{color:var(--mute);font-size:.9rem}
-.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.b{font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px;background:#eef0ff;color:#2d3a8c}
-.b.ent{background:#fff1cc;color:#6b4a00}
-.b.par{background:#e3f4ea;color:#17613a}
-.b.d{background:#e3f4ea;color:#17613a}
-.b.x{background:#f3f3f6;color:var(--mute)}
-.tags{display:flex;gap:6px;flex-wrap:wrap}
-.tags span{font-size:.82rem;background:#f6f6f8;border-radius:8px;padding:3px 9px;color:#4a4a52}
-.desc{margin:0;font-size:.96rem;color:#33333a}
-.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:14px;border-top:1px solid var(--line);gap:10px}
-.price{font:800 1.2rem "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;white-space:nowrap}
-.rating{color:var(--mute);font-size:.86rem;white-space:nowrap}
+/* Cartes prestataires */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;padding:22px 0 90px}
+.pc{position:relative;background:#fff;border-radius:22px;border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s}
+.pc:hover{transform:translateY(-4px);box-shadow:0 22px 50px rgba(40,40,80,.12)}
+.cov{position:relative;height:176px}
+.tiles{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;height:100%;padding:12px 12px 0}
+.tl{position:relative;border:1.5px dashed #d4d4dc;border-radius:14px;display:grid;place-items:center;color:#b1b1ba;background:center/cover no-repeat;overflow:hidden}
+.tl:first-child{grid-row:1/3}
+.tl.img{border:0}
+.tl b{font-weight:700;color:var(--mute)}
+.tl.img b{position:absolute;inset:0;display:grid;place-items:center;background:rgba(17,17,17,.5);color:#fff}
+.tl .nw{font-size:.8rem;font-weight:700;color:#8a4b00;background:#fff4e5;border-radius:99px;padding:5px 11px}
+.xtag{position:absolute;top:20px;left:20px;z-index:2;font-size:.75rem;font-weight:700;background:#f3f3f6;color:#55555c;border-radius:99px;padding:3px 9px}
+.fav{position:absolute;top:18px;right:18px;z-index:3;width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.95);display:grid;place-items:center;cursor:pointer;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.fav[aria-pressed=true]{color:var(--o)}
+.fav[aria-pressed=true] svg{fill:currentColor}
+.bd{padding:0 20px 20px;display:flex;flex-direction:column;gap:5px;flex:1}
+.av{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o)) center/cover;margin-top:-22px;border:4px solid #fff;position:relative;z-index:1}
+.nr{display:flex;align-items:center;gap:6px;min-width:0}
+.pc h3{font-size:1.28rem;letter-spacing:-.03em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc h3 a{text-decoration:none}
+.pc h3 a:after{content:"";position:absolute;inset:0;z-index:2}
+.vbw{display:inline-flex;flex:none}
+.dp{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:#17613a;white-space:nowrap;flex:none}
+.dp:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--g)}
+.job{font-size:.95rem;color:#45454d}
+.pl{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--mute)}
+.pl svg{flex:none}
+.tg{font-size:.82rem;color:var(--mute)}
+.ft{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:14px;border-top:1px solid #f0f0f3}
+.ft>div{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.price{font:800 1.18rem "Bricolage Grotesque",sans-serif;letter-spacing:-.02em;white-space:nowrap}
+.rating{color:var(--mute);font-size:.82rem;white-space:nowrap}
 .rating b{color:#e8a317}
-.acts2{display:flex;gap:8px;width:100%}.acts2 .btn{flex:1}
-.empty{grid-column:1/-1;border:1.5px dashed #dedee4;border-radius:22px;padding:44px;text-align:center;color:var(--mute);background:rgba(255,255,255,.7)}
-.empty .btn{margin-top:14px}
+.msgb{position:relative;z-index:3;width:44px;height:44px;border-radius:50%;border:1.5px solid #e4e4ea;background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--ink);flex:none}
+.msgb:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
 
-/* Boîte de dialogue */
+/* Missions */
+.list{display:flex;flex-direction:column;gap:14px;padding:22px 0 90px}
+.mrow{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 24px;display:flex;gap:22px;align-items:center;transition:box-shadow .25s}
+.mrow:hover{box-shadow:0 16px 40px rgba(40,40,80,.10)}
+.mic{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-weight:800;flex:none;background:#eef0ff;color:#2234c4}
+.mtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.mtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.82rem;color:var(--mute)}.mtop b{color:var(--ink)}
+.mrow h3{font-size:1.28rem;letter-spacing:-.03em}
+.mrow p{margin:0;color:#55555c;font-size:.95rem}
+.mbud{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.mbud b{font:800 1.3rem "Bricolage Grotesque",sans-serif;letter-spacing:-.02em;white-space:nowrap}
+.mbud span{font-size:.82rem;color:var(--mute);white-space:nowrap}
+
+.empty{grid-column:1/-1;border:1.5px dashed #dcdce2;border-radius:22px;padding:48px 24px;text-align:center;background:rgba(255,255,255,.85);display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty b{font:800 1.5rem "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+.empty span{color:#55555c;max-width:30em}
+.empty div{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+
+/* Boîtes de dialogue */
 dialog{border:0;border-radius:22px;padding:28px;width:min(480px,94vw);box-shadow:0 30px 80px rgba(0,0,0,.25)}
-dialog::backdrop{background:rgba(17,17,17,.45);backdrop-filter:blur(3px)}
+dialog::backdrop{background:rgba(17,17,17,.42);backdrop-filter:blur(3px)}
 dialog h2{font-size:1.6rem;margin-bottom:6px}
-label{display:block;font-weight:600;font-size:.88rem;margin:14px 0 5px}
+dialog label{display:block;font-weight:600;font-size:.88rem;margin:14px 0 5px}
 dialog input,dialog select,dialog textarea{width:100%;border:1px solid #e3e3e8;border-radius:12px;padding:11px 13px;background:#fafafb}
 dialog input:focus,dialog select:focus,dialog textarea:focus{outline:0;border-color:var(--ink);background:#fff}
 textarea{min-height:96px;resize:vertical}
 .dacts{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+.sub{color:var(--mute);font-size:.9rem}
+
+/* Panneau Filtres : à droite sur ordinateur, en bas sur téléphone */
+#dFilt{margin:0 0 0 auto;height:100%;max-height:100%;width:min(420px,100vw);border-radius:0;padding:0}
+#dFilt[open]{display:flex;flex-direction:column}
+#dFilt .fh{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line)}
+#dFilt .fh h2{margin:0;font-size:1.5rem}
+.xbtn{width:44px;height:44px;border-radius:50%;border:1.5px solid #e4e4ea;background:#fff;display:grid;place-items:center;cursor:pointer}
+#dFilt .fb{flex:1;overflow-y:auto;padding:4px 24px 20px}
+.fs{display:flex;flex-direction:column;gap:12px;padding:20px 0;border-bottom:1px solid #f0f0f3}
+.fs:last-child{border-bottom:0}
+.fs .lh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.fs .lh b{font-size:1rem}.fs .lh span{font-weight:700;color:var(--b);white-space:nowrap}
+.fs .hint{font-size:.85rem;color:var(--mute)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{height:44px;padding:0 16px;border-radius:99px;border:1.5px solid #e4e4ea;background:#fff;font-weight:600;font-size:.9rem;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+input[type=range]{width:100%;accent-color:var(--b);height:28px}
+.scale{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute)}
+#dFilt .ff{display:flex;gap:10px;padding:14px 24px;border-top:1px solid var(--line)}
+#dFilt .ff .btn{min-height:50px}
+#dFilt .ff .btn:last-child{flex:1}
+
+/* Barre flottante (téléphone) */
+.fbar{display:none}
+
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;z-index:60}
 #toast.on{opacity:1;transform:translateX(-50%)}
-footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-size:.9rem}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-size:.9rem;background:rgba(255,255,255,.85)}
 footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 footer a{text-decoration:none}
 
+@media(max-width:860px){
+ .mrow{flex-wrap:wrap}.mbud{align-items:flex-start;flex-direction:row;gap:10px;align-items:baseline}
+ .mrow .btn{width:100%}
+}
 @media(max-width:760px){
+ .wrap{padding:0 16px}
  nav .hide{display:none}
  nav{gap:14px}
- .finder{flex-wrap:wrap;border-radius:20px}
- .seg{width:100%}.seg button{flex:1;padding:10px 8px}
- .q{flex:1 1 60%;padding:0 6px}
- .hero{padding-top:34px}
+ .hero{padding:28px 0 18px}
+ h1{font-size:2.3rem}
+ .finder{position:static;flex-wrap:wrap;border-radius:24px;gap:4px}
+ .seg{width:100%}.seg button{flex:1;padding:0 8px}
+ .fq.q{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+ .fq.c{flex:1 1 0}
+ .fbtn{height:48px;padding:0 16px}
+ .pub{flex-direction:column;align-items:stretch;gap:10px;padding-top:16px}
+ .pub p{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0 5px;text-align:left;font-size:.9rem}.pub p b{font-size:.9rem}
+ .glass{height:58px;padding:0 7px 0 22px;font-size:1.02rem;justify-content:space-between}.glass .gi{width:44px;height:44px}
+ .bar .right{width:100%;justify-content:space-between}
+ .grid{grid-template-columns:minmax(0,1fr);gap:16px;padding-bottom:110px}
+ .cov{height:150px}
+ .list{padding-bottom:110px}
+ #dFilt{margin:auto 0 0;width:100vw;max-width:100vw;height:auto;max-height:88vh;border-radius:26px 26px 0 0}
+ #dFilt .fh{padding:16px}#dFilt .fb{padding:0 16px 12px}#dFilt .ff{padding:12px 16px 22px}
+ .fbar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:4px;background:var(--ink);border-radius:99px;padding:5px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
+ .fbar button{height:44px;padding:0 16px;border:0;border-radius:99px;background:transparent;color:#fff;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+ .fbar button:first-child,.fbar button[aria-pressed=true]{background:#fff;color:var(--ink)}
+ .veil .v3,.veil .v4,.veil .v7,.veil .wc{display:none}
+ #toast{bottom:86px}
 }
 @media(max-width:420px){header .btn{display:none}}
-@media(prefers-reduced-motion:reduce){.card,#toast{transition:none}.card:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.veil i,.veil .wb,.veil .wv,.glass:before{animation:none}.pc,.mrow,#toast,.glass{transition:none}.pc:hover{transform:none}}
 </style>
 </head>
 <body>
+<div class="veil" aria-hidden="true"><i class="bl v1"></i><i class="bl v2"></i><i class="bl v3"></i><i class="bl v4"></i><i class="st v5"></i><i class="st v6"></i><i class="st v7"></i>
+ <div class="wb wa"><div class="wv"><svg viewBox="0 0 2880 300" preserveAspectRatio="none"><path d="M0 150 Q360 30 720 150 T1440 150 T2160 150 T2880 150" fill="none" stroke="#3448f0" stroke-width="64" stroke-linecap="round"/></svg></div></div>
+ <div class="wb wbb"><div class="wv"><svg viewBox="0 0 2880 300" preserveAspectRatio="none"><path d="M0 150 Q360 260 720 150 T1440 150 T2160 150 T2880 150" fill="none" stroke="#f55a1f" stroke-width="70" stroke-linecap="round"/></svg></div></div>
+ <div class="wb wc"><div class="wv"><svg viewBox="0 0 2880 300" preserveAspectRatio="none"><path d="M0 150 Q360 40 720 150 T1440 150 T2160 150 T2880 150" fill="none" stroke="#e2365b" stroke-width="56" stroke-linecap="round"/></svg></div></div>
+ <i class="v8"></i></div>
+
 <header>
   <div class="wrap">
     <a class="logo" href="index.html"><i></i>Dealr</a>
-    <nav data-nav="marketplace">
-      <button data-extra="end" class="btn sm member-only" type="button" id="openMission">Publier une mission</button>
-    </nav>
+    <nav data-nav="marketplace"></nav>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
-    <h1>La bonne personne, <em>au bon prix.</em></h1>
-    <p class="lead">Parcourez les freelances et les agences, ou trouvez votre prochaine mission parmi les besoins publiés.</p>
-    <div class="finder">
-      <div class="seg" role="group" aria-label="Que cherchez-vous ?">
-        <button type="button" id="vPros" aria-pressed="true">Prestataires</button>
-        <button type="button" id="vMis" aria-pressed="false">Missions</button>
-      </div>
-      <label class="q" for="q" style="margin:0;font-weight:400">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <input id="q" type="search" placeholder="Métier, compétence, ville…" aria-label="Recherche">
-      </label>
-      <select id="type" aria-label="Type"></select>
-    </div>
-    <div class="cats" id="chips" role="group" aria-label="Catégories"></div>
+    <h1 id="h1">Trouvez le bon <em>talent.</em></h1>
+    <p class="lead" id="lead">Choisissez, discutez, payez en toute sécurité.</p>
   </section>
-  <div class="count" id="count" aria-live="polite"></div>
+
+  <div class="finder">
+    <div class="seg" role="group" aria-label="Que cherchez-vous ?">
+      <button type="button" id="vPros" aria-pressed="true">Prestataires</button>
+      <button type="button" id="vMis" aria-pressed="false">Missions</button>
+    </div>
+    <label class="fq q">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Métier, compétence, nom…" aria-label="Rechercher" maxlength="60">
+    </label>
+    <label class="fq c" id="cityBox">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+      <input id="city" type="text" placeholder="Ville" aria-label="Ville" maxlength="60">
+    </label>
+    <button type="button" class="fbtn" id="openFilt">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      Filtres<span class="n" id="nf" hidden></span>
+    </button>
+  </div>
+
+  <div class="pub member-only">
+    <p>Pas le temps de chercher ?<b>Les freelances viennent à vous.</b></p>
+    <button type="button" class="glass" id="openMission">Publier un besoin<span class="gi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+  </div>
+
+  <div class="cats" id="chips" role="group" aria-label="Catégories"></div>
+
+  <div class="bar">
+    <div class="togs" id="togs"></div>
+    <div class="right">
+      <span class="count" id="count" aria-live="polite"></span>
+      <label class="sort">Trier
+        <select id="sort" aria-label="Trier les résultats">
+          <option value="pert">Pertinence</option>
+          <option value="note">Mieux notés</option>
+          <option value="prix">Prix croissant</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="applied" id="applied" hidden></div>
+
   <div class="grid" id="grid"></div>
 </main>
 
+<div class="fbar" id="fbar">
+  <button type="button" id="fbFilt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span id="fbFiltT">Filtres</span></button>
+  <button type="button" id="fbFav" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-9.3-9.3C1.6 7.6 3.6 4.5 6.9 4.5c2 0 3.6 1.1 5.1 3 1.5-1.9 3.1-3 5.1-3 3.3 0 5.3 3.1 4.2 6.2C19.5 15.4 12 20 12 20z"/></svg><span id="fbFavT">Favoris</span></button>
+</div>
+
 <footer><div class="wrap"><span>© 2026 Dealr. Tous droits réservés.</span><a href="index.html">Retour à l’accueil</a></div></footer>
+
+<dialog id="dFilt" aria-labelledby="fT">
+  <div class="fh"><h2 id="fT">Filtres</h2><button type="button" class="xbtn" data-close aria-label="Fermer les filtres"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="fb">
+    <div class="fs"><div class="lh"><b id="typeT">Type de profil</b></div><div class="pills" id="typePills"></div></div>
+    <div class="fs" data-pros>
+      <div class="lh"><b>Distance</b><span id="distV"></span></div>
+      <span class="hint" id="distH"></span>
+      <input type="range" id="dist" min="0" max="100" step="5" value="30" aria-label="Distance maximale en kilomètres">
+      <div class="scale"><span>Même ville</span><span>50 km</span><span>100 km</span></div>
+    </div>
+    <div class="fs" data-pros>
+      <div class="lh"><b>Tarif journalier maximum</b><span id="budV"></span></div>
+      <input type="range" id="bud" min="100" max="800" step="50" value="800" aria-label="Tarif journalier maximum">
+      <div class="scale"><span>100 €</span><span>800 € et plus</span></div>
+      <span class="hint">Les tarifs à l’heure comptent pour 7 heures. Les tarifs au projet restent affichés.</span>
+    </div>
+    <div class="fs" data-pros><div class="lh"><b>Note minimale</b></div><div class="pills" id="notePills"></div></div>
+  </div>
+  <div class="ff"><button type="button" class="btn out" id="fClear">Effacer</button><button type="button" class="btn" data-close id="fSee">Voir les résultats</button></div>
+</dialog>
 
 <dialog id="dForm">
   <form method="dialog" id="fForm">
@@ -168,6 +362,7 @@ footer a{text-decoration:none}
 <script src="profils.js"></script>
 <script src="config.js"></script>
 <script src="auth.js"></script>
+<script src="villes.js"></script>
 <script>
 const CATS=["Développement","Design","Marketing","Rédaction","Vidéo","Conseil"];
 const pros=(window.DEALR_PROS||[]).map(p=>Object.assign({demo:true},p));
@@ -179,59 +374,203 @@ const missions=[
  {title:"Logo et charte graphique pour mon association",who:"Particulier",by:"Marc T.",c:"Design",b:"600 €",d:"Sous 2 semaines",desc:"Association sportive : logo, couleurs et modèles de documents."},
  {title:"Audit de notre stratégie d’acquisition",who:"Entreprise",by:"Lumio SAS",c:"Marketing",b:"3 000 €",d:"Sous 1 mois",desc:"Analyse de nos canaux payants et recommandations chiffrées."}
 ].map(m=>Object.assign({demo:true},m));
-let view="pros",cat="Toutes",type="Tous",q="",me=null;
-/* Lien direct : marketplace.html?cat=Vidéo ou ?q=montage (depuis l’accueil) */
-{const P0=new URLSearchParams(location.search),c0=P0.get("cat"),q0=P0.get("q");if(c0&&CATS.includes(c0))cat=c0;if(q0)q=q0.slice(0,60)}
+const MCOL={"Développement":["#eef0ff","#2234c4"],"Design":["#f4ecfb","#6b2fa3"],"Marketing":["#fff1e8","#b2400f"],"Rédaction":["#e3f4ea","#17613a"],"Vidéo":["#f1f1f4","#111"],"Conseil":["#fff4e5","#8a4b00"]};
+
+/* État des filtres */
+const F={view:"pros",cat:"Toutes",q:"",place:null,dist:30,type:"Tous",bud:800,rmin:0,dispo:false,valid:false,fav:false,sort:"pert"};
+let me=null,distReady=false;
+{const P0=new URLSearchParams(location.search),c0=P0.get("cat"),q0=P0.get("q");if(c0&&CATS.includes(c0))F.cat=c0;if(q0)F.q=q0.slice(0,60)}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const init=s=>String(s||"?").split(" ").map(w=>w[0]||"").slice(0,2).join("").toUpperCase();
-const cls=t=>t==="Entreprise"?"ent":t==="Particulier"?"par":"";
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+const fr=n=>String(n).replace(".",",");
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2800)}
 
+/* Favoris : gardés dans ce navigateur uniquement */
+let favs=new Set();
+try{favs=new Set(JSON.parse(localStorage.getItem("dealr_favs")||"[]").filter(x=>typeof x==="string"))}catch(e){}
+function saveFavs(){try{localStorage.setItem("dealr_favs",JSON.stringify([...favs].slice(0,200)))}catch(e){}}
+const pid=x=>String(x.id||("demo:"+x.n));
+
+/* Tarif ramené à la journée (0 = au projet ou inconnu) */
+function dayRate(x){
+  const u=String(x.unit||""),r=+x.rate;
+  if(r>0&&u){return u==="jour"?r:u==="h"?r*7:0}
+  const m=String(x.p||"").replace(/\s/g,"").match(/(\d+)€\/(jour|h)/);
+  return m?(m[2]==="h"?+m[1]*7:+m[1]):0;
+}
+
+/* Distances : position des villes via la Base Adresse Nationale, gardée pour la session */
+const GEO={};try{Object.assign(GEO,JSON.parse(sessionStorage.getItem("dealr_geo")||"{}"))}catch(e){}
+function geo(nom,cp){
+  const k=norm(nom)+"|"+(cp||"");
+  if(!nom)return Promise.resolve(null);
+  if(k in GEO)return Promise.resolve(GEO[k]);
+  const qs="?q="+encodeURIComponent(nom)+(cp?"&postcode="+encodeURIComponent(cp):"")+"&type=municipality&limit=1";
+  const get=b=>fetch(b+qs).then(r=>{if(!r.ok)throw new Error("geo");return r.json()}).then(j=>{const f=j&&j.features&&j.features[0],c=f&&f.geometry&&f.geometry.coordinates;return Array.isArray(c)&&isFinite(c[0])&&isFinite(c[1])?[+c[0],+c[1]]:null});
+  return get("https://data.geopf.fr/geocodage/search").catch(()=>get("https://api-adresse.data.gouv.fr/search/"))
+    .then(c=>{GEO[k]=c;try{sessionStorage.setItem("dealr_geo",JSON.stringify(GEO))}catch(e){}return c},()=>null);
+}
+function km(a,b){const R=6371,t=Math.PI/180,dLat=(b[1]-a[1])*t,dLon=(b[0]-a[0])*t;const h=Math.sin(dLat/2)**2+Math.cos(a[1]*t)*Math.cos(b[1]*t)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+let geoRun=0;
+function computeDist(){
+  pros.forEach(x=>{x.km=null});distReady=false;
+  if(!F.place){render();return}
+  const run=++geoRun;render();
+  geo(F.place.nom,F.place.cp).then(here=>{
+    if(run!==geoRun)return;
+    if(!here){distReady=true;render();return}
+    return Promise.all(pros.map(x=>geo(x.city,x.cp).then(c=>{if(c)x.km=Math.round(km(here,c))}))).then(()=>{if(run===geoRun){distReady=true;render()}});
+  });
+}
+function nearOk(x){
+  if(!F.place)return true;
+  if(x.km==null){return distReady?(x.dep&&x.dep===F.place.dep)||norm(x.city)===norm(F.place.nom):true}
+  const lim=F.dist===0?3:F.dist;
+  return x.km<=Math.max(lim,+x.radius||0);
+}
+
+/* Construction de l’interface */
 function setup(){
-  $("#chips").innerHTML=["Toutes",...CATS].map(c=>`<button type="button" class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("");
-  const opts=view==="pros"?["Tous","Freelance","Entreprise"]:["Tous","Entreprise","Particulier"];
-  $("#type").innerHTML=opts.map(o=>`<option>${o}</option>`).join("");
-  $("#type").value=type;
-  $("#q").placeholder=view==="pros"?"Métier, compétence, ville…":"Mission, client, mot-clé…";
+  const src=F.view==="pros"?pros:missions;
+  $("#chips").innerHTML=["Toutes",...CATS].map(c=>{const n=c==="Toutes"?src.length:src.filter(x=>x.c===c).length;return `<button type="button" class="chip" aria-pressed="${c===F.cat}" data-c="${esc(c)}">${esc(c)}<small>${n}</small></button>`}).join("");
+  const ck='<i><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>';
+  $("#togs").innerHTML=F.view!=="pros"?"":
+    `<button type="button" class="tog" data-t="dispo" aria-pressed="${F.dispo}">${ck}Disponible maintenant</button><button type="button" class="tog" data-t="valid" aria-pressed="${F.valid}">${ck}Profil validé</button>`+
+    (favs.size||F.fav?`<button type="button" class="tog" data-t="fav" aria-pressed="${F.fav}">${ck}Mes favoris (${favs.size})</button>`:"");
+  const types=F.view==="pros"?[["Tous","Tous"],["Freelance","Freelances"],["Entreprise","Agences et entreprises"]]:[["Tous","Tous"],["Entreprise","Entreprises"],["Particulier","Particuliers"]];
+  $("#typeT").textContent=F.view==="pros"?"Type de profil":"Type de client";
+  $("#typePills").innerHTML=types.map(t=>`<button type="button" class="pill" data-type="${t[0]}" aria-pressed="${F.type===t[0]}">${t[1]}</button>`).join("");
+  $("#notePills").innerHTML=[[0,"Toutes"],[4.5,"4,5 et plus"],[4.8,"4,8 et plus"]].map(t=>`<button type="button" class="pill" data-note="${t[0]}" aria-pressed="${F.rmin===t[0]}">${t[1]}</button>`).join("");
+  document.querySelectorAll("#dFilt [data-pros]").forEach(e=>e.hidden=F.view!=="pros");
+  $("#cityBox").hidden=F.view!=="pros";
+  $("#q").placeholder=F.view==="pros"?"Métier, compétence, nom…":"Mission, client, mot-clé…";
+  $("#h1").innerHTML=F.view==="pros"?"Trouvez le bon <em>talent.</em>":"Trouvez votre prochaine <em>mission.</em>";
+  $("#lead").textContent=F.view==="pros"?"Choisissez, discutez, payez en toute sécurité.":"Répondez aux besoins publiés en un message.";
+  $("#sort").value=F.sort;$("#sort").closest(".sort").hidden=F.view!=="pros";
+  $("#distV").textContent=F.dist===0?"Même ville":"À moins de "+F.dist+" km";
+  $("#distH").textContent=F.place?"Autour de "+F.place.nom+". Les prestataires qui se déplacent jusque-là sont aussi affichés.":"Choisissez d’abord une ville dans la barre de recherche.";
+  $("#dist").disabled=!F.place;
+  $("#budV").textContent=F.bud>=800?"Sans limite":F.bud+" €";
+  $("#fbar").hidden=F.view!=="pros";
+  $("#fbFav").setAttribute("aria-pressed",F.fav);$("#fbFavT").textContent="Favoris"+(favs.size?" · "+favs.size:"");
+}
+function appliedList(){
+  const a=[];
+  if(F.type!=="Tous")a.push(["type",F.view==="pros"?(F.type==="Entreprise"?"Agences et entreprises":"Freelances"):(F.type==="Entreprise"?"Entreprises":"Particuliers")]);
+  if(F.view==="pros"){
+    if(F.place)a.push(["place",F.place.nom+(F.dist===0?"":" · "+F.dist+" km")]);
+    if(F.bud<800)a.push(["bud","Jusqu’à "+F.bud+" €/jour"]);
+    if(F.rmin)a.push(["rmin","Note "+fr(F.rmin)+" et plus"]);
+  }
+  return a;
 }
 function render(){
-  const s=q.toLowerCase().trim();
-  const list=(view==="pros"?pros:missions).filter(x=>{
-    const kind=view==="pros"?x.t:x.who;
-    const hay=(view==="pros"?[x.n,x.job,x.city,...(x.tags||[]),...(x.skills||[])]:[x.title,x.by,x.desc]).join(" ").toLowerCase();
-    return (cat==="Toutes"||x.c===cat)&&(type==="Tous"||kind===type)&&hay.includes(s);
+  const s=norm(F.q),isP=F.view==="pros";
+  let list=(isP?pros:missions).filter(x=>{
+    const hay=norm((isP?[x.n,x.job,x.city,...(x.tags||[]),...(x.skills||[])]:[x.title,x.by,x.desc]).join(" "));
+    if(F.cat!=="Toutes"&&x.c!==F.cat)return false;
+    if(s&&!hay.includes(s))return false;
+    if(F.type!=="Tous"&&(isP?x.t:x.who)!==F.type)return false;
+    if(!isP)return true;
+    if(F.dispo&&!(x.dispo&&/maintenant/.test(x.dispo)))return false;
+    if(F.valid&&!DealrAuth.validated(x))return false;
+    if(F.fav&&!favs.has(pid(x)))return false;
+    if(F.bud<800){const d=dayRate(x);if(d&&d>F.bud)return false}
+    if(F.rmin&&(!+x.a||+x.r<F.rmin))return false;
+    return nearOk(x);
   });
-  $("#count").textContent=`${list.length} ${view==="pros"?"prestataire":"mission"}${list.length>1?"s":""}`;
-  $("#grid").innerHTML=list.length?list.map(view==="pros"?proCard:misCard).join(""):
-    `<div class="empty">Aucun résultat pour cette recherche.<br><button type="button" class="btn out" data-reset>Effacer les filtres</button></div>`;
+  if(isP){
+    if(F.sort==="note")list=list.slice().sort((a,b)=>(+b.a?+b.r:0)-(+a.a?+a.r:0));
+    else if(F.sort==="prix")list=list.slice().sort((a,b)=>(dayRate(a)||1e9)-(dayRate(b)||1e9));
+    else if(F.place&&distReady)list=list.slice().sort((a,b)=>(a.km==null?1e9:a.km)-(b.km==null?1e9:b.km));
+  }
+  const n=list.length,w=isP?"prestataire":"mission";
+  $("#count").innerHTML=F.place&&isP&&!distReady?"Calcul des distances…":`<b>${n}</b> ${w}${n>1?"s":""}`;
+  const ap=appliedList();
+  $("#applied").hidden=!ap.length;
+  $("#applied").innerHTML=ap.map(f=>`<button type="button" data-rm="${f[0]}" aria-label="Retirer le filtre ${esc(f[1])}">${esc(f[1])}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`).join("")+(ap.length?'<button type="button" class="clr" data-rm="all">Tout effacer</button>':"");
+  $("#nf").hidden=!ap.length;$("#nf").textContent=ap.length;
+  $("#fbFiltT").textContent="Filtres"+(ap.length?" · "+ap.length:"");
+  $("#fSee").textContent=`Voir ${n} ${w}${n>1?"s":""}`;
+  const g=$("#grid");g.className=isP?"grid":"list";
+  g.innerHTML=n?list.map(isP?proCard:misCard).join(""):
+    `<div class="empty"><b>${isP?"Aucun profil ne correspond… pour l’instant.":"Aucune mission ne correspond."}</b><span>${isP?"Élargissez votre recherche, ou publiez votre besoin : les freelances viendront à vous.":"Élargissez votre recherche ou revenez bientôt."}</span><div><button type="button" class="btn out" data-reset>Effacer les filtres</button>${isP?'<button type="button" class="btn member-only" data-pub>Publier un besoin</button>':""}</div></div>`;
 }
-const proCard=x=>{const img=DealrAuth.safeImg(x.photo),nm=x.n||"?",mine=me&&x.id===me;return `<article class="card">
-  <div class="top">${img?`<div class="av" style="background-image:url('${img}')"></div>`:`<div class="av">${esc(init(nm))}</div>`}
-  <div><h3>${esc(nm)}${DealrAuth.validated(x)?`<span class="vbw" title="Profil validé : plus de 3 deals conclus sur Dealr">${DealrAuth.badgeSvg(18)}</span>`:""}</h3><div class="sub">${esc(x.job||"")}</div></div></div>
-  <div class="meta"><span class="b ${cls(x.t)}">${esc(x.t||"Freelance")}</span>${x.dispo&&/maintenant/.test(x.dispo)?'<span class="b d">Disponible</span>':""}${x.demo?'<span class="b x">Exemple</span>':""}<span class="sub">${esc(x.city||"")}</span></div>
-  <div class="tags">${(x.tags||[]).slice(0,4).map(t=>`<span>${esc(t)}</span>`).join("")}</div>
-  <div class="foot"><div><div class="price">${esc(x.p||"Sur devis")}</div><div class="rating">${+x.a?`<b>★</b> ${String(+x.r).replace(".",",")} · ${+x.a} avis`:"Nouveau profil"}</div></div>
-  <div class="acts2"><a class="btn out sm" href="prestataire.html?id=${encodeURIComponent(mine?"moi":(x.id||""))}">Voir le profil</a>${mine?"":`<button type="button" class="btn sm member-only" data-pro="${esc(x.id||"")}">Contacter</button>`}</div></div></article>`};
-const misCard=(x,i)=>`<article class="card">
-  <div class="meta"><span class="b ${cls(x.who)}">${esc(x.who)}</span><span class="b x">${esc(x.c)}</span>${x.demo?'<span class="b x">Exemple</span>':""}</div>
-  <h3>${esc(x.title)}</h3>
-  <p class="desc">${esc(x.desc)}</p>
-  <div class="sub">${esc(x.by)}</div>
-  <div class="foot"><div><div class="price">${esc(x.b)}</div><div class="rating">${esc(x.d)}</div></div>
-  <button type="button" class="btn sm member-only" data-mis="${esc(x.by)}">Proposer mes services</button></div></article>`;
+const ICO_IMG='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-9 9"/></svg>';
+const ICO_PIN='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+const ICO_HEART='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-9.3-9.3C1.6 7.6 3.6 4.5 6.9 4.5c2 0 3.6 1.1 5.1 3 1.5-1.9 3.1-3 5.1-3 3.3 0 5.3 3.1 4.2 6.2C19.5 15.4 12 20 12 20z"/></svg>';
+const ICO_MSG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>';
+function tiles(x){
+  const port=(x.port||[]).map(DealrAuth.safeImg).filter(Boolean),more=port.length>3?port.length-3:0,isNew=!+x.a&&!port.length;
+  let h="";
+  for(let i=0;i<3;i++){
+    const im=port[i],last=i===2&&more?`<b>+${more}</b>`:"";
+    if(im)h+=`<div class="tl img" style="background-image:url('${im}')">${last}</div>`;
+    else h+=`<div class="tl">${i===0?(isNew?'<span class="nw">Nouveau sur Dealr</span>':ICO_IMG):last}</div>`;
+  }
+  return `<div class="tiles" aria-hidden="true">${h}</div>`;
+}
+const proCard=x=>{
+  const img=DealrAuth.safeImg(x.photo),nm=x.n||"?",mine=me&&x.id===me,id=pid(x),on=favs.has(id),href="prestataire.html?id="+encodeURIComponent(mine?"moi":(x.id||""));
+  let place=esc(x.city||"");
+  if(x.km!=null&&F.place)place=`À ${x.km} km · `+place;
+  if(x.t==="Entreprise")place+=" · Entreprise";
+  else if(x.mob==="À distance")place+=" · à distance";
+  else if(+x.radius)place+=" · se déplace jusqu’à "+(+x.radius)+" km";
+  const tags=(x.tags||[]).slice(0,3).map(esc).join(" · ");
+  return `<article class="pc">
+  <div class="cov">${tiles(x)}${x.demo?'<span class="xtag">Exemple</span>':""}
+   <button type="button" class="fav" data-fav="${esc(id)}" aria-pressed="${on}" aria-label="Ajouter ${esc(nm)} aux favoris">${ICO_HEART}</button></div>
+  <div class="bd">
+   ${img?`<div class="av" style="background-image:url('${img}')"></div>`:`<div class="av">${esc(init(nm))}</div>`}
+   <div class="nr"><h3><a href="${href}">${esc(nm)}</a></h3>${DealrAuth.validated(x)?`<span class="vbw" title="Profil validé : plus de 3 deals conclus sur Dealr">${DealrAuth.badgeSvg(19)}</span>`:""}${x.dispo&&/maintenant/.test(x.dispo)?'<span class="dp">Disponible</span>':""}</div>
+   <span class="job">${esc(x.job||"")}</span>
+   ${place?`<span class="pl">${ICO_PIN}${place}</span>`:""}
+   ${tags?`<span class="tg">${tags}</span>`:""}
+   <div class="ft"><div><span class="price">${esc(x.p||"Sur devis")}</span><span class="rating">${+x.a?`<b>★</b> ${fr(+x.r)} · ${+x.a} avis`:"Nouveau profil"}</span></div>
+    ${mine?"":`<button type="button" class="msgb member-only" data-pro="${esc(x.id||"")}" aria-label="Contacter ${esc(nm)}">${ICO_MSG}</button>`}</div>
+  </div></article>`};
+const misCard=x=>{const c=MCOL[x.c]||MCOL["Vidéo"];return `<article class="mrow">
+  <span class="mic" style="background:${c[0]};color:${c[1]}">${esc(init(x.by))}</span>
+  <div class="mtx"><div class="mtop"><b>${esc(x.c)}</b><span>·</span><span>${esc(x.by)}</span><span>·</span><span>${esc(x.who)}</span>${x.demo?'<span>·</span><span>Exemple</span>':""}</div>
+   <h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p></div>
+  <div class="mbud"><b>${esc(x.b)}</b><span>${esc(x.d)}</span></div>
+  <button type="button" class="btn member-only" data-mis="${esc(x.by)}">Proposer mes services</button></article>`};
 
-/* Filtres */
-function setView(v){view=v;type="Tous";cat="Toutes";$("#vPros").setAttribute("aria-pressed",v==="pros");$("#vMis").setAttribute("aria-pressed",v==="missions");setup();render()}
+/* Événements */
+function refresh(){setup();render()}
+function setView(v){F.view=v;F.type="Tous";F.cat="Toutes";$("#vPros").setAttribute("aria-pressed",v==="pros");$("#vMis").setAttribute("aria-pressed",v==="missions");refresh()}
+function clearAll(){F.q="";$("#q").value="";F.cat="Toutes";F.type="Tous";F.bud=800;$("#bud").value=800;F.rmin=0;F.dispo=F.valid=F.fav=false;if(F.place){F.place=null;villes.set("");computeDist()}refresh()}
 $("#vPros").onclick=()=>setView("pros");
 $("#vMis").onclick=()=>setView("missions");
-$("#q").oninput=e=>{q=e.target.value;render()};
-$("#type").onchange=e=>{type=e.target.value;render()};
-$("#chips").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;cat=b.dataset.c;setup();render()};
+$("#q").oninput=e=>{F.q=e.target.value;render()};
+$("#sort").onchange=e=>{F.sort=e.target.value;render()};
+$("#chips").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;F.cat=b.dataset.c;refresh()};
+$("#togs").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;F[b.dataset.t]=!F[b.dataset.t];refresh()};
+$("#applied").onclick=e=>{const b=e.target.closest("[data-rm]");if(!b)return;const k=b.dataset.rm;
+  if(k==="all")return clearAll();
+  if(k==="type")F.type="Tous";if(k==="bud"){F.bud=800;$("#bud").value=800}if(k==="rmin")F.rmin=0;
+  if(k==="place"){F.place=null;villes.set("");computeDist()}refresh()};
+const villes=DealrVilles.attach($("#city"),{onPick:c=>{F.place=c||null;setup();computeDist()}});
+const dF=$("#dFilt");
+function openFilt(){setup();render();dF.showModal()}
+$("#openFilt").onclick=openFilt;$("#fbFilt").onclick=openFilt;
+$("#fbFav").onclick=()=>{F.fav=!F.fav;refresh()};
+dF.addEventListener("click",e=>{if(e.target===dF)dF.close();
+  const t=e.target.closest("[data-type]");if(t){F.type=t.dataset.type;refresh()}
+  const n=e.target.closest("[data-note]");if(n){F.rmin=+n.dataset.note;refresh()}});
+$("#dist").oninput=e=>{F.dist=+e.target.value;setup();render()};
+$("#bud").oninput=e=>{F.bud=+e.target.value;setup();render()};
+$("#fClear").onclick=clearAll;
 
-/* Contacter un prestataire : ouvre la messagerie */
 $("#grid").onclick=e=>{
-  if(e.target.closest("[data-reset]")){q="";$("#q").value="";cat="Toutes";type="Tous";setup();render();return}
+  if(e.target.closest("[data-reset]"))return clearAll();
+  if(e.target.closest("[data-pub]"))return $("#openMission").click();
+  const f=e.target.closest("[data-fav]");
+  if(f){const id=f.dataset.fav;favs.has(id)?favs.delete(id):favs.add(id);saveFavs();const on=favs.has(id);f.setAttribute("aria-pressed",on);
+    toast(on?"Ajouté à vos favoris.":"Retiré de vos favoris.");setup();if(F.fav)render();return}
   const p=e.target.closest("[data-pro]");
   if(p){const x=pros.find(y=>y.id===p.dataset.pro);
     if(!x||x.demo){toast("Profil d’exemple : la messagerie fonctionne avec les membres inscrits.");return}
@@ -250,14 +589,14 @@ $("#fForm").onsubmit=()=>{
 };
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 
-setup();if(q)$("#q").value=q;render();
+refresh();if(F.q)$("#q").value=F.q;
 
 /* Profils des membres + en-tête selon la connexion */
 DealrAuth.listProfiles().then(list=>{list=list.filter(p=>p.t!=="Particulier");if(!list.length)return;
   const ids=new Set(list.map(p=>p.id));
   for(let i=pros.length-1;i>=0;i--)if(ids.has(pros[i].id))pros.splice(i,1);
-  pros.unshift(...list);if(view==="pros")render()});
-DealrAuth.user().then(u=>{if(!u)return;me=u.id;if(view==="pros")render()});
+  pros.unshift(...list);if(F.place)computeDist();else if(F.view==="pros")refresh()});
+DealrAuth.user().then(u=>{if(!u)return;me=u.id;if(F.view==="pros")render()});
 </script>
 </body>
 </html>
