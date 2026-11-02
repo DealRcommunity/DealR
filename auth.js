@@ -949,9 +949,9 @@
         return;
       }
       add("Messages", "messages.html", "messages", "dnMsg");
-      /* Sur l'accueil (page avec ses propres liens), on garde la même forme que pour un visiteur :
+      /* Sur l'accueil, on garde la même forme que pour un visiteur :
          les liens du compte sont regroupés derrière un bouton « Mon compte » */
-      var compact = !!nav.querySelector("[data-extra]:not([data-extra=end])"), target = box;
+      var compact = !!nav.querySelector("[data-extra]:not([data-extra=end])") || nav.getAttribute("data-nav") === "home", target = box;
       if (compact) {
         var wrap = document.createElement("span"); wrap.className = "dn-acc";
         var bt = document.createElement("button"); bt.type = "button"; bt.className = "lk dn-pill dn-accbtn"; bt.id = "dnAcc";
