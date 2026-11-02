@@ -81,27 +81,22 @@ h1{font-size:clamp(2.6rem,6.4vw,5rem)}
 .trust{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;font-size:.95rem;color:#55555c;font-weight:500}
 .trust li{display:flex;align-items:center;gap:8px}
 .trust li:before{content:"";width:18px;height:18px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2322a863' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
-/* Bandeau des membres inscrits */
-.band{margin-top:80px}
-.band-h{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 20px;padding:0 22px}
-.band-h p{margin:0;font-weight:600}
-.stack{display:flex;padding-left:10px}
-.sav,.mav{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;overflow:hidden}
-.sav img,.mav img{width:100%;height:100%;object-fit:cover}
-.sav{width:36px;height:36px;border:3px solid #fff;margin-left:-10px;font-size:.72rem}
-.band-v{overflow:hidden;padding:6px 0 18px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%)}
-.track{display:flex;width:max-content;animation:slide 40s linear infinite}
-.band-v:hover .track,.band-v:focus-within .track{animation-play-state:paused}
-@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.mcard{display:flex;align-items:center;gap:12px;margin-right:16px;background:#fff;border-radius:18px;padding:12px 18px 12px 12px;box-shadow:0 10px 30px rgba(60,30,10,.09),0 1px 3px rgba(60,30,10,.06);min-width:260px;text-decoration:none;transition:transform .2s}
-.mcard:hover{transform:translateY(-3px)}
-.mav{width:46px;height:46px;font-size:.92rem}
-.mtx{display:flex;flex-direction:column;gap:3px;min-width:0}
-.mtop{display:flex;align-items:center;gap:8px}
-.mtop b{font-size:.95rem;white-space:nowrap}
-.mt{font-size:.7rem;font-weight:700;border-radius:99px;padding:2px 8px;background:#eef0ff;color:#2d3a8c;white-space:nowrap}
-.mt.co{background:#fff1cc;color:#6b4a00}
-.mtx small{font-size:.85rem;color:var(--mute);white-space:nowrap}
+/* Bandeau des métiers qui défilent */
+.tk{margin-top:80px;padding:10px 0 20px;overflow:hidden}
+.tk-k{margin:0 0 18px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#c2410c}
+.tk-mq{overflow:hidden;padding:4px 0}
+.tk-tr{display:flex;width:max-content}
+.tk-set{display:flex;align-items:center;gap:34px;padding-right:34px}
+.tk-tr.l{animation:tkL 48s linear infinite}.tk-tr.r{animation:tkR 54s linear infinite}
+.tk-mq:hover .tk-tr,.tk-mq:focus-within .tk-tr{animation-play-state:paused}
+@keyframes tkL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes tkR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.tk-w{font-family:"Bricolage Grotesque",Figtree,sans-serif;font-weight:800;font-size:clamp(2.6rem,6vw,4.6rem);letter-spacing:-.04em;line-height:1.12;white-space:nowrap;color:var(--ink);text-decoration:none;transition:color .2s}
+.tk-w.it{font-family:"Instrument Serif",serif;font-weight:400;font-style:italic;letter-spacing:-.01em;color:var(--o)}
+.tk-w.ou{color:transparent;-webkit-text-stroke:1.5px var(--ink)}
+.tk-w:hover,.tk-w:focus-visible{color:#3448f0;-webkit-text-stroke:0}
+.tk-star{width:26px;height:26px;flex:none}
+.tk-more{margin:16px 0 0;color:#55555c}.tk-more a{color:#3448f0;font-weight:700}
 .ctas{display:flex;gap:12px;flex-wrap:wrap}
 .card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 24px 60px rgba(60,30,10,.12),0 2px 6px rgba(60,30,10,.06)}
 .tilt{transform:rotate(-2.5deg)}
@@ -114,11 +109,6 @@ h1{font-size:clamp(2.6rem,6.4vw,5rem)}
 .price{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:-.04em;margin:16px 0 14px}
 .price small{font:500 .9rem Figtree;color:var(--mute);letter-spacing:0}
 .full{display:block;width:100%;text-align:center}
-.cats{padding:50px 0 10px;text-align:center}
-.cats p{margin:0 0 14px;font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.chips a{border:1px solid #dcdce2;background:#fff;border-radius:99px;padding:8px 18px;text-decoration:none;font-weight:500}
-.chips a:hover{border-color:var(--ink)}
 section.row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:84px 0}
 section.row.flip .txt{order:2}
 .side{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;margin-bottom:16px}
@@ -197,8 +187,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
  .hero .ctas{flex-direction:column;align-self:stretch;gap:18px}
  .cta{padding-left:24px}
  .trust{flex-direction:column;align-items:flex-start}
- .band{margin-top:56px}
- .mcard{min-width:0;padding:10px 14px 10px 10px;margin-right:12px}
+ .tk{margin-top:56px}.tk-set{gap:22px;padding-right:22px}.tk-star{width:18px;height:18px}
  .mav{width:40px;height:40px}
 }
 @media(max-width:860px){
@@ -208,7 +197,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
  section.row.flip .txt{order:0}
  nav a.hide{display:none}
 }
-@media(prefers-reduced-motion:reduce){.hub,.tile,.track{animation:none}.band-v{overflow-x:auto}html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.hub,.tile,.tk-tr{animation:none}.tk-mq{overflow-x:auto}html{scroll-behavior:auto}}
 .mtop .vbw{display:inline-flex;vertical-align:-2px;margin-left:5px}
 </style>
 </head>
@@ -244,19 +233,14 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
   </section>
 </div>
 
-<section class="band" aria-label="Membres inscrits sur Dealr">
-  <div class="band-h"><div class="stack" id="stack" aria-hidden="true"></div><p>Ils sont déjà sur Dealr</p></div>
-  <div class="band-v"><div class="track" id="track"></div></div>
+<section class="tk" aria-labelledby="tkT">
+  <div class="wrap"><p class="tk-k" id="tkT">Ce que vous trouverez sur Dealr</p></div>
+  <div class="tk-mq"><div class="tk-tr l"><div class="tk-set"><a class="tk-w" href="marketplace.html?cat=Vidéo">Montage vidéo</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement">Développement web</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Design">UI / UX design</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w" href="marketplace.html?cat=Marketing">SEO</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w it" href="marketplace.html?cat=Design">Identité visuelle</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w ou" href="marketplace.html?cat=Vidéo">Reels &amp; TikTok</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w" href="marketplace.html?cat=Rédaction">Rédaction web</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement">Application mobile</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg></div><div class="tk-set" aria-hidden="true"><a class="tk-w" href="marketplace.html?cat=Vidéo" tabindex="-1">Montage vidéo</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement" tabindex="-1">Développement web</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Design" tabindex="-1">UI / UX design</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w" href="marketplace.html?cat=Marketing" tabindex="-1">SEO</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w it" href="marketplace.html?cat=Design" tabindex="-1">Identité visuelle</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w ou" href="marketplace.html?cat=Vidéo" tabindex="-1">Reels &amp; TikTok</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w" href="marketplace.html?cat=Rédaction" tabindex="-1">Rédaction web</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement" tabindex="-1">Application mobile</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg></div></div></div>
+  <div class="tk-mq"><div class="tk-tr r"><div class="tk-set"><a class="tk-w it" href="marketplace.html?cat=Design">Motion design</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Marketing">Community management</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w" href="marketplace.html?cat=Vidéo">Photographie</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement">No-code</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w ou" href="marketplace.html?cat=Rédaction">Copywriting</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w" href="marketplace.html?cat=Marketing">Publicité en ligne</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement">Shopify</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Conseil">Stratégie digitale</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg></div><div class="tk-set" aria-hidden="true"><a class="tk-w it" href="marketplace.html?cat=Design" tabindex="-1">Motion design</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Marketing" tabindex="-1">Community management</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w" href="marketplace.html?cat=Vidéo" tabindex="-1">Photographie</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement" tabindex="-1">No-code</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w ou" href="marketplace.html?cat=Rédaction" tabindex="-1">Copywriting</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w" href="marketplace.html?cat=Marketing" tabindex="-1">Publicité en ligne</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg><a class="tk-w it" href="marketplace.html?cat=Développement" tabindex="-1">Shopify</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#3448f0"/></svg><a class="tk-w ou" href="marketplace.html?cat=Conseil" tabindex="-1">Stratégie digitale</a><svg class="tk-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f55a1f"/></svg></div></div></div>
+  <div class="wrap"><p class="tk-more">Et des dizaines d’autres métiers. <a href="marketplace.html">Parcourir la marketplace →</a></p></div>
 </section>
 
 <div class="wrap">
-  <div class="cats">
-    <p>Tous les métiers du numérique au même endroit.</p>
-    <div class="chips">
-      <a href="marketplace.html">Montage vidéo</a><a href="marketplace.html">Contenu</a><a href="marketplace.html">Photo</a><a href="marketplace.html">SEO</a><a href="marketplace.html">Développement</a><a href="marketplace.html">Design</a><a href="marketplace.html">Rédaction</a><a href="marketplace.html">Prospection</a>
-    </div>
-  </div>
-
   <section class="row" id="entreprise">
     <div class="txt">
       <span class="side b">Côté entreprise</span>
@@ -404,34 +388,6 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 </script>
 <script src="config.js"></script>
 <script src="auth.js"></script>
-<script src="profils.js"></script>
-<script>
-/* Bandeau défilant des membres inscrits (vrais profils d'abord, puis profils de démonstration) */
-(function(){
-  var C=["#1f4fd8","#c2410c","#0f766e","#7c3aed","#be185d","#4d7c0f","#f55a1f","#3b4a9e"];
-  var track=document.getElementById("track"),stack=document.getElementById("stack");
-  function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-  function ini(n){return String(n||"?").trim().split(/\s+/).map(function(w){return w.charAt(0)}).slice(0,2).join("").toUpperCase()}
-  function av(p,i,cls){var ph=DealrAuth.safeImg(p.photo);return '<span class="'+cls+'" style="background:'+C[i%C.length]+'">'+(ph?'<img src="'+ph+'" alt="">':esc(ini(p.n)))+'</span>'}
-  function draw(list){
-    if(!list.length)return;
-    var one=list.map(function(p,i){var co=p.t==="Entreprise";
-      return '<a class="mcard" href="prestataire.html?id='+encodeURIComponent(p.id)+'">'+av(p,i,"mav")+
-        '<span class="mtx"><span class="mtop"><b>'+esc(p.n)+(DealrAuth.validated(p)?'<span class="vbw">'+DealrAuth.badgeSvg(15)+'</span>':'')+'</b><span class="mt'+(co?" co":"")+'">'+(co?"Entreprise":"Freelance")+'</span></span>'+
-        '<small>'+esc([p.job,p.city].filter(Boolean).join(" · "))+'</small></span></a>'}).join("");
-    track.innerHTML=one+one.replace(/<a class="mcard"/g,'<a class="mcard" tabindex="-1" aria-hidden="true"');
-    track.style.animationDuration=Math.max(30,list.length*5)+"s";
-    stack.innerHTML=list.slice(0,5).map(function(p,i){return av(p,i,"sav")}).join("");
-  }
-  var base=(window.DEALR_PROS||[]).slice();
-  draw(base);
-  DealrAuth.listProfiles().then(function(l){
-    l=(l||[]).filter(function(p){return p&&p.n&&p.t!=="Particulier"});if(!l.length)return;
-    var ids={};l.forEach(function(p){ids[p.id]=1});
-    draw(l.concat(base.filter(function(p){return !ids[p.id]})));
-  });
-})();
-</script>
 <script>
 /* Membre connecté : les boutons « Créer mon compte » mènent à son profil */
 DealrAuth.user().then(function(u){

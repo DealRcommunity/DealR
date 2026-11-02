@@ -180,6 +180,8 @@ const missions=[
  {title:"Audit de notre stratégie d’acquisition",who:"Entreprise",by:"Lumio SAS",c:"Marketing",b:"3 000 €",d:"Sous 1 mois",desc:"Analyse de nos canaux payants et recommandations chiffrées."}
 ].map(m=>Object.assign({demo:true},m));
 let view="pros",cat="Toutes",type="Tous",q="",me=null;
+/* Lien direct : marketplace.html?cat=Vidéo ou ?q=montage (depuis l’accueil) */
+{const P0=new URLSearchParams(location.search),c0=P0.get("cat"),q0=P0.get("q");if(c0&&CATS.includes(c0))cat=c0;if(q0)q=q0.slice(0,60)}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const init=s=>String(s||"?").split(" ").map(w=>w[0]||"").slice(0,2).join("").toUpperCase();
@@ -248,7 +250,7 @@ $("#fForm").onsubmit=()=>{
 };
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 
-setup();render();
+setup();if(q)$("#q").value=q;render();
 
 /* Profils des membres + en-tête selon la connexion */
 DealrAuth.listProfiles().then(list=>{list=list.filter(p=>p.t!=="Particulier");if(!list.length)return;
