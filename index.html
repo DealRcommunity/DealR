@@ -7,7 +7,7 @@
 <meta name="description" content="Publiez un besoin ou proposez vos services. Paiement bloqué jusqu’à la livraison.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
 [hidden]{display:none!important}
 :root{--ink:#111;--mute:#6b6b73;--line:#ececf0;--o:#f55a1f;--ind:#3b4a9e;--g:#22a863;--bg:#fff}
@@ -109,62 +109,105 @@ h1{font-size:clamp(2.6rem,6.4vw,5rem)}
 .price{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:-.04em;margin:16px 0 14px}
 .price small{font:500 .9rem Figtree;color:var(--mute);letter-spacing:0}
 .full{display:block;width:100%;text-align:center}
-section.row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:84px 0}
-section.row.flip .txt{order:2}
-.side{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;margin-bottom:16px}
-.side:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--o)}
-.side.b:before{background:var(--ind)}
 h2{font-size:clamp(2.1rem,4.6vw,3.5rem)}
-.txt ul{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:8px}
-.txt li{display:flex;gap:10px;align-items:center;font-weight:500}
-.txt li:before{content:"";width:18px;height:18px;border-radius:50%;background:var(--o) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.5l2.5 2.5L13 6.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");flex:none}
-.txt p{color:var(--mute);margin:18px 0 0;max-width:28em}
-.stage{position:relative}
-.item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
-.item:first-of-type{border-top:0}
-.item b{display:block;font-size:.98rem}
-.item small{color:var(--mute);font-size:.82rem}
-.pr{font-weight:700;white-space:nowrap}
-.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;flex:none;background:linear-gradient(135deg,#ff8a3d,var(--o))}
-.av.b{background:linear-gradient(135deg,#6f7fe0,var(--ind))}
-.who{display:flex;gap:12px;align-items:center}
-.who b{display:block;line-height:1.2}.who small{color:var(--mute)}
-.port{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
-.port div{aspect-ratio:1;border-radius:14px;display:grid;place-items:center}
-.port div:after{content:"";width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 7px transparent;clip-path:circle()}
-.stars{color:#f5a623;letter-spacing:2px}
-.pill{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:99px;padding:9px 16px;font-size:.88rem;font-weight:600;margin-top:12px}
-.pill:before{content:"✓";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--o);font-size:.75rem}
-.chat{display:grid;gap:10px;margin:16px 0}
-.msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:.92rem}
-.msg.l{background:#f1f1f4;border-bottom-left-radius:4px}
-.msg.r{background:var(--o);color:#fff;justify-self:end;border-bottom-right-radius:4px}
-.pair{display:flex;gap:8px;align-items:center;font-size:.82rem;font-weight:600;justify-content:center}
-.deal{border:2px solid var(--ink);border-radius:14px;padding:16px;margin-top:18px;background:#fff}
-.deal .top{display:flex;justify-content:space-between;align-items:center}
-.tag{background:var(--ink);color:#fff;border-radius:99px;padding:3px 12px;font-size:.78rem;font-weight:700}
-.deal .top b{font:800 1.7rem "Bricolage Grotesque",sans-serif;letter-spacing:-.04em}
-.deal p{margin:8px 0 0;color:var(--mute);font-size:.88rem}
-.vault{width:min(300px,80%);aspect-ratio:1;margin:0 auto;background:linear-gradient(160deg,#2b2b30,#0e0e10);border-radius:34px;display:grid;place-items:center;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.28)}
-.vault svg{width:78%}
-.vault .coin{position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:#fff;border-radius:99px;padding:6px 14px;font-weight:700;font-size:.9rem;box-shadow:0 6px 18px rgba(0,0,0,.18);display:flex;gap:6px;align-items:center}
-.vault .coin:before{content:"";width:14px;height:14px;border-radius:50%;background:#ffc53d}
-.hub{transform-origin:100px 100px;animation:spin 18s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.locked{text-align:center;margin-top:26px}
-.locked span{display:inline-block;background:#fff;border-radius:99px;padding:6px 14px;font-size:.85rem;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.1)}
-.steps{display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:.88rem;font-weight:600}
-.steps .s{display:flex;gap:8px;align-items:center;color:var(--mute)}
-.steps .s i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #cfcfd6;font-style:normal;font-size:.75rem}
-.steps .s.ok{color:var(--ink)}
-.steps .s.ok i{background:var(--g);border-color:var(--g);color:#fff}
-.steps hr{flex:1;border:0;height:2px;background:#e3e3e8;margin:0}
-.bar{height:6px;border-radius:9px;background:#eee;margin:10px 0 18px;overflow:hidden}
-.bar span{display:block;height:100%;width:100%;background:var(--o)}
-#ok{width:100%;border-radius:12px;padding:13px;border:0;background:var(--ink);color:#fff;font:600 1rem Figtree,sans-serif;cursor:pointer}
-#ok.done{background:var(--g);cursor:default}
-#res{margin-top:14px;font-size:.95rem;color:var(--mute);min-height:1.5em}
-#res b{color:var(--ink)}
+/* Comment ça marche : étapes à gauche, écran fixe à droite qui change selon l'étape */
+.hw{background:#fbfaf8;padding:96px 0 104px;margin-top:80px}
+.hw-h{max-width:760px;margin:0 auto;padding:0 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+.hw-k{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#c2410c}
+.hw-h h2{font-size:clamp(2.4rem,5vw,3.6rem);letter-spacing:-.035em;line-height:1.02}
+.hw-h p{margin:0;font-size:1.06rem;color:#55555c;max-width:34em}
+.hw-grid{max-width:1180px;margin:40px auto 0;padding:0 32px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:64px;align-items:start}
+.hw-st{min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:10px;scroll-margin-top:90px;transition:opacity .35s}
+.hw.js .hw-st:not(.on){opacity:.28}
+.hw-n{font-size:.85rem;font-weight:700;color:#3448f0}
+.hw-st h3{font-size:2.1rem;letter-spacing:-.03em;line-height:1.1}
+.hw-st p{margin:0;font-size:1.04rem;color:#55555c;max-width:26em}
+.hw-mon{position:sticky;top:max(96px,calc(50vh - 254px));display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:max(0px,calc(36vh - 254px))}
+.hw-frame{width:100%;background:#ececf0;border-radius:26px;padding:14px;box-shadow:0 30px 70px rgba(40,40,80,.16)}
+.hw-screen{position:relative;height:420px;background:#fff;border-radius:16px;overflow:hidden;font-size:15px;line-height:1.45}
+.hw-scr{position:absolute;inset:0;opacity:0;transform:translateY(12px);transition:opacity .45s,transform .45s;display:flex;flex-direction:column;justify-content:center;padding:26px 22px}
+.hw-scr.on{opacity:1;transform:none}
+.hw-dots{display:flex;gap:10px}
+.hw-dots button{width:44px;height:44px;border-radius:50%;border:1.5px solid #dcdce2;background:#fff;font:700 15px Figtree,sans-serif;color:#111;cursor:pointer}
+.hw-dots button.on{border-color:transparent;color:#fff;background:linear-gradient(135deg,#3448f0,#f55a1f)}
+.hw-cta{display:flex;justify-content:center;margin-top:24px}
+/* Contenu des écrans */
+.hw-scr b{font-weight:700}
+.hw-amt{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:-.03em}
+.s1{gap:18px}
+.hw-brand{display:flex;align-items:center;gap:10px;font:800 18px "Bricolage Grotesque",sans-serif}
+.hw-brand i{width:10px;height:10px;border-radius:50%;background:var(--o)}
+.hw-q{font:800 22px "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+.hw-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hw-opt{border:1.5px solid #ececf0;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
+.hw-opt.sel{border:2px solid #3448f0;background:#f3f5ff}
+.hw-opt b{font-size:16px}
+.hw-opt>span:last-child{font-size:13px;color:#55555c;line-height:1.4}
+.hw-chk{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;background:#3448f0;color:#fff;display:grid;place-items:center}
+.hw-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.hw-ic.o{background:#ffe9de;color:#b2400f}.hw-ic.b{background:#e7eaff;color:#2234c4}
+.s2{justify-content:flex-start;gap:12px;padding:22px}
+.hw-chat-h{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid #ececf0}
+.hw-chat-h small{font-size:12px;color:#6b6b73}
+.hw-av{width:34px;height:34px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.hw-av.im{background:#c2410c}.hw-av.cl{background:#4d7c0f}
+.hw-av.lg{width:54px;height:54px;font-size:15px}
+.hw-b{align-self:flex-start;background:#f1f1f4;border-radius:18px 18px 18px 6px;padding:9px 14px;font-size:14px;max-width:70%}
+.hw-b.me{align-self:flex-end;background:#111;color:#fff;border-radius:18px 18px 6px 18px}
+.hw-deal{align-self:flex-start;width:78%;border:1.5px solid #111;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.hw-dk{font-size:12px;font-weight:700;color:#c2410c}
+.hw-dl{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.hw-dl .hw-amt{font-size:22px}
+.hw-deal small{font-size:12px;color:#6b6b73}
+.hw-acts{display:flex;gap:8px;margin-top:4px}
+.hw-acts span{flex:1;text-align:center;border:1px solid #dcdce2;border-radius:99px;padding:8px;font-size:13px;font-weight:600}
+.hw-acts span.y{background:#111;color:#fff;border-color:#111;font-weight:700}
+.s3{gap:22px}
+.hw-flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.25fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.hw-who,.hw-safe{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.hw-who b{font-size:13px}
+.hw-safe{gap:10px}
+.hw-safe .hw-amt{font-size:26px}
+.hw-tag{font-size:12px;font-weight:700;border-radius:99px;padding:4px 9px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.hw-tag.g{color:#17613a;background:#e3f4ea}.hw-tag.b{color:#2234c4;background:#e7eaff}.hw-tag.w{color:#8a4b00;background:#fff4e5}
+.hw-cap{margin:0;text-align:center;font-size:14px;line-height:1.5;color:#45454d}
+.s4{gap:16px;padding:26px}
+.hw-paid{display:flex;align-items:center;gap:14px;background:#e3f4ea;border-radius:16px;padding:16px 18px;color:#17613a}
+.hw-ok{width:42px;height:42px;border-radius:50%;background:#22a863;color:#fff;display:grid;place-items:center;flex:none}
+.hw-pt{flex:1;min-width:0}.hw-pt b{display:block;font-size:15px}.hw-pt small{font-size:13px}
+.hw-paid .hw-amt{font-size:24px}
+.hw-rev{border:1px solid #ececf0;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:#45454d}
+.hw-rh{display:flex;align-items:center;gap:10px;color:#111}.hw-rh b{flex:1}
+.hw-stars{color:#f5a524;letter-spacing:2px}
+/* Copie statique de l'écran sous chaque étape (téléphone) */
+.hw-mini{display:none}
+@media(max-width:860px){
+ .hw{padding:64px 0 72px;margin-top:56px}
+ .hw-grid{display:block;padding:0 16px;margin-top:28px}
+ .hw-mon{display:none}
+ .hw-st{min-height:0;padding:28px 0;gap:12px}
+ .hw.js .hw-st:not(.on){opacity:1}
+ .hw-st h3{font-size:1.7rem}
+ .hw-mini{display:block;background:#ececf0;border-radius:22px;padding:10px;margin-top:8px}
+ .hw-mini .hw-scr{position:static;opacity:1;transform:none;background:#fff;border-radius:14px;padding:18px 16px;font-size:14px;line-height:1.45}
+ .hw-mini .hw-opt>span:last-child{display:none}
+ .hw-mini .hw-opt{padding:12px}
+ .hw-mini .hw-brand{display:none}
+ .hw-mini .hw-q{font-size:18px}
+ .hw-mini .hw-deal{width:100%}
+ .hw-mini .hw-b{max-width:85%}
+ .hw-mini .hw-flow{gap:4px}
+ .hw-mini .hw-arr{width:16px}
+ .hw-mini .hw-safe-ic{width:74px;height:70px}
+ .hw-mini .hw-safe .hw-amt{font-size:20px}
+ .hw-mini .hw-av.lg{width:42px;height:42px;font-size:13px}
+ .hw-mini .hw-tag{font-size:11px;padding:3px 7px;white-space:normal;justify-content:center}
+ .hw-mini .hw-cap br{display:none}
+ .hw-mini .hw-paid{padding:12px 14px;gap:10px}
+ .hw-mini .hw-ok{width:34px;height:34px}
+ .hw-mini .hw-paid .hw-amt{font-size:20px}
+}
+@media(prefers-reduced-motion:reduce){.hw-scr,.hw-st{transition:none}}
 .final{text-align:center;padding:90px 0 100px}
 .final h2{font-size:clamp(2.2rem,5.4vw,4.2rem)}
 .final p{color:var(--mute);margin:20px auto 30px;max-width:30em}
@@ -192,12 +235,9 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 }
 @media(max-width:860px){
  .fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}
- section.row{grid-template-columns:1fr;gap:36px}
- section.row{padding:56px 0}
- section.row.flip .txt{order:0}
  nav a.hide{display:none}
 }
-@media(prefers-reduced-motion:reduce){.hub,.tile,.tk-tr{animation:none}.tk-mq{overflow-x:auto}html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.tile,.tk-tr{animation:none}.tk-mq{overflow-x:auto}html{scroll-behavior:auto}}
 .mtop .vbw{display:inline-flex;vertical-align:-2px;margin-left:5px}
 </style>
 </head>
@@ -240,107 +280,111 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
   <div class="wrap"><p class="tk-more">Et des dizaines d’autres métiers. <a href="marketplace.html">Parcourir la marketplace →</a></p></div>
 </section>
 
-<div class="wrap">
-  <section class="row" id="entreprise">
-    <div class="txt">
-      <span class="side b">Côté entreprise</span>
-      <h2>Publiez votre besoin en <em class="i">1 minute.</em></h2>
-      <ul><li>Vous fixez votre prix</li><li>Vous recevez des offres de profils vérifiés</li><li>Vous choisissez qui travaille pour vous</li></ul>
+<section class="hw" id="comment" aria-labelledby="hwT">
+  <div class="hw-h">
+    <span class="hw-k">Comment ça marche</span>
+    <h2 id="hwT">Dealr en <em>4 étapes.</em></h2>
+    <p>Du premier message au paiement, tout se passe au même endroit. Et l’argent reste protégé jusqu’à la livraison.</p>
+  </div>
+  <div class="hw-grid">
+    <div class="hw-steps">
+      <article class="hw-st on" id="entreprise" data-i="0">
+        <span class="hw-n">Étape 1</span>
+        <h3>Publiez un besoin ou trouvez un profil.</h3>
+        <p>Deux façons de commencer : recevoir des offres, ou choisir vous-même le bon freelance.</p>
+      </article>
+      <article class="hw-st" id="freelance" data-i="1">
+        <span class="hw-n">Étape 2</span>
+        <h3>Discutez, puis proposez un deal.</h3>
+        <p>Prix, délai, livrables : tout est écrit noir sur blanc dans le chat.</p>
+      </article>
+      <article class="hw-st" id="paiement" data-i="2">
+        <span class="hw-n">Étape 3</span>
+        <h3>L’argent part au coffre.</h3>
+        <p>Le client paie, mais le freelance ne reçoit rien tout de suite : l’argent attend, en sécurité, que le travail soit livré.</p>
+      </article>
+      <article class="hw-st" data-i="3">
+        <span class="hw-n">Étape 4</span>
+        <h3>Livré, payé, noté.</h3>
+        <p>Le client valide : le freelance est payé, et chacun laisse un avis.</p>
+      </article>
     </div>
-    <div class="stage">
-      <div class="card">
-        <h3>3 offres reçues</h3>
-        <div class="item"><div class="who"><span class="av">IM</span><div><b>Inès M.</b><small>Monteuse vidéo · Paris</small></div></div><span class="pr">320 €</span></div>
-        <div class="item"><div class="who"><span class="av b">TB</span><div><b>Studio Nord</b><small>Agence · Lille</small></div></div><span class="pr">390 €</span></div>
-        <div class="item"><div class="who"><span class="av">YB</span><div><b>Yanis B.</b><small>Freelance · Marseille</small></div></div><span class="pr">336 €</span></div>
-      </div>
-    </div>
-  </section>
 
-  <section class="row flip" id="freelance">
-    <div class="txt">
-      <span class="side">Côté freelance</span>
-      <h2>Trouvez des <em>missions.</em><br>Proposez votre prix.</h2>
-      <p>Les besoins publiés arrivent chez vous, classés par métier et par budget.</p>
-    </div>
-    <div class="stage">
-      <div class="card">
-        <h3>Missions pour vous</h3>
-        <div class="item"><div><b>Montage de 3 Reels</b><small>Café Lumen · Paris</small></div><span class="pr">350 €</span></div>
-        <div class="item"><div><b>Shooting produit</b><small>Maison Aube · 1 jour</small></div><span class="pr">600 €</span></div>
-        <div class="item"><div><b>Audit SEO</b><small>Nova Studio · À distance</small></div><span class="pr" style="color:var(--o)">Offres ouvertes</span></div>
-      </div>
-    </div>
-  </section>
+    <div class="hw-mon">
+      <div class="hw-frame" aria-hidden="true">
+        <div class="hw-screen">
 
-  <section class="row">
-    <div class="txt">
-      <span class="side">Côté freelance</span>
-      <h2>Votre profil <em>parle pour vous.</em></h2>
-      <ul><li>Un portfolio qui montre votre travail</li><li>Des avis laissés après chaque mission</li><li>Un badge « profil validé » après plus de 3 deals conclus</li></ul>
-    </div>
-    <div class="stage">
-      <div class="card">
-        <div class="who"><span class="av" style="width:52px;height:52px">IM</span><div><b style="font-size:1.1rem">Inès M.</b><small>Monteuse vidéo · Paris</small></div></div>
-        <div class="port"><div style="background:linear-gradient(135deg,#ff9a4d,var(--o))"></div><div style="background:linear-gradient(135deg,#6f86ff,#2f45d6)"></div><div style="background:linear-gradient(135deg,#3a3a40,#0f0f12)"></div></div>
-        <div><span class="stars">★★★★★</span> <b>4,9</b> <small style="color:var(--mute)">38 avis</small></div>
-        <span class="pill">Profil validé · plus de 3 deals conclus</span>
-      </div>
-    </div>
-  </section>
+          <div class="hw-scr s1 on" data-i="0">
+            <div class="hw-brand"><i></i>Dealr</div>
+            <b class="hw-q">Que voulez-vous faire ?</b>
+            <div class="hw-two">
+              <div class="hw-opt sel">
+                <span class="hw-chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                <span class="hw-ic o"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l15-6v14L3 13zM7 13v5a2 2 0 0 0 4 0v-3"/></svg></span>
+                <b>Publier un besoin</b>
+                <span>Décrivez votre projet, les freelances vous font une offre.</span>
+              </div>
+              <div class="hw-opt">
+                <span class="hw-ic b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+                <b>Trouver un profil</b>
+                <span>Parcourez les freelances et contactez celui qui vous plaît.</span>
+              </div>
+            </div>
+          </div>
 
-  <section class="row flip">
-    <div class="txt">
-      <h2>Tout se négocie <em>dans le chat.</em></h2>
-      <p>Précisez le besoin, ajustez le prix, fixez la date. Quand vous êtes d’accord, un seul bouton : <em>Deal.</em></p>
-    </div>
-    <div class="stage">
-      <div class="card">
-        <div class="pair"><span class="av b" style="width:26px;height:26px;font-size:.62rem">CL</span>Café Lumen ↔ <span class="av" style="width:26px;height:26px;font-size:.62rem">IM</span>Inès M.</div>
-        <div class="chat">
-          <div class="msg l">Ton offre à 320 € nous convient !</div>
-          <div class="msg r">Parfait, je livre vendredi.</div>
+          <div class="hw-scr s2" data-i="1">
+            <div class="hw-chat-h"><span class="hw-av im">IM</span><b>Inès M.</b><small>Monteuse vidéo</small></div>
+            <div class="hw-b me">Bonjour, vous êtes dispo pour 3 Reels la semaine prochaine ?</div>
+            <div class="hw-b">Oui ! Je vous propose un deal.</div>
+            <div class="hw-deal">
+              <span class="hw-dk">DEAL PROPOSÉ</span>
+              <div class="hw-dl"><b>Montage de 3 Reels</b><b class="hw-amt">320 €</b></div>
+              <small>Livraison avant le 14 novembre · 2 retouches</small>
+              <div class="hw-acts"><span class="y">Accepter</span><span>Contre-proposer</span></div>
+            </div>
+          </div>
+
+          <div class="hw-scr s3" data-i="2">
+            <div class="hw-flow">
+              <div class="hw-who"><span class="hw-av cl lg">CL</span><b>Café Lumen</b><span class="hw-tag g">A payé</span></div>
+              <svg class="hw-arr" width="34" height="14" viewBox="0 0 34 14"><path d="M1 7h28M24 2l6 5-6 5" fill="none" stroke="#b9bccb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="hw-safe">
+                <svg class="hw-safe-ic" width="120" height="112" viewBox="0 0 120 112"><rect x="6" y="6" width="108" height="92" rx="14" fill="#111"/><rect x="16" y="16" width="88" height="72" rx="9" fill="#1f1f22" stroke="#3a3a40" stroke-width="2"/><circle cx="60" cy="52" r="20" fill="#f3f5ff"/><circle cx="60" cy="52" r="13" fill="none" stroke="#3448f0" stroke-width="3"/><path d="M60 39v6M60 59v6M47 52h6M67 52h6" stroke="#3448f0" stroke-width="3" stroke-linecap="round"/><rect x="92" y="40" width="6" height="24" rx="3" fill="#f55a1f"/><rect x="20" y="98" width="16" height="8" rx="2" fill="#111"/><rect x="84" y="98" width="16" height="8" rx="2" fill="#111"/></svg>
+                <b class="hw-amt">320 €</b>
+                <span class="hw-tag b">Bloqués en sécurité</span>
+              </div>
+              <svg class="hw-arr" width="34" height="14" viewBox="0 0 34 14"><path d="M1 7h28M24 2l6 5-6 5" fill="none" stroke="#dcdce2" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="hw-who"><span class="hw-av im lg">IM</span><b>Inès M.</b><span class="hw-tag w"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>À la livraison</span></div>
+            </div>
+            <p class="hw-cap">Ni le client ni le freelance ne peuvent toucher à l’argent. <br>Il est versé à Inès dès que Café Lumen valide le travail.</p>
+          </div>
+
+          <div class="hw-scr s4" data-i="3">
+            <div class="hw-paid">
+              <span class="hw-ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <span class="hw-pt"><b>Paiement versé</b><small>Livraison validée par Café Lumen</small></span>
+              <b class="hw-amt">+320 €</b>
+            </div>
+            <div class="hw-rev">
+              <div class="hw-rh"><span class="hw-av cl">CL</span><b>Café Lumen</b><span class="hw-stars">★★★★★</span></div>
+              <span>Travail rapide et soigné, nos Reels ont enfin du rythme. Merci Inès !</span>
+            </div>
+          </div>
+
         </div>
-        <div class="deal"><div class="top"><span class="tag">DEAL</span><b>320 €</b></div><p>Montage de 3 Reels · livraison vendredi</p></div>
+      </div>
+      <div class="hw-dots" role="group" aria-label="Choisir une étape">
+        <button type="button" class="on" data-i="0" aria-label="Étape 1" aria-current="step">1</button>
+        <button type="button" data-i="1" aria-label="Étape 2">2</button>
+        <button type="button" data-i="2" aria-label="Étape 3">3</button>
+        <button type="button" data-i="3" aria-label="Étape 4">4</button>
       </div>
     </div>
-  </section>
+  </div>
+  <div class="hw-cta"><a class="cta o" data-acc href="connexion.html#inscription">Créer mon compte<span class="ar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f55a1f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
+</section>
 
-  <section class="row" id="paiement">
-    <div class="txt">
-      <h2>L’argent part <em>au coffre.</em></h2>
-      <ul><li>Paiement sécurisé</li><li>Fonds bloqués jusqu’à la livraison</li><li>Versement dès la validation du client</li></ul>
-    </div>
-    <div class="stage">
-      <div class="vault" role="img" aria-label="Coffre contenant 320 euros">
-        <span class="coin">320 €</span>
-        <svg viewBox="0 0 200 200" aria-hidden="true">
-          <circle cx="100" cy="100" r="92" fill="#1b1b1f" stroke="#3a3a42" stroke-width="2"/>
-          <g class="hub"><g stroke="#d9d9de" stroke-width="5" stroke-linecap="round"><path d="M100 100V52M100 100L141 124M100 100L59 124"/></g>
-          <g fill="#e6e6ea"><circle cx="100" cy="52" r="7"/><circle cx="141" cy="124" r="7"/><circle cx="59" cy="124" r="7"/></g></g>
-          <circle cx="100" cy="100" r="22" fill="var(--o)"/>
-        </svg>
-      </div>
-      <div class="locked"><span>Fonds bloqués · 320 €</span></div>
-    </div>
-  </section>
-
-  <section class="row flip">
-    <div class="txt">
-      <h2>Le travail est <em class="i">livré.</em></h2>
-      <p>Le freelance dépose son fichier. Le client vérifie, puis valide. Essayez : cliquez sur le bouton.</p>
-    </div>
-    <div class="stage">
-      <div class="card">
-        <div class="steps" aria-live="polite"><span class="s ok" id="s1"><i>✓</i>Livré</span><hr><span class="s" id="s2"><i>2</i>Vérifié</span><hr><span class="s" id="s3"><i>3</i>Payé</span></div>
-        <div class="item" style="border:0;padding-bottom:0"><div><b>Reels_cafe_lumen.mp4</b><small>Livré à Café Lumen</small></div></div>
-        <div class="bar"><span></span></div>
-        <button id="ok">Valider la livraison</button>
-        <div id="res" aria-live="polite"></div>
-      </div>
-    </div>
-  </section>
-
+<div class="wrap">
   <section class="final">
     <h2>Votre prochaine mission <em>commence ici.</em></h2>
     <p>Publiez un besoin ou créez votre profil de freelance.<br>Inscription sans frais !</p>
@@ -362,7 +406,7 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
       </div>
       <div>
         <h4>Freelances</h4>
-        <ul><li><a href="marketplace.html">Voir les missions</a></li><li><a data-acc href="connexion.html#inscription">Créer mon compte</a></li><li><a href="#freelance">Comment ça marche</a></li></ul>
+        <ul><li><a href="marketplace.html">Voir les missions</a></li><li><a data-acc href="connexion.html#inscription">Créer mon compte</a></li><li><a href="#comment">Comment ça marche</a></li></ul>
       </div>
       <div>
         <h4>Dealr</h4>
@@ -377,13 +421,26 @@ footer{border-top:1px solid var(--line);background:#fff;color:var(--mute);font-s
 </footer>
 
 <script>
+/* Comment ça marche : l'étape la plus proche du centre de l'écran devient active */
 (function(){
-  var btn=document.getElementById("ok"),res=document.getElementById("res"),n=0;
-  function ok(id){var e=document.getElementById(id);e.classList.add("ok");e.querySelector("i").textContent="✓"}
-  btn.addEventListener("click",function(){
-    if(n===0){n=1;ok("s2");btn.textContent="Libérer le paiement";res.innerHTML="Livraison vérifiée par <b>Café Lumen</b>."}
-    else if(n===1){n=2;ok("s3");btn.textContent="Paiement versé";btn.classList.add("done");res.innerHTML="<b>+320 €</b> versés à Inès M. Solde du mois : <b>1 240 €</b>."}
-  });
+  var sec=document.getElementById("comment");if(!sec)return;
+  var steps=[].slice.call(sec.querySelectorAll(".hw-st")),scr=[].slice.call(sec.querySelectorAll(".hw-scr")),dots=[].slice.call(sec.querySelectorAll(".hw-dots button")),cur=-1,tick=false;
+  sec.classList.add("js");
+  /* Téléphone : une copie fixe de chaque écran sous son étape */
+  steps.forEach(function(st,i){var m=document.createElement("div");m.className="hw-mini";m.setAttribute("aria-hidden","true");var c=scr[i].cloneNode(true);c.classList.add("on");m.appendChild(c);st.appendChild(m)});
+  function set(n){if(n===cur)return;cur=n;
+    steps.forEach(function(e,i){e.classList.toggle("on",i===n)});
+    scr.forEach(function(e,i){e.classList.toggle("on",i===n)});
+    dots.forEach(function(e,i){e.classList.toggle("on",i===n);if(i===n)e.setAttribute("aria-current","step");else e.removeAttribute("aria-current")});
+  }
+  function upd(){tick=false;var mid=innerHeight/2,best=0,bd=1e9;
+    steps.forEach(function(e,i){var r=e.getBoundingClientRect(),d=Math.abs(r.top+r.height/2-mid);if(d<bd){bd=d;best=i}});
+    set(best);
+  }
+  addEventListener("scroll",function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+  addEventListener("resize",upd);
+  dots.forEach(function(b,i){b.addEventListener("click",function(){steps[i].scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})})});
+  upd();
 })();
 </script>
 <script src="config.js"></script>
