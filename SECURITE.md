@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace.
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -29,7 +29,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
   - Correction : limites par compte dans la base (nombre de messages par minute, nouvelles conversations par jour), bouton « Signaler », CAPTCHA à l'inscription (Supabase → Attack Protection).
 - [ ] **Nom de famille complet lisible par tous.** Le site n'affiche que l'initiale (« Nina R. »), mais le nom complet est stocké dans le profil public et lisible via l'API.
   - Correction : stocker le nom de famille dans une partie privée du profil (RGPD : ne publier que le nécessaire).
-- [ ] **Pages légales manquantes.** Les liens « Mentions légales », « Conditions d'utilisation » et « Confidentialité » du pied de page ne mènent nulle part. Obligatoires pour une plateforme qui traite des données personnelles et de l'argent.
+- [ ] **Pages légales incomplètes.** Mentions légales en ligne depuis le 05/11 (`mentions-legales.html`, avec la partie données personnelles), mais les champs surlignés en orange (nom, adresse, SIREN, e-mail, téléphone, e-mail de signalement, médiateur, commission) restent à remplir dès l'immatriculation. Restent à écrire : « Conditions d'utilisation » et une politique de confidentialité complète (les liens du pied de page ne mènent nulle part). Obligatoires pour une plateforme qui traite des données personnelles et de l'argent.
   - Correction : rédiger ces pages (idéalement validées par un juriste), ajouter la suppression de compte et l'export des données (RGPD).
 - [ ] **Pas de sauvegarde de la base.** Le plan gratuit de Supabase ne fait pas de sauvegardes automatiques.
   - Correction : passer au plan Pro avant le lancement (sauvegardes quotidiennes), ou exporter la base régulièrement.
@@ -68,6 +68,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ## Points vérifiés sur les nouvelles fonctions
 
+- **05/11/2026 – Mentions légales** : page statique, aucune donnée collectée. Signale honnêtement que les polices Google Fonts transmettent l'IP du visiteur à Google (à héberger sur notre site plus tard pour l'éviter) et que le badge « Entreprise vérifiée » ne prouve pas que la personne est le dirigeant.
 - **02/11/2026 – Nouvelle marketplace** : tout le texte des profils est échappé avant affichage, les photos (avatar, portfolio) ne passent que si ce sont de vraies images, les filtres se font dans le navigateur sur des profils déjà publics (aucune nouvelle donnée exposée). Les favoris restent dans le navigateur du visiteur (rien n'est envoyé à Dealr). Pour la distance, seuls des noms de villes et codes postaux sont envoyés au service public de géocodage (IGN, Base Adresse Nationale), déjà utilisé pour les adresses ; aucune donnée nominative.
   - Rappel lié : la faille « Nom de famille complet lisible par tous » (ci-dessus) concerne directement cette page, à corriger avant le lancement.
 
