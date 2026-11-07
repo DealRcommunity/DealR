@@ -36,6 +36,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ### Moyen
 
+- [ ] **Accès admin aux messages trop large et non tracé** (repéré le 07/11). Les règles de la base laissent un compte admin lire *toutes* les conversations, pas seulement celles en litige, et aucun journal ne garde trace des lectures. La page admin n'affiche que les litiges, mais l'accès existe techniquement. Décision d'Alexis : pas de recherche de compte ni de lecture hors litige. Correction proposée : limiter la lecture admin aux conversations ayant un deal en litige (ou une demande d'assistance) et tracer chaque ouverture.
 - [ ] **Fichiers en base64 dans la base.** Justificatifs de certification, photos et portfolio sont stockés dans les tables. Ça alourdit la base (limite 500 Mo en gratuit).
   - Correction : Supabase Storage, avec un dossier privé pour les justificatifs.
 - [ ] **Pièces jointes non analysées par un antivirus.** Un membre peut envoyer un PDF piégé. Les fichiers sont limités aux PDF et images (5 Mo), privés et ouverts depuis le domaine de Supabase, pas celui de Dealr, ce qui limite les risques pour le site, mais pas pour l'ordinateur de la personne qui les ouvre.
