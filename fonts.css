@@ -1,0 +1,5 @@
+/* Polices hébergées sur le site (aucune requête vers Google).
+   Licence SIL Open Font License 1.1 : voir fonts/OFL-*.txt */
+@font-face{font-family:"Bricolage Grotesque";src:url("fonts/bricolage-grotesque.woff") format("woff");font-weight:600 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Figtree";src:url("fonts/figtree.woff") format("woff");font-weight:400 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url("fonts/instrument-serif-italic.woff") format("woff");font-weight:400;font-style:italic;font-display:swap}

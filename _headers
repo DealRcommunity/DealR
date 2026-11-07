@@ -5,3 +5,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Strict-Transport-Security: max-age=31536000
+
+# Polices : gardées en cache 30 jours par le navigateur
+/fonts/*
+  Cache-Control: public, max-age=2592000

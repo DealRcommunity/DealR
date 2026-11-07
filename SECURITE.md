@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales.
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -68,7 +68,8 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ## Points vérifiés sur les nouvelles fonctions
 
-- **05/11/2026 – Mentions légales** : page statique, aucune donnée collectée. Signale honnêtement que les polices Google Fonts transmettent l'IP du visiteur à Google (à héberger sur notre site plus tard pour l'éviter) et que le badge « Entreprise vérifiée » ne prouve pas que la personne est le dirigeant.
+- **07/11/2026 – Polices hébergées sur le site** : Bricolage Grotesque, Figtree et Instrument Serif sont servies depuis `fonts/` (licence OFL jointe) au lieu de Google Fonts. Plus aucune adresse IP de visiteur n'est envoyée à Google pour afficher les pages ; le site ne dépose toujours aucun cookie non indispensable, donc pas de bandeau cookies nécessaire.
+- **05/11/2026 – Mentions légales** : page statique, aucune donnée collectée. Signale que le badge « Entreprise vérifiée » ne prouve pas que la personne est le dirigeant.
 - **02/11/2026 – Nouvelle marketplace** : tout le texte des profils est échappé avant affichage, les photos (avatar, portfolio) ne passent que si ce sont de vraies images, les filtres se font dans le navigateur sur des profils déjà publics (aucune nouvelle donnée exposée). Les favoris restent dans le navigateur du visiteur (rien n'est envoyé à Dealr). Pour la distance, seuls des noms de villes et codes postaux sont envoyés au service public de géocodage (IGN, Base Adresse Nationale), déjà utilisé pour les adresses ; aucune donnée nominative.
   - Rappel lié : la faille « Nom de famille complet lisible par tous » (ci-dessus) concerne directement cette page, à corriger avant le lancement.
 
