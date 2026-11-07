@@ -324,19 +324,21 @@ services.forEach(function(s,i){var lb=h("label","it"),cb=document.createElement(
   var t=h("div");t.appendChild(h("b","",s.t));t.appendChild(h("span","sub",eur(s.price)+" / "+s.unit));
   var n=document.createElement("input");n.type="number";n.min="1";n.value="1";n.setAttribute("aria-label","Quantité : "+s.t);
   lb.appendChild(cb);lb.appendChild(t);lb.appendChild(n);q.appendChild(lb);boxes.push({s:s,cb:cb,n:n});cb.onchange=n.oninput=calc});
-var tv=document.createElement("select");tv.setAttribute("aria-label","TVA");tv.style.marginTop="10px";
-[["20","TVA 20 %"],["10","TVA 10 %"],["5.5","TVA 5,5 %"],["0","TVA non applicable"]].forEach(function(o){var op=h("option","",o[1]);op.value=o[0];tv.appendChild(op)});
-tv.onchange=calc;q.appendChild(tv);
+/* La TVA dépend du statut du prestataire (renseigné dans ses informations juridiques), pas du choix du client */
+var rg=(p.legal&&p.legal.tvaRegime)||(p.legal&&p.legal.tva?"assujetti":""),rate=rg==="assujetti"?20:0;
+var tvNote=h("p","sub",rg==="franchise"?"TVA non applicable : ce prestataire est en franchise de TVA (art. 293 B du CGI).":rg==="assujetti"?"TVA à 20 % : ce prestataire facture la TVA.":"Montant hors taxes. Une TVA peut s’ajouter selon le statut du prestataire.");
+tvNote.style.marginTop="10px";q.appendChild(tvNote);
 var tot=h("div","tot");q.appendChild(tot);
 var go=h("button","btn","Envoyer ma demande de devis");go.type="button";go.style.cssText="width:100%;margin-top:14px";q.appendChild(go);
 q.appendChild(h("p","sub","Estimation indicative. Le prestataire vous enverra son devis définitif."));
 side.appendChild(q);
-function calc(){var ht=boxes.filter(function(x){return x.cb.checked}).reduce(function(a,x){return a+Math.max(1,parseFloat(x.n.value)||1)*x.s.price},0),t=ht*parseFloat(tv.value)/100;tot.textContent="";
-  [["Total HT",eur(ht)],["TVA",eur(t)]].forEach(function(r){var d=h("div");d.appendChild(h("span","",r[0]));d.appendChild(h("span","",r[1]));tot.appendChild(d)});
-  var d=h("div","big");d.appendChild(h("span","","Total TTC"));d.appendChild(h("span","",eur(ht+t)));tot.appendChild(d)}
+var totLabel=rg==="assujetti"?"Total TTC":rg==="franchise"?"Total":"Total HT";
+function calc(){var ht=boxes.filter(function(x){return x.cb.checked}).reduce(function(a,x){return a+Math.max(1,parseFloat(x.n.value)||1)*x.s.price},0),t=Math.round(ht*rate)/100;tot.textContent="";
+  if(rg==="assujetti")[["Total HT",eur(ht)],["TVA 20 %",eur(t)]].forEach(function(r){var d=h("div");d.appendChild(h("span","",r[0]));d.appendChild(h("span","",r[1]));tot.appendChild(d)});
+  var d=h("div","big");d.appendChild(h("span","",totLabel));d.appendChild(h("span","",eur(ht+t)));tot.appendChild(d)}
 go.onclick=function(){var sel=boxes.filter(function(x){return x.cb.checked});if(!sel.length){toast("Sélectionnez au moins un service.");return}
   var lines=sel.map(function(x){var n=Math.max(1,parseFloat(x.n.value)||1);return"• "+x.s.t+" × "+n+" ("+eur(x.s.price)+" / "+x.s.unit+")"});
-  contact("Bonjour, je souhaiterais un devis pour :\n"+lines.join("\n")+"\nEstimation : "+tot.querySelector(".big span:last-child").textContent+" TTC.\nPouvez-vous me confirmer vos disponibilités ?")};
+  contact("Bonjour, je souhaiterais un devis pour :\n"+lines.join("\n")+"\nEstimation : "+tot.querySelector(".big span:last-child").textContent+(rg==="assujetti"?" TTC":rg==="franchise"?" (TVA non applicable)":" HT")+".\nPouvez-vous me confirmer vos disponibilités ?")};
 calc();
 });
 })();
