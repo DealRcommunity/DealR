@@ -1,0 +1,12 @@
+# Documents internes : présents dans le dépôt GitHub mais jamais servis sur le site public.
+# Le « 404! » force une page introuvable même si le fichier existe.
+/CLAUDE.md       /introuvable  404!
+/claude.md       /introuvable  404!
+/COMMISSION.md   /introuvable  404!
+/commission.md   /introuvable  404!
+/SECURITE.md     /introuvable  404!
+/securite.md     /introuvable  404!
+/SUPABASE.md     /introuvable  404!
+/supabase.md     /introuvable  404!
+/supabase.sql    /introuvable  404!
+/SUPABASE.sql    /introuvable  404!

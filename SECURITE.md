@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site, statistiques admin.
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site, statistiques admin, documents internes masqués du site.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -69,6 +69,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ## Points vérifiés sur les nouvelles fonctions
 
+- **07/11/2026 – Documents internes publiés sur le site (corrigé)** : `SECURITE.md` (liste des failles), `SUPABASE.md`, `CLAUDE.md`, `COMMISSION.md` et `supabase.sql` (schéma de la base) étaient lisibles par tous à l'adresse du site, puisque Netlify publie tout le dépôt. Ajout d'un fichier `_redirects` qui renvoie une page introuvable pour ces fichiers. **À vérifier après le prochain déploiement** en ouvrant `…/SECURITE.md` sur le site (doit afficher « Page introuvable »). Le schéma ne contient aucun mot de passe ni clé secrète, mais il aide un attaquant à comprendre la base.
 - **07/11/2026 – Estimation de devis** : la TVA n'est plus choisie par le client ; elle suit le régime déclaré par le prestataire (franchise → non applicable, assujetti → 20 %, inconnu → montant HT). Affichage indicatif uniquement, aucun paiement ni document légal n'en dépend ; le texte affiché est échappé.
 - **07/11/2026 – Statistiques admin** : nouvelle fonction `admin_stats()` (section 15 de `supabase.sql`). Elle ne renvoie que des totaux (aucun nom, e-mail ni message), refuse tout compte non admin (testé : « forbidden ») et n'est pas appelable sans être connecté. Le contrôle Supabase la signale comme « fonction appelable par les membres connectés » : c'est voulu, la vérification admin est faite à l'intérieur. Aucune donnée modifiée.
 - **07/11/2026 – Polices hébergées sur le site** : Bricolage Grotesque, Figtree et Instrument Serif sont servies depuis `fonts/` (licence OFL jointe) au lieu de Google Fonts. Plus aucune adresse IP de visiteur n'est envoyée à Google pour afficher les pages ; le site ne dépose toujours aucun cookie non indispensable, donc pas de bandeau cookies nécessaire.
