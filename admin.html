@@ -241,7 +241,8 @@ function btn(label,cls,fn){var b=h("button","btn"+(cls?" "+cls:""),label);b.type
 function load(){
   return A.adminDeals().then(function(ds){
     all=ds||[];
-    var ids=all.map(function(d){return d.conv}).filter(function(id,i,a){return a.indexOf(id)===i&&!convs[id]});
+    /* L’équipe Dealr ne peut lire que les conversations où un deal a été mis en litige (règle de la base) */
+    var ids=all.filter(function(d){return d.disputed_at}).map(function(d){return d.conv}).filter(function(id,i,a){return a.indexOf(id)===i&&!convs[id]});
     return Promise.all(ids.map(function(id){return A.getConversation(id).then(function(c){if(c)convs[id]=c}).catch(function(){})}));
   }).then(function(){
     renderStats();renderList();
@@ -333,7 +334,7 @@ function renderDetail(){
   wrow.appendChild(btn("Envoyer dans la conversation","",function(){var b=this;if(!wt.value.trim())return;b.disabled=true;wok.textContent="";
     A.adminPost(d.conv,wt.value).then(function(){wt.value="";wok.className="ok";wok.textContent="Message envoyé aux deux parties.";threadSig="";return loadThread()})
      .catch(function(e){wok.className="err";wok.textContent=A.message(e)}).then(function(){b.disabled=false})}));
-  wb.appendChild(wrow);wb.appendChild(wok);box.appendChild(wb);
+  wb.appendChild(wrow);wb.appendChild(wok);if(convs[d.conv])box.appendChild(wb);
 
   /* Conversation */
   var th=h("div","thread");th.appendChild(h("h3","","Conversation du deal"));
@@ -356,6 +357,7 @@ $("cfNo").onclick=function(){$("dConf").close()};
 
 function loadThread(){
   var d=sel;if(!d||!$("thr"))return Promise.resolve();
+  if(!convs[d.conv]){var tb=$("thr");tb.textContent="";tb.appendChild(h("div","ev","Conversation privée : l’équipe Dealr ne peut la lire que si un deal de cette conversation est mis en litige."));return Promise.resolve()}
   return Promise.all([A.listMessages(d.conv),A.listDeals(d.conv)]).then(function(r){
     if(!sel||sel.id!==d.id)return;var ms=r[0]||[],ds={};(r[1]||[]).forEach(function(x){ds[x.id]=x});
     var sig=ms.length+":"+(ms.length?ms[ms.length-1].id:"");if(sig===threadSig)return;threadSig=sig;

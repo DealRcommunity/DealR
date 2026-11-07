@@ -741,3 +741,52 @@ begin
 end $$;
 revoke all on function public.admin_stats() from public, anon;
 grant execute on function public.admin_stats() to authenticated;
+
+-- =====================================================================
+-- 16. Accès de l'équipe Dealr limité aux litiges (07/11/2026)
+--     Un compte admin ne peut lire une conversation, ses messages et ses
+--     pièces jointes que si un deal de cette conversation a été mis en
+--     litige (en cours ou résolu). Les conversations d'assistance restent
+--     visibles car l'admin y participe (règles des membres).
+-- =====================================================================
+create or replace function public.admin_can_see(conv_id text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select public.is_admin()
+     and exists (select 1 from public.deals d where d.conv = conv_id and d.disputed_at is not null);
+$$;
+revoke all on function public.admin_can_see(text) from public, anon;
+grant execute on function public.admin_can_see(text) to authenticated;
+
+drop policy if exists "Admins : voir les conversations" on public.conversations;
+create policy "Admins : voir les conversations"
+  on public.conversations for select to authenticated using (public.admin_can_see(id));
+
+drop policy if exists "Admins : mettre à jour les conversations" on public.conversations;
+create policy "Admins : mettre à jour les conversations"
+  on public.conversations for update to authenticated
+  using (public.admin_can_see(id)) with check (public.admin_can_see(id));
+
+drop policy if exists "Admins : lire les messages" on public.messages;
+create policy "Admins : lire les messages"
+  on public.messages for select to authenticated using (public.admin_can_see(conv));
+
+drop policy if exists "Admins : écrire au nom de l'équipe Dealr" on public.messages;
+create policy "Admins : écrire au nom de l'équipe Dealr"
+  on public.messages for insert to authenticated
+  with check (public.is_admin() and sender = auth.uid() and kind = 'admin'
+              and (public.admin_can_see(conv)
+                   or exists (select 1 from public.conversations c where c.id = conv and auth.uid() in (c.user_a, c.user_b))));
+
+drop policy if exists "Pièces jointes : lire" on storage.objects;
+create policy "Pièces jointes : lire" on storage.objects for select to authenticated
+  using (bucket_id = 'pieces-jointes' and (
+    public.admin_can_see((storage.foldername(name))[1])
+    or exists (select 1 from public.conversations c
+               where c.id = (storage.foldername(name))[1] and auth.uid() in (c.user_a, c.user_b))));
+
+drop policy if exists "Pièces jointes : envoyer" on storage.objects;
+create policy "Pièces jointes : envoyer" on storage.objects for insert to authenticated
+  with check (bucket_id = 'pieces-jointes' and (
+    public.admin_can_see((storage.foldername(name))[1])
+    or exists (select 1 from public.conversations c
+               where c.id = (storage.foldername(name))[1] and auth.uid() in (c.user_a, c.user_b))));

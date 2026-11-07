@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site, statistiques admin, documents internes masqués du site.
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site, statistiques admin, documents internes masqués du site, accès admin limité aux litiges.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -36,7 +36,6 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ### Moyen
 
-- [ ] **Accès admin aux messages trop large et non tracé** (repéré le 07/11). Les règles de la base laissent un compte admin lire *toutes* les conversations, pas seulement celles en litige, et aucun journal ne garde trace des lectures. La page admin n'affiche que les litiges, mais l'accès existe techniquement. Décision d'Alexis : pas de recherche de compte ni de lecture hors litige. Correction proposée : limiter la lecture admin aux conversations ayant un deal en litige (ou une demande d'assistance) et tracer chaque ouverture.
 - [ ] **Fichiers en base64 dans la base.** Justificatifs de certification, photos et portfolio sont stockés dans les tables. Ça alourdit la base (limite 500 Mo en gratuit).
   - Correction : Supabase Storage, avec un dossier privé pour les justificatifs.
 - [ ] **Pièces jointes non analysées par un antivirus.** Un membre peut envoyer un PDF piégé. Les fichiers sont limités aux PDF et images (5 Mo), privés et ouverts depuis le domaine de Supabase, pas celui de Dealr, ce qui limite les risques pour le site, mais pas pour l'ordinateur de la personne qui les ouvre.
@@ -50,6 +49,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 ## Corrigé
 
+- **Accès admin limité aux litiges (07/11/2026, section 16 de `supabase.sql`)** : un compte admin ne peut plus lire une conversation, ses messages ni ses pièces jointes que si un deal de cette conversation a été mis en litige (en cours ou résolu). Les conversations d'assistance restent lisibles car l'admin y participe. Testé en local (admin : seul le message de la conversation en litige est visible ; membre : seulement ses propres messages) et règles vérifiées sur la vraie base. Reste visible pour l'admin : la liste des deals (titres et montants), nécessaire aux totaux du tableau de bord. Pas de journal des lectures (non demandé).
 - [x] **29/10/2026 – Mot de passe de 8 caractères minimum exigé aussi par Supabase** (réglé par Alexis), plus seulement par le site.
 - [x] **29/10/2026 – Usurpation du support dans la messagerie.** La fiche d'un participant (nom, photo, mention « support ») était écrite par le navigateur : un membre pouvait apparaître comme « Équipe Dealr ». Elle est maintenant construite par la base à partir des profils (supabase.sql, section 12 c). Le site ne reconnaît plus le support par son nom.
 - [x] **29/10/2026 – Noms réservés.** Un membre ne peut plus prendre un nom contenant « Dealr » (section 12 d).
@@ -65,6 +65,7 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 - **Vue `certifications_public` (alerte « Security Definer View »)** : elle doit être lisible par tous et ne montre que les certifications vérifiées, sans justificatif.
 - **Table `admins` sans règle** : volontairement illisible depuis le site.
+- **Fonction `admin_can_see` appelable par les membres connectés** : elle répond seulement « oui / non » et répond toujours « non » à un compte qui n'est pas admin.
 - **Fonction `admin_stats` appelable par les membres connectés** : elle vérifie elle-même que l'appelant est admin et renvoie uniquement des totaux.
 - **Fonctions `is_admin_id`, `deals_done`, `open_support` appelables** : le site en a besoin. Elles ne renvoient que « oui/non », un nombre de deals par membre, ou ouvrent une conversation avec le support.
 
