@@ -2,7 +2,7 @@
 
 Ce registre liste les failles connues, ce qui a été corrigé et ce qui reste à faire avant le lancement. Il est mis à jour à chaque audit et à chaque nouvelle fonction.
 
-Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site.
+Dernier audit : 29 octobre 2026 (base Supabase, règles d'accès, code du site). Mis à jour le 29/10 au soir : pièces jointes. Mis à jour le 02/11 : nouvelle marketplace. Mis à jour le 05/11 : mentions légales. Mis à jour le 07/11 : polices hébergées sur le site, statistiques admin.
 
 Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou de l'argent réel. **Élevé** = avant le lancement public. **Moyen** = dans les premiers mois. **Faible** = à surveiller.
 
@@ -64,10 +64,12 @@ Niveaux : **Critique** = à corriger avant d'accepter de vrais utilisateurs ou d
 
 - **Vue `certifications_public` (alerte « Security Definer View »)** : elle doit être lisible par tous et ne montre que les certifications vérifiées, sans justificatif.
 - **Table `admins` sans règle** : volontairement illisible depuis le site.
+- **Fonction `admin_stats` appelable par les membres connectés** : elle vérifie elle-même que l'appelant est admin et renvoie uniquement des totaux.
 - **Fonctions `is_admin_id`, `deals_done`, `open_support` appelables** : le site en a besoin. Elles ne renvoient que « oui/non », un nombre de deals par membre, ou ouvrent une conversation avec le support.
 
 ## Points vérifiés sur les nouvelles fonctions
 
+- **07/11/2026 – Statistiques admin** : nouvelle fonction `admin_stats()` (section 15 de `supabase.sql`). Elle ne renvoie que des totaux (aucun nom, e-mail ni message), refuse tout compte non admin (testé : « forbidden ») et n'est pas appelable sans être connecté. Le contrôle Supabase la signale comme « fonction appelable par les membres connectés » : c'est voulu, la vérification admin est faite à l'intérieur. Aucune donnée modifiée.
 - **07/11/2026 – Polices hébergées sur le site** : Bricolage Grotesque, Figtree et Instrument Serif sont servies depuis `fonts/` (licence OFL jointe) au lieu de Google Fonts. Plus aucune adresse IP de visiteur n'est envoyée à Google pour afficher les pages ; le site ne dépose toujours aucun cookie non indispensable, donc pas de bandeau cookies nécessaire.
 - **05/11/2026 – Mentions légales** : page statique, aucune donnée collectée. Signale que le badge « Entreprise vérifiée » ne prouve pas que la personne est le dirigeant.
 - **02/11/2026 – Nouvelle marketplace** : tout le texte des profils est échappé avant affichage, les photos (avatar, portfolio) ne passent que si ce sont de vraies images, les filtres se font dans le navigateur sur des profils déjà publics (aucune nouvelle donnée exposée). Les favoris restent dans le navigateur du visiteur (rien n'est envoyé à Dealr). Pour la distance, seuls des noms de villes et codes postaux sont envoyés au service public de géocodage (IGN, Base Adresse Nationale), déjà utilisé pour les adresses ; aucune donnée nominative.

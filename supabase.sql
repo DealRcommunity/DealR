@@ -674,3 +674,70 @@ begin
   end if;
   return new;
 end $$;
+
+-- =====================================================================
+-- 15. Statistiques du tableau de bord admin (07/11/2026)
+--     Une seule fonction de calcul : ne renvoie que des chiffres (aucun nom,
+--     e-mail ou message), réservée aux administrateurs, ne modifie rien.
+--     Les comptes admin et les conversations d'assistance sont exclus.
+-- =====================================================================
+create or replace function public.admin_stats() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare r jsonb;
+begin
+  if not public.is_admin() then
+    raise exception 'forbidden' using errcode = '42501';
+  end if;
+  with
+  u as (select au.id, au.created_at from auth.users au where not exists (select 1 from public.admins a where a.user_id = au.id)),
+  p as (select pr.data d from public.profiles pr join u on u.id = pr.id),
+  pro as (select d from p where coalesce(d->>'t', 'Freelance') <> 'Particulier'),
+  cv as (select c.id from public.conversations c
+         where not exists (select 1 from public.admins a where a.user_id in (c.user_a, c.user_b))),
+  msg as (select m.created_at from public.messages m join cv on cv.id = m.conv where m.kind in ('text', 'file')),
+  dl as (select d.* from public.deals d join cv on cv.id = d.conv),
+  done as (select x.uid, count(*) as n from (
+             select payer as uid from dl where status = 'released'
+             union all select payee from dl where status = 'released') x group by x.uid),
+  wk as (select generate_series(date_trunc('week', now()) - interval '11 weeks', date_trunc('week', now()), interval '1 week') as w)
+  select jsonb_build_object(
+    'members', jsonb_build_object(
+      'total', (select count(*) from u),
+      'freelance', (select count(*) from p where coalesce(d->>'t', 'Freelance') = 'Freelance'),
+      'entreprise', (select count(*) from p where d->>'t' = 'Entreprise'),
+      'particulier', (select count(*) from p where d->>'t' = 'Particulier'),
+      'new7', (select count(*) from u where created_at > now() - interval '7 days'),
+      'new30', (select count(*) from u where created_at > now() - interval '30 days')),
+    'weekly', (select jsonb_agg(jsonb_build_object('w', to_char(w, 'YYYY-MM-DD'),
+                 'n', (select count(*) from u where created_at >= wk.w and created_at < wk.w + interval '1 week')) order by w) from wk),
+    'profiles', jsonb_build_object(
+      'total', (select count(*) from p),
+      'pros', (select count(*) from pro),
+      'complete', (select count(*) from p where coalesce(d->>'n', '') <> '' and coalesce(d->>'city', '') <> ''
+                     and (d->>'t' = 'Particulier' or (
+                       coalesce(d->>'job', '') <> ''
+                       and jsonb_typeof(d->'skills') = 'array' and jsonb_array_length(d->'skills') >= 3
+                       and length(coalesce(d->>'bio', '')) >= 40
+                       and coalesce(d->>'rate', '') ~ '^[0-9]+([.][0-9]+)?$' and (d->>'rate')::numeric > 0))),
+      'siret', (select count(*) from pro where length(trim(coalesce(d#>>'{legal,name}', ''))) >= 2
+                  and public.siren_ok(regexp_replace(coalesce(d#>>'{legal,siren}', ''), '\D', '', 'g'))
+                  and length(trim(coalesce(d#>>'{legal,addr}', ''))) >= 8),
+      'validated', (select count(*) from done join u on u.id = done.uid where done.n >= 4)),
+    'activity', jsonb_build_object(
+      'conversations', (select count(*) from cv),
+      'messages', (select count(*) from msg),
+      'messages7', (select count(*) from msg where created_at > now() - interval '7 days'),
+      'deals', (select count(*) from dl),
+      'accepted', (select count(*) from dl where accepted_at is not null
+                     or status in ('accepted', 'funded', 'delivered', 'released', 'disputed', 'refunded')),
+      'released', (select count(*) from dl where status = 'released')),
+    'reviews', jsonb_build_object(
+      'n', (select count(*) from public.reviews),
+      'avg', (select round(avg(rating)::numeric, 2) from public.reviews)),
+    'categories', (select coalesce(jsonb_agg(jsonb_build_object('c', c, 'n', n) order by n desc, c), '[]'::jsonb)
+                   from (select d->>'c' as c, count(*) as n from pro where coalesce(d->>'c', '') <> '' group by 1) s)
+  ) into r;
+  return r;
+end $$;
+revoke all on function public.admin_stats() from public, anon;
+grant execute on function public.admin_stats() to authenticated;

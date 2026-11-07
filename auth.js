@@ -797,6 +797,42 @@
       .then(function (c) { return c.from("deals").select("*").order("updated_at", { ascending: false }).limit(500); })
       .then(check);
   };
+  /* Statistiques de la plateforme (chiffres seulement) : fonction admin_stats côté base, recalculée ici en mode démo */
+  A.adminStats = function () {
+    return needAdmin().then(function () {
+      if (!demo) return client().then(function (c) { return c.rpc("admin_stats"); }).then(check);
+      function get(k) { try { return JSON.parse(localStorage.getItem("dealr_demo_" + k)) || []; } catch (e) { return []; } }
+      var users = get("users").filter(function (u) { return !isAdminEmail(u.email); }), ids = {};
+      users.forEach(function (u) { ids[u.id] = 1; });
+      var ps = get("profiles").filter(function (r) { return ids[r.id]; }).map(function (r) { return r.data || {}; });
+      var pros = ps.filter(function (d) { return d.t !== "Particulier"; });
+      var cv = get("conversations").filter(function (c) { return ids[c.user_a] && ids[c.user_b]; }), cid = {};
+      cv.forEach(function (c) { cid[c.id] = 1; });
+      var msg = get("messages").filter(function (m) { return cid[m.conv] && (m.kind === "text" || m.kind === "file"); });
+      var dl = get("deals").filter(function (d) { return cid[d.conv]; }), done = {};
+      dl.forEach(function (d) { if (d.status === "released") { done[d.payer] = (done[d.payer] || 0) + 1; done[d.payee] = (done[d.payee] || 0) + 1; } });
+      var rv = get("reviews"), wk = [], now = new Date(), mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+      for (var i = 11; i >= 0; i--) { var w = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() - 7 * i);
+        wk.push({ w: w.getFullYear() + "-" + ("0" + (w.getMonth() + 1)).slice(-2) + "-" + ("0" + w.getDate()).slice(-2), n: 0 }); }
+      var cats = {};
+      pros.forEach(function (d) { if (d.c) cats[d.c] = (cats[d.c] || 0) + 1; });
+      var week = Date.now() - 7 * 864e5;
+      return {
+        members: { total: users.length, freelance: ps.filter(function (d) { return (d.t || "Freelance") === "Freelance"; }).length,
+          entreprise: ps.filter(function (d) { return d.t === "Entreprise"; }).length, particulier: ps.filter(function (d) { return d.t === "Particulier"; }).length,
+          new7: null, new30: null },
+        weekly: wk,
+        profiles: { total: ps.length, pros: pros.length, complete: ps.filter(function (d) { return !A.profileMissing(d).length; }).length,
+          siret: pros.filter(function (d) { return A.legalOk(d); }).length,
+          validated: Object.keys(done).filter(function (k) { return ids[k] && done[k] >= A.DEALS_BADGE; }).length },
+        activity: { conversations: cv.length, messages: msg.length, messages7: msg.filter(function (m) { return new Date(m.created_at) > week; }).length,
+          deals: dl.length, accepted: dl.filter(function (d) { return d.accepted_at || /^(accepted|funded|delivered|released|disputed|refunded)$/.test(d.status); }).length,
+          released: dl.filter(function (d) { return d.status === "released"; }).length },
+        reviews: { n: rv.length, avg: rv.length ? Math.round(rv.reduce(function (a, r) { return a + (+r.rating || 0); }, 0) / rv.length * 100) / 100 : null },
+        categories: Object.keys(cats).map(function (c) { return { c: c, n: cats[c] }; }).sort(function (a, b) { return b.n - a.n || (a.c < b.c ? -1 : 1); })
+      };
+    });
+  };
   A.getConversation = function (id) {
     return client().then(function (c) { return getConv(c, id); });
   };

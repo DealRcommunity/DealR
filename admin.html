@@ -126,6 +126,42 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 .denied{max-width:520px;margin:80px auto;background:#fff;border-radius:22px;padding:30px;text-align:center;border:1px solid var(--line)}
 .denied h1{font-size:2rem;margin-bottom:10px}
 
+/* Statistiques de la plateforme */
+.kpi{margin:34px 0 60px;scroll-margin-top:20px}
+.kpi-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.kpi-h h2{font-size:clamp(1.6rem,3vw,2.1rem)}
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kt{background:#fff;border-radius:18px;padding:16px 18px;border:1px solid var(--line);min-width:0}
+.kt .l{color:var(--mute);font-size:.86rem;font-weight:600}
+.kt b{display:block;font:800 1.9rem "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin-top:4px;font-variant-numeric:tabular-nums}
+.kt .s{display:block;color:var(--mute);font-size:.84rem;margin-top:2px}
+.kcharts{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;margin-top:12px}
+.kc{background:#fff;border-radius:18px;padding:18px;border:1px solid var(--line);min-width:0}
+.kc h3{font-size:1.1rem;margin-bottom:4px}
+.kc .sub{margin:0 0 14px}
+.vb{display:flex;align-items:flex-end;gap:2px;height:170px;border-bottom:1px solid #d9d9e0;padding-top:22px}
+.vb .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;outline:0}
+.vb .bar{width:min(70%,30px);background:#3448f0;border-radius:4px 4px 0 0;min-height:2px}
+.vb .c.z .bar{background:#dcdff5}
+.vb .c .v{position:absolute;bottom:calc(var(--h) + 4px);font-size:.75rem;font-weight:700;color:var(--ink);opacity:0;transition:opacity .15s;white-space:nowrap}
+.vb .c:hover .v,.vb .c:focus .v,.vb .c.last .v{opacity:1}
+.vb .c:hover .bar,.vb .c:focus .bar{background:#2234c4}
+.vx{display:flex;gap:2px;margin-top:6px}
+.vx span{flex:1;text-align:center;font-size:.72rem;color:var(--mute);white-space:nowrap;overflow:hidden}
+.hb{display:grid;gap:10px}
+.hr{display:grid;grid-template-columns:minmax(0,9em) minmax(0,1fr) auto;align-items:center;gap:10px;font-size:.9rem}
+.hr .t{height:14px;background:#f0f0f4;border-radius:4px;overflow:hidden}
+.hr .t i{display:block;height:100%;background:#3448f0;border-radius:0 4px 4px 0;min-width:2px}
+.hr .n{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hr .k{color:#45454d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc details{margin-top:12px;font-size:.86rem}
+.kc details summary{cursor:pointer;color:var(--mute);font-weight:600}
+.kc table{width:100%;border-collapse:collapse;margin-top:8px}
+.kc td,.kc th{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.kempty{color:var(--mute);font-size:.9rem}
+@media(max-width:980px){.kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.kcharts{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:420px){.kt b{font-size:1.55rem}}
+
 @media(max-width:980px){
  .stats{grid-template-columns:1fr 1fr}
  .board{grid-template-columns:1fr}
@@ -147,7 +183,7 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 <main class="wrap" id="main">
   <div class="top">
     <div><h1>Centre des <em>litiges.</em></h1><p class="sub" style="margin:8px 0 0">Examinez les deals bloqués, lisez la conversation, décidez où va l’argent du coffre.</p></div>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><a class="btn out" href="admin-certifs.html" id="certLink">Certifications à vérifier<span class="cn" id="nCert" hidden></span></a><span class="sub" id="upd"></span></div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><a class="btn out" href="#kpi">Statistiques</a><a class="btn out" href="admin-certifs.html" id="certLink">Certifications à vérifier<span class="cn" id="nCert" hidden></span></a><span class="sub" id="upd"></span></div>
   </div>
   <div class="stats" id="stats"></div>
   <div class="board" id="board">
@@ -166,6 +202,18 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
       <div class="detail" id="detail" hidden></div>
     </section>
   </div>
+  <section class="kpi" id="kpi" aria-labelledby="kpiT">
+    <div class="kpi-h">
+      <div><h2 id="kpiT">Statistiques de la <em>plateforme.</em></h2><p class="sub" style="margin:6px 0 0">Chiffres calculés depuis la base Dealr. Les comptes admin et les conversations d’assistance ne sont pas comptés.</p></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="sub" id="kUpd"></span><button type="button" class="btn out sm" id="kRef">Actualiser</button></div>
+    </div>
+    <div class="kgrid" id="kTiles"><p class="kempty">Chargement des statistiques…</p></div>
+    <div class="kcharts">
+      <div class="kc"><h3>Inscriptions par semaine</h3><p class="sub">Les 12 dernières semaines. Survolez une barre pour voir le nombre.</p><div id="kWeek"></div></div>
+      <div class="kc"><h3>Parcours des deals</h3><p class="sub">Des deals proposés jusqu’aux deals payés.</p><div id="kFunnel"></div>
+        <h3 style="margin-top:22px">Métiers les plus présents</h3><p class="sub">Freelances et entreprises, par catégorie.</p><div id="kCats"></div></div>
+    </div>
+  </section>
 </main>
 
 <dialog id="dConf" aria-labelledby="cfT">
@@ -340,6 +388,49 @@ function loadThread(){
 document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
   document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderList()}});
 $("q").oninput=renderList;
+/* ---------- Statistiques ---------- */
+function nb(n){return n==null?"—":Number(n).toLocaleString("fr-FR")}
+function pc(a,b){return b?Math.round(a/b*100)+" %":"—"}
+function tile(l,v,sub){var t=h("div","kt");t.appendChild(h("span","l",l));t.appendChild(h("b","",v));if(sub)t.appendChild(h("span","s",sub));return t}
+function hbars(box,rows,max){box.textContent="";var w=h("div","hb");
+  rows.forEach(function(r){var row=h("div","hr");row.appendChild(h("span","k",r[0]));var t=h("span","t");var i=h("i");i.style.width=(max?Math.max(r[1]/max*100,r[1]?2:0):0)+"%";t.appendChild(i);row.appendChild(t);
+    row.appendChild(h("span","n",nb(r[1])+(r[2]?" · "+r[2]:"")));w.appendChild(row)});box.appendChild(w)}
+function renderKpi(s){
+  var m=s.members||{},p=s.profiles||{},a=s.activity||{},rv=s.reviews||{},box=$("kTiles");box.textContent="";
+  var nw=m.new7==null?"":"+"+nb(m.new7)+" sur 7 jours · +"+nb(m.new30)+" sur 30 jours";
+  box.appendChild(tile("Membres inscrits",nb(m.total),nw));
+  box.appendChild(tile("Freelances",nb(m.freelance),pc(m.freelance,p.total)+" des profils"));
+  box.appendChild(tile("Entreprises",nb(m.entreprise),pc(m.entreprise,p.total)+" des profils"));
+  box.appendChild(tile("Particuliers",nb(m.particulier),pc(m.particulier,p.total)+" des profils"));
+  box.appendChild(tile("Profils complets",nb(p.complete),pc(p.complete,p.total)+" des "+nb(p.total)+" profils"));
+  box.appendChild(tile("SIRET renseigné",nb(p.siret),pc(p.siret,p.pros)+" des freelances et entreprises"));
+  box.appendChild(tile("Profils validés",nb(p.validated),"Plus de 3 deals conclus"));
+  box.appendChild(tile("Conversations",nb(a.conversations),nb(a.messages7)+" messages sur 7 jours · "+nb(a.messages)+" au total"));
+  box.appendChild(tile("Deals proposés",nb(a.deals),nb(a.accepted)+" acceptés"));
+  box.appendChild(tile("Deals conclus et payés",nb(a.released),"Taux : "+pc(a.released,a.deals)+" des deals proposés"));
+  box.appendChild(tile("Avis laissés",nb(rv.n),rv.avg==null?"Pas encore de note":"Note moyenne : "+String(rv.avg).replace(".",",")+" / 5"));
+  box.appendChild(tile("Métiers représentés",nb((s.categories||[]).length),"Catégories avec au moins un profil"));
+  /* Inscriptions par semaine */
+  var wk=s.weekly||[],max=Math.max.apply(null,wk.map(function(x){return +x.n||0}).concat([1])),kw=$("kWeek");kw.textContent="";
+  if(m.new7==null){kw.appendChild(h("p","kempty","Disponible avec la vraie base (les dates d’inscription ne sont pas enregistrées en mode démonstration)."))}
+  else{var vb=h("div","vb");vb.setAttribute("role","img");vb.setAttribute("aria-label","Inscriptions par semaine sur les 12 dernières semaines");var vx=h("div","vx");
+    wk.forEach(function(x,i){var d=new Date(x.w+"T12:00:00"),lab=d.toLocaleDateString("fr-FR",{day:"numeric",month:"short"}),n=+x.n||0;
+      var c=h("div","c"+(n?"":" z")+(i===wk.length-1?" last":""));c.tabIndex=0;var ht=Math.round(n/max*100);c.style.setProperty("--h",ht+"%");
+      c.title="Semaine du "+lab+" : "+n+" inscription"+(n>1?"s":"");c.setAttribute("aria-label",c.title);
+      var b=h("span","bar");b.style.height=ht+"%";c.appendChild(h("span","v",String(n)));c.appendChild(b);vb.appendChild(c);vx.appendChild(h("span","",i%2?"":d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"})))});
+    kw.appendChild(vb);kw.appendChild(vx);
+    var dt=h("details");dt.appendChild(h("summary","","Voir le tableau"));var tb=h("table"),hd=h("tr");hd.appendChild(h("th","","Semaine du"));hd.appendChild(h("th","","Inscriptions"));tb.appendChild(hd);
+    wk.forEach(function(x){var tr=h("tr");tr.appendChild(h("td","",new Date(x.w+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"long"})));tr.appendChild(h("td","",nb(x.n)));tb.appendChild(tr)});dt.appendChild(tb);kw.appendChild(dt)}
+  /* Parcours des deals */
+  hbars($("kFunnel"),[["Proposés",a.deals||0,""],["Acceptés",a.accepted||0,pc(a.accepted,a.deals)],["Payés",a.released||0,pc(a.released,a.deals)]],a.deals||0);
+  /* Catégories */
+  var cs=(s.categories||[]).slice(0,8),cb=$("kCats");
+  if(!cs.length){cb.textContent="";cb.appendChild(h("p","kempty","Aucun profil avec une catégorie pour l’instant."))}
+  else hbars(cb,cs.map(function(x){return[x.c,+x.n||0,""]}),Math.max.apply(null,cs.map(function(x){return +x.n||0})));
+  $("kUpd").textContent="Mis à jour à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+}
+function loadKpi(){$("kRef").disabled=true;return A.adminStats().then(renderKpi).catch(function(e){var b=$("kTiles");b.textContent="";b.appendChild(h("p","kempty","Statistiques indisponibles : "+A.message(e)))}).then(function(){$("kRef").disabled=false})}
+$("kRef").onclick=loadKpi;
 var email="";
 A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.isAdmin()}).then(function(ok){
   document.body.classList.remove("wait");
@@ -350,6 +441,7 @@ A.requireUser("admin.html").then(function(u){me=u.id;email=u.email||"";return A.
     var row=h("div","row");row.style.justifyContent="center";
     row.appendChild(btn("Se connecter en admin","",function(){A.signOut().then(function(){location.href="connexion.html?next=admin.html"})}));
     var a=h("a","btn out","Retour à l’accueil");a.href="index.html";row.appendChild(a);dn.appendChild(row);m.appendChild(dn);return}
+  loadKpi();
   return load().then(function(){var first=all.filter(function(d){return d.status==="disputed"})[0];
     if(first&&window.innerWidth>980){sel=first;renderList();renderDetail()}});
 }).catch(function(e){document.body.classList.remove("wait");$("main").textContent=A.message(e)});
