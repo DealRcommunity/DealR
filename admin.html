@@ -39,6 +39,7 @@ h1{font-size:clamp(2rem,4vw,2.8rem)}
 .sub{color:var(--mute);font-size:.9rem}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
 .stat{background:#fff;border-radius:18px;padding:14px 16px;border:1px solid var(--line)}
+.stat .sub+b+.sub{display:block;margin-top:2px;font-size:.8rem}
 .stat b{display:block;font:800 1.7rem "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin-top:2px}
 .stat.alert{border-color:#f3c2bb;background:#fff7f6}.stat.alert b{color:var(--red)}
 .cn{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:.72rem;margin-left:8px;padding:0 6px}
@@ -131,6 +132,7 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
 .kpi-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .kpi-h h2{font-size:clamp(1.6rem,3vw,2.1rem)}
 .kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kgh{font-size:1.05rem;margin:18px 0 10px}
 .kt{background:#fff;border-radius:18px;padding:16px 18px;border:1px solid var(--line);min-width:0}
 .kt .l{color:var(--mute);font-size:.86rem;font-weight:600}
 .kt b{display:block;font:800 1.9rem "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin-top:4px;font-variant-numeric:tabular-nums}
@@ -207,6 +209,9 @@ dialog h2{font-size:1.5rem;margin-bottom:8px}
       <div><h2 id="kpiT">Statistiques de la <em>plateforme.</em></h2><p class="sub" style="margin:6px 0 0">Chiffres calculés depuis la base Dealr. Les comptes admin et les conversations d’assistance ne sont pas comptés.</p></div>
       <div style="display:flex;align-items:center;gap:10px"><span class="sub" id="kUpd"></span><button type="button" class="btn out sm" id="kRef">Actualiser</button></div>
     </div>
+    <h3 class="kgh">Revenus de Dealr</h3>
+    <div class="kgrid" id="kMoney"></div>
+    <h3 class="kgh">Membres et activité</h3>
     <div class="kgrid" id="kTiles"><p class="kempty">Chargement des statistiques…</p></div>
     <div class="kcharts">
       <div class="kc"><h3>Inscriptions par semaine</h3><p class="sub">Les 12 dernières semaines. Survolez une barre pour voir le nombre.</p><div id="kWeek"></div></div>
@@ -257,9 +262,10 @@ function renderStats(){
   var open=all.filter(function(d){return d.status==="disputed"}),vault=all.filter(function(d){return /^(funded|delivered|disputed)$/.test(d.status)}),
       paid=all.filter(function(d){return d.status==="released"}),sum=function(l){return l.reduce(function(a,d){return a+(+d.amount||0)},0)};
   var box=$("stats");box.textContent="";
-  [["Litiges ouverts",String(open.length),open.length?"alert":""],["Argent bloqué en litige",eur(sum(open)),open.length?"alert":""],
-   ["Argent au coffre (total)",eur(sum(vault)),""],["Deals payés",paid.length+" · "+eur(sum(paid)),""]].forEach(function(r){
-    var t=h("div","stat "+r[2]);t.appendChild(h("span","sub",r[0]));t.appendChild(h("b","",r[1]));box.appendChild(t)});
+  [["Litiges ouverts",String(open.length),open.length?"alert":"","Deals que le client conteste"],["Argent bloqué en litige",eur(sum(open)),open.length?"alert":"","Montant des deals en litige"],
+   ["Argent au coffre",eur(sum(vault)),"","Payé par les clients, pas encore versé aux freelances"],["Versé aux freelances",eur(sum(paid)),"",paid.length+" deal"+(paid.length>1?"s":"")+" terminé"+(paid.length>1?"s":"")+" · ce que les freelances ont reçu"]].forEach(function(r){
+    var t=h("div","stat "+r[2]);t.appendChild(h("span","sub",r[0]));t.appendChild(h("b","",r[1]));t.appendChild(h("span","sub",r[3]));box.appendChild(t)});
+  renderMoney(paid)
   $("nOpen").textContent=open.length;$("nOpen").hidden=!open.length}
 
 function inTab(d){
@@ -390,6 +396,17 @@ function loadThread(){
 document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){tab=b.dataset.tab;
   document.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});renderList()}});
 $("q").oninput=renderList;
+/* ---------- Revenus de Dealr ----------
+   Les commissions et les abonnements ne sont pas encore actifs (paiements simulés, grille dans COMMISSION.md).
+   Tant que c'est le cas : 0 € réel, avec une estimation selon la grille (client 5 % + freelance 7 %, 5 € minimum). */
+function renderMoney(paid){
+  var box=$("kMoney");if(!box)return;box.textContent="";
+  var est=paid.reduce(function(a,d){var x=+d.amount||0;return a+Math.max(x*0.12,5)},0);
+  box.appendChild(tile("Commissions gagnées par Dealr","0 €","Pas encore facturées : les paiements sont simulés. Avec la grille prévue, ces deals auraient rapporté environ "+eur(est)+"."));
+  box.appendChild(tile("Revenus des abonnements","0 €","Les abonnements Pro et Premium ne sont pas encore ouverts."));
+  box.appendChild(tile("Total gagné par Dealr","0 €","Commissions + abonnements, avant frais Stripe et cotisations."));
+  box.appendChild(tile("Abonnements en cours","0","Pro : 0 · Premium : 0"));
+}
 /* ---------- Statistiques ---------- */
 function nb(n){return n==null?"—":Number(n).toLocaleString("fr-FR")}
 function pc(a,b){return b?Math.round(a/b*100)+" %":"—"}
@@ -409,7 +426,7 @@ function renderKpi(s){
   box.appendChild(tile("Profils validés",nb(p.validated),"Plus de 3 deals conclus"));
   box.appendChild(tile("Conversations",nb(a.conversations),nb(a.messages7)+" messages sur 7 jours · "+nb(a.messages)+" au total"));
   box.appendChild(tile("Deals proposés",nb(a.deals),nb(a.accepted)+" acceptés"));
-  box.appendChild(tile("Deals conclus et payés",nb(a.released),"Taux : "+pc(a.released,a.deals)+" des deals proposés"));
+  box.appendChild(tile("Taux de réussite",pc(a.released,a.deals),nb(a.released)+(a.released>1?" deals terminés":" deal terminé")+" sur "+nb(a.deals)+" proposé"+(a.deals>1?"s":"")));
   box.appendChild(tile("Avis laissés",nb(rv.n),rv.avg==null?"Pas encore de note":"Note moyenne : "+String(rv.avg).replace(".",",")+" / 5"));
   box.appendChild(tile("Métiers représentés",nb((s.categories||[]).length),"Catégories avec au moins un profil"));
   /* Inscriptions par semaine */
